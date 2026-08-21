@@ -1,67 +1,62 @@
-# Artifact-First Engineering Workflow
+# Gabriel's agent skills
 
-This repo packages a reusable artifact-first engineering workflow for repo-local and cross-repo work. It is primarily a filesystem layout, a set of Markdown manuals, and installable skills that help agents and engineers work from durable artifacts instead of chat history.
+Portable personal skills and workstation guidance for Codex and other compatible coding agents.
 
-`Artifact-first` means the durable artifact comes before the conversation. Active research, plans, status artifacts, and decision records live in the shared context root; repo-local docs capture durable knowledge worth keeping after implementation. Chat is only a way to produce or refine those artifacts, not the long-term system of record.
+This repository contains behavior that is specific to Gabriel's workflow but reusable across projects. Third-party skills remain installed from their upstream repositories. Project-specific skills stay in the projects that own their assumptions.
 
-Planning in this workflow follows a QRSPI-style path: Questions, Research when needed, Design, Structure, and Plan before implementation. `PI` still means `Plan -> Implement` and `RPI` still means `Research -> Plan -> Implement`; those labels are shorthand for the common execution paths, not the full planning method.
+## Install
 
-This repo has three parts:
+List the available skills:
 
-1. Guidance for what to add to `~/.codex/AGENTS.md`
-2. A practical installation and usage manual for the workflow
-3. Skill source folders you can install into agent setups
+```bash
+npx skills add gabrielrojasc/skills --list
+```
 
-The package uses `artifact-first` as the top-level term:
+Install them globally:
 
-- `artifact-first` = the workflow family and package
-- `repo-local` = work contained within one repo
-- `cross-repo` = work that spans more than one repo
-- `service` = a repo-owned runtime component
+```bash
+npx skills add gabrielrojasc/skills -g
+```
 
-Users should adapt directory roots to their own setup. The docs use examples such as `~/git`, `~/src`, `~/code`, `~/work/repos`, `~/git/engineering-context`, and `~/tmp/_ai_scratch`, but none of those paths are mandatory.
-
-## Inspiration
-
-This workflow is explicitly inspired by:
-
-- OpenAI's [Harness engineering: leveraging Codex in an agent-first world](https://openai.com/index/harness-engineering)
-- HumanLayer's [advanced-context-engineering-for-coding-agents](https://github.com/humanlayer/advanced-context-engineering-for-coding-agents)
-
-The influence shows up in artifact-first working habits, planning discipline, context compaction, and the idea that shared execution artifacts plus versioned durable knowledge should be the main system of record.
-
-## Start Here
-
-- Clone this repo, then run `scripts/install.sh` to install the starter home files and live skill symlinks.
-- Run `scripts/render-home-agents-snippet.sh` to print the ready-to-merge `~/.codex/AGENTS.md` snippet with the default workstation paths filled in.
-- [`~/.codex/AGENTS.md` guidance](docs/home-agents-guide.md)
-- [Install and use manual](docs/install-and-use.md)
-- [Workflow examples](docs/workflow-examples.md)
-- [Reusable home guidance snippet](templates/HOME.AGENTS.snippets.md)
+The repository does not provide a second skill installer. The `skills` CLI owns installation, updates, and lock tracking.
 
 ## Skills
 
-Canonical skill sources live in [`skills/`](skills/):
+- [`git-workspace`](skills/git-workspace/SKILL.md) manages bare-container repositories under `~/git`, persistent default-branch worktrees, and isolated task worktrees.
+- [`evidence-comparison-report`](skills/evidence-comparison-report/SKILL.md) creates persistent, auditable comparison reports with explicit write authority and evidence controls.
+- [`gh-review-comments`](skills/gh-review-comments/SKILL.md) fetches unresolved GitHub review threads and proposes fix, dismissal, or already-addressed decisions before any mutation.
 
-The `af` prefix stands for `artifact-first`.
+Matt Pocock's skills cover general research, specification, implementation, TDD, architecture, and review. They are intentionally not copied here.
 
-- [`af-research`](skills/af-research/SKILL.md): Analyze one or more repositories and produce a compact, evidence-backed research artifact for artifact-first engineering work.
-- [`af-workspace`](skills/af-workspace/SKILL.md): Add, repair, list, and sync bare-container repos so default-branch browsing and initiative worktrees live under each repo container.
-- [`af-plan`](skills/af-plan/SKILL.md): Create mini-plans for `PI` (`Plan -> Implement`) work and phased plans for `RPI` (`Research -> Plan -> Implement`) work using QRSPI-style interactive alignment and inline research when needed.
-- [`af-implement`](skills/af-implement/SKILL.md): Execute an approved artifact-first plan phase by phase with explicit exits back to planning or research.
-- [`af-iterate`](skills/af-iterate/SKILL.md): Apply targeted revisions to an existing artifact-first plan when the structure still holds but specific sections need updates.
-- [`af-archive`](skills/af-archive/SKILL.md): Archive completed or abandoned initiatives by removing worktrees, cleaning branches, and moving context from active to archive.
-- [`gh-review-comments`](skills/gh-review-comments/SKILL.md): Fetch PR review comments, assess fix-versus-dismiss decisions, and produce an approval proposal before changing code or replying on GitHub.
+## Global guidance
 
-## What This Workflow Optimizes For
+Print the Linear-first user-level `AGENTS.md` section:
 
-- Shared context execution artifacts as the main source of truth for active work
-- Repo-local docs as the durable home for long-lived repo knowledge
-- Short, map-like agent guidance instead of giant manuals
-- Plans as first-class artifacts
-- Compacting useful exploration into durable Markdown
-- Generated dark-mode-first HTML views of artifacts for easy human reading, with Markdown staying the source of truth
-- Version-grounded framework and library references when repo evidence alone is not enough
-- Explicit separation of automated verification from manual verification
-- Bounded implementation adaptation with explicit status logging instead of brittle plan matching
-- Returning to research when ownership, boundaries, or evidence are unclear
+```bash
+scripts/render-global-agents-snippet.sh
+```
+
+The renderer writes to stdout only. See [`docs/global-agents-guidance.md`](docs/global-agents-guidance.md) for the ownership boundary and merge instructions.
+
+## Repository layout
+
+```text
+skills/       Installable personal skills
+scripts/      Repository validation and guidance rendering
+templates/    Source templates for generated guidance
+docs/         Supporting documentation
+```
+
+## Development
+
+After changing a skill, metadata file, or script, run:
+
+```bash
+scripts/validate-skills.sh
+```
+
+The validator checks skill names, strict Codex metadata shape, invocation-policy consistency, README links, script executability, syntax, retired AF directories, and whitespace errors in staged or unstaged changes.
+
+## License
+
+[MIT](LICENSE)

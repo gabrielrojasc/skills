@@ -3,7 +3,9 @@ name: gh-review-comments
 description: fetch GitHub PR review comments for one or more PRs, assess whether each unresolved item should be fixed or dismissed, and produce an approval proposal before editing code or replying.
 ---
 
-# GitHub Review Comment Triage
+# GitHub review comment triage
+
+Resolve `<SKILL_DIR>` as the directory containing this `SKILL.md` before running the bundled helper.
 
 ## Overview
 
@@ -23,7 +25,7 @@ Use this skill when the user asks to:
    - If no PR is provided, use the PR associated with the current branch.
    - For multiple PRs, keep the findings grouped by PR.
 2. Fetch comments.
-   - Run `scripts/fetch-pr-comments.py <pr> [<pr> ...]` for unresolved inline review threads.
+   - Run `<SKILL_DIR>/scripts/fetch-pr-comments.py <pr> [<pr> ...]` for unresolved inline review threads.
    - Unresolved review threads are the default.
    - Use `--all-threads` only when the user asks to inspect resolved threads too.
    - Use `--include-context` only when top-level PR conversation comments or review bodies are needed. They can be noisy because bot summaries often include large generated reports.
@@ -42,7 +44,7 @@ Use this skill when the user asks to:
    - Ask one concise chat approval question after the decision pack.
    - Do not edit code or reply on GitHub until the human approves the proposal or a subset of items.
 
-## Decision Pack Format
+## Decision pack format
 
 Keep the proposal compact enough to make a decision without becoming a wall of text. Prefer numbered blocks over tables. Do not force a rigid template when a shorter recommendation is clearer.
 
@@ -75,7 +77,7 @@ Separate items with `───────────────────�
 
 After the decision pack, ask one concise approval question in chat. The user can approve all, approve specific item numbers, skip items, or ask for revisions.
 
-## Approval Rules
+## Approval rules
 
 - The proposal is read-only.
 - Fixes require explicit human approval.
@@ -83,7 +85,7 @@ After the decision pack, ask one concise approval question in chat. The user can
 - Resolving review threads requires explicit human approval separate from posting a reply unless the user already asked to resolve them.
 - If the human approves only some items, handle only those items.
 
-## Posting Replies After Approval
+## Posting replies after approval
 
 Use the least broad mutation needed:
 

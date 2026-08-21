@@ -1,0 +1,3 @@
+interface:
+  display_name: "Evidence Comparison Report"
+  short_description: "Create an auditable comparison artifact"
