@@ -1,3 +1,5 @@
 interface:
   display_name: "GitHub Review Comments"
   short_description: "Triage unresolved PR review threads"
+policy:
+  allow_implicit_invocation: false
