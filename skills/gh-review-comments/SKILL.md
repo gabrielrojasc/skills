@@ -1,6 +1,6 @@
 ---
 name: gh-review-comments
-description: Use when triaging unresolved GitHub PR review comments.
+description: Triages PR feedback. Use when reviewing unresolved comments.
 disable-model-invocation: true
 ---
 

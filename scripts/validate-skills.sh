@@ -12,6 +12,13 @@ fail() {
   failed=1
 }
 
+has_description_shape() {
+  case "$1" in
+    ?*". Use when "?*.) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 if ! git -C "$repo_root" diff --quiet --exit-code --; then
   fail "working tree differs from the staged snapshot; stage or restore changes before validation"
 fi
@@ -118,8 +125,8 @@ for skill_dir in "${repo_root}"/skills/*; do
         fail "${folder_name} description must be an unquoted YAML scalar"
         ;;
       *)
-        if [ "${declared_description#Use when }" = "$declared_description" ]; then
-          fail "${folder_name} description must start with 'Use when '"
+        if ! has_description_shape "$declared_description"; then
+          fail "${folder_name} description must use '<what it does>. Use when <trigger>.'"
         elif [ "${#declared_description}" -lt 25 ] || [ "${#declared_description}" -gt 64 ]; then
           fail "${folder_name} description must be 25-64 characters"
         fi

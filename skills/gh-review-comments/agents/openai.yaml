@@ -1,5 +1,5 @@
 interface:
   display_name: "GitHub Review Comments"
-  short_description: "Use when triaging unresolved GitHub PR review comments."
+  short_description: "Triages PR feedback. Use when reviewing unresolved comments."
 policy:
   allow_implicit_invocation: false

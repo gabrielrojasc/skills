@@ -1,3 +1,3 @@
 interface:
   display_name: "Python Environments"
-  short_description: "Use when creating or repairing Python project environments."
+  short_description: "Manages Python venvs. Use when setting up or repairing one."

@@ -1,3 +1,3 @@
 interface:
   display_name: "Git Workspace"
-  short_description: "Use when managing repositories and task worktrees under ~/git."
+  short_description: "Manages Git workspaces. Use when adding repos or task worktrees."

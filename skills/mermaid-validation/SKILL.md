@@ -1,6 +1,6 @@
 ---
 name: mermaid-validation
-description: Use when creating, editing, or fixing Mermaid diagrams.
+description: Validates Mermaid diagrams. Use when creating or editing them.
 ---
 
 # Mermaid validation

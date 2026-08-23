@@ -1,6 +1,6 @@
 ---
 name: developer-documentation-style
-description: Use when writing, editing, or reviewing developer docs.
+description: Applies Google's live guide. Use when working on developer docs.
 metadata:
   source: https://developers.google.com/style/
   source_owner: Google LLC

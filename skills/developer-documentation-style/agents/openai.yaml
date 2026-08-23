@@ -1,3 +1,3 @@
 interface:
   display_name: "Developer Documentation Style"
-  short_description: "Use when writing, editing, or reviewing developer docs."
+  short_description: "Applies Google's live guide. Use when working on developer docs."

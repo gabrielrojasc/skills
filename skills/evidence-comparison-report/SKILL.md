@@ -1,6 +1,6 @@
 ---
 name: evidence-comparison-report
-description: Use when creating a reusable evidence-backed comparison.
+description: Builds comparison reports. Use when the result must be reusable.
 ---
 
 # Evidence comparison report

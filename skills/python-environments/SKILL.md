@@ -1,6 +1,6 @@
 ---
 name: python-environments
-description: Use when creating or repairing Python project environments.
+description: Manages Python venvs. Use when setting up or repairing one.
 ---
 
 # Python environments

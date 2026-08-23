@@ -1,6 +1,6 @@
 ---
 name: git-workspace
-description: Use when managing repositories and task worktrees under ~/git.
+description: Manages Git workspaces. Use when adding repos or task worktrees.
 ---
 
 # Git workspace
