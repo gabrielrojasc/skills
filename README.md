@@ -25,6 +25,9 @@ The repository does not provide a second skill installer. The `skills` CLI owns 
 - [`git-workspace`](skills/git-workspace/SKILL.md) manages bare-container repositories under `~/git`, persistent default-branch worktrees, and isolated task worktrees.
 - [`evidence-comparison-report`](skills/evidence-comparison-report/SKILL.md) creates persistent, auditable comparison reports with explicit write authority and evidence controls.
 - [`gh-review-comments`](skills/gh-review-comments/SKILL.md) fetches unresolved GitHub review threads and proposes fix, dismissal, or already-addressed decisions before any mutation.
+- [`google-developer-docs-style`](skills/google-developer-docs-style/SKILL.md) applies the official Google editorial guide when requested or declared by a repository.
+- [`python-environments`](skills/python-environments/SKILL.md) creates and manages project-local Python environments with `uv venv` while preserving each repository's dependency workflow.
+- [`mermaid-validation`](skills/mermaid-validation/SKILL.md) renders and inspects changed Mermaid diagrams with Mermaid CLI.
 
 Matt Pocock's skills cover general research, specification, implementation, TDD, architecture, and review. They are intentionally not copied here.
 

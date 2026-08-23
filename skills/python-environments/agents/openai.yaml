@@ -1,0 +1,3 @@
+interface:
+  display_name: "Python Environments"
+  short_description: "Manage Python project environments with uv"

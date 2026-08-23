@@ -1,0 +1,3 @@
+interface:
+  display_name: "Mermaid Validation"
+  short_description: "Render and inspect Mermaid diagrams"

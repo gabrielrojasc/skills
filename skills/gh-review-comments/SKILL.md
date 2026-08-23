@@ -1,6 +1,6 @@
 ---
 name: gh-review-comments
-description: fetch GitHub PR review comments for one or more PRs, assess whether each unresolved item should be fixed or dismissed, and produce an approval proposal before editing code or replying.
+description: Triage unresolved GitHub PR review comments before fixes or replies.
 disable-model-invocation: true
 ---
 

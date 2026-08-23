@@ -13,7 +13,7 @@
 - Give every skill a `SKILL.md` whose frontmatter name matches its directory.
 - Add `agents/openai.yaml` for Codex display metadata and invocation policy.
 - Keep ordered agent steps in `SKILL.md`. Move branch-specific reference material behind a direct pointer under `references/`.
-- Put repeatable mechanics in `scripts/`; keep workstation policy in the global guidance template.
+- Put repeatable mechanics in `scripts/`. Keep cross-task policy in the global guidance template and domain-specific workflow in the skill that triggers it.
 - Choose model invocation only when the agent must discover the skill itself. Otherwise set `disable-model-invocation: true`.
 
 ## Change rules
