@@ -1,6 +1,6 @@
 ---
 name: mermaid-validation
-description: Validate Mermaid diagrams by rendering them with Mermaid CLI. Use when creating or editing Mermaid blocks or `.mmd` files, or when diagnosing Mermaid parse and rendering failures.
+description: Use when creating, editing, or fixing Mermaid diagrams.
 ---
 
 # Mermaid validation

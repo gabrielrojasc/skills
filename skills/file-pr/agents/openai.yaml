@@ -1,0 +1,3 @@
+interface:
+  display_name: "File Pull Request"
+  short_description: "Use when the user asks to file, open, or create a PR."

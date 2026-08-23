@@ -1,6 +1,6 @@
 ---
 name: python-environments
-description: Manage Python project environments with uv. Use when creating or repairing a Python virtual environment, selecting a Python version, installing project dependencies, or running commands that require a project-local Python environment.
+description: Use when creating or repairing Python project environments.
 ---
 
 # Python environments

@@ -1,0 +1,3 @@
+interface:
+  display_name: "Developer Documentation Style"
+  short_description: "Use when writing, editing, or reviewing developer docs."

@@ -1,6 +1,6 @@
 ---
 name: evidence-comparison-report
-description: Create a persistent, auditable comparison report when the user explicitly asks for a reusable report, scorecard, buying guide, or benchmark across alternatives that require evidence synthesis.
+description: Use when creating a reusable evidence-backed comparison.
 ---
 
 # Evidence comparison report

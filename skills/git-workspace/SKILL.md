@@ -1,6 +1,6 @@
 ---
 name: git-workspace
-description: Manage bare-container repositories under ~/git and their isolated task worktrees. Use when adding, repairing, listing, or syncing repository containers, or when implementation needs a task worktree outside the persistent default-branch checkout.
+description: Use when managing repositories and task worktrees under ~/git.
 ---
 
 # Git workspace

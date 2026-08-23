@@ -100,11 +100,50 @@ for skill_dir in "${repo_root}"/skills/*; do
     fail "${folder_name} declares name '${declared_name}'"
   fi
 
+  declared_description="$(awk '
+    NR == 1 && $0 == "---" { in_frontmatter = 1; next }
+    in_frontmatter && $0 == "---" { exit }
+    in_frontmatter && $0 ~ /^description:[[:space:]]+/ {
+      sub(/^description:[[:space:]]+/, "")
+      print
+      exit
+    }
+  ' "$skill_file")"
+
+  if [ -z "$declared_description" ]; then
+    fail "${folder_name} must declare a single-line description"
+  else
+    case "$declared_description" in
+      \"*|*\"|\'*|*\')
+        fail "${folder_name} description must be an unquoted YAML scalar"
+        ;;
+      *)
+        if [ "${declared_description#Use when }" = "$declared_description" ]; then
+          fail "${folder_name} description must start with 'Use when '"
+        elif [ "${#declared_description}" -lt 25 ] || [ "${#declared_description}" -gt 64 ]; then
+          fail "${folder_name} description must be 25-64 characters"
+        fi
+        ;;
+    esac
+  fi
+
   if [ ! -f "$metadata_file" ]; then
     fail "${folder_name} is missing agents/openai.yaml"
   elif ! validate_openai_metadata "$metadata_file"; then
     fail "${folder_name} has invalid agents/openai.yaml structure"
   else
+    metadata_description="$(awk '
+      /^  short_description: "[^"]+"$/ {
+        sub(/^  short_description: "/, "")
+        sub(/"$/, "")
+        print
+        exit
+      }
+    ' "$metadata_file")"
+    if [ "$declared_description" != "$metadata_description" ]; then
+      fail "${folder_name} description differs between SKILL.md and agents/openai.yaml"
+    fi
+
     skill_disables_implicit=false
     metadata_disables_implicit=false
     if awk '
