@@ -1,6 +1,6 @@
 # Global agent guidance
 
-The repository owns one short section for the user-level `AGENTS.md`. Its purpose is to define the Linear and Git ownership boundary and route implementation into `$git-workspace`.
+The repository owns one short section for the user-level `AGENTS.md`. Its purpose is to define the Linear and Git ownership boundary and route implementation into the `git-workspace` skill.
 
 The canonical template is [`templates/GLOBAL.AGENTS.snippet.md`](../templates/GLOBAL.AGENTS.snippet.md). Print it with:
 

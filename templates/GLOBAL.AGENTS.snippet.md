@@ -4,6 +4,6 @@
 - I use Linear as my default issue tracker unless a repository states otherwise. Linear owns active scope, dependencies, ownership, and progress. Git owns code, branches, worktrees, and commits.
 - Fetching Linear data is read-only. Get my explicit approval before creating or updating issues, projects, comments, or workflow state.
 - I keep repository containers under `<REPOS_ROOT>/<repo>/`. The persistent default-branch worktree lives at `<REPOS_ROOT>/<repo>/<default-branch>/` and is used for browsing and synchronization.
-- Before implementation, use `$git-workspace` to create or select an isolated task worktree. If I explicitly ask you to use the current checkout, follow that instruction instead.
+- Before implementation, use the `git-workspace` skill to create or select an isolated task worktree. If I explicitly ask you to use the current checkout, follow that instruction instead.
 - Keep stable technical knowledge in repository documentation and ADRs. Do not mirror active Linear state into planning files.
 <!-- END gabrielrojasc/skills -->

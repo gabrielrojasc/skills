@@ -29,7 +29,7 @@ The current request must explicitly authorize a persistent artifact. Prior conte
    - Use weights only when the evidence supports that precision.
 3. Research the unresolved dimensions.
    - Prefer primary sources, then independent testing and real-world evidence.
-   - Use the installed `$research` skill when reading legwork should run in a background agent and its repo-local research file is within the approved artifact scope.
+   - Use the installed `research` skill when reading legwork should run in a background agent and its repo-local research file is within the approved artifact scope.
    - A research task may name several repositories. Split it only when independent questions benefit from separate agents.
 4. Reconcile claims.
    - Record strong supporting evidence, contradictions, currentness, and confidence.
