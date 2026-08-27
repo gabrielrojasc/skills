@@ -35,19 +35,18 @@ Depart from the guide when a higher authority requires it or when the guide
 allows a clearer, more consistent choice for the intended readers. Do not
 present personal judgment as a Google rule.
 
-## Read upstream first
+## Use upstream selectively
 
-Read `https://developers.google.com/style/` on every invocation. Identify the
-document type and editorial questions, then open the official `/style/` pages
-that govern them before drafting, editing, or reporting findings. Do not replace
-this step with remembered or locally distilled rules.
+Identify material editorial questions before browsing. Open only the official
+`https://developers.google.com/style/` pages that answer those questions. Open
+the guide overview for a broad Google-style review or when the relevant page is
+unclear.
 
-Use only the relevant upstream pages. Do not browse the entire guide when the
-task has a narrow scope.
+A narrow task may require no upstream lookup. Attribute a finding to Google or
+claim Google-style compliance only after checking the relevant live page.
 
-If the live guide is unavailable, report that the required source could not be
-read and ask whether to continue with a best-effort editorial pass. Do not claim
-Google-style compliance without reading the upstream guidance.
+If a required live page is unavailable, report that and ask whether to continue
+with a best-effort editorial pass.
 
 ## Workflow
 
@@ -55,7 +54,7 @@ Google-style compliance without reading the upstream guidance.
    scope.
 2. For repository work, read the applicable repository instructions and style
    conventions.
-3. Read the upstream guide and the official pages relevant to the task.
+3. Read only the upstream pages required by the material editorial questions.
 4. Draft, edit, or review within the user's authorization.
 5. Preserve technical meaning, exact identifiers, required terminology, code,
    commands, paths, and citations.
