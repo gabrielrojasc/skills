@@ -82,6 +82,10 @@ After the decision pack, ask one concise approval question in chat. The user can
 
 - The proposal is read-only.
 - Fixes require explicit human approval.
+- For approved fixes, implement only the approved scope. Before committing,
+  trace the changed behavior through affected callers and consumers. Test the
+  reported defect and any relevant edge or failure paths, then run the smallest
+  suite that covers them.
 - Dismissal replies require explicit human approval and must target a review thread.
 - Resolving review threads requires explicit human approval separate from posting a reply unless the user already asked to resolve them.
 - If the human approves only some items, handle only those items.
