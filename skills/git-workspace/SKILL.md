@@ -35,7 +35,10 @@ The helper creates or repairs the bare repository, detects the remote default br
 <SKILL_DIR>/scripts/sync-workspace.sh --repos-root ~/git
 ```
 
-Synchronization fetches every managed repository and fast-forwards only clean default-branch worktrees. Task worktrees are reported but not modified.
+Synchronization fetches every managed repository. When a clean persistent
+worktree has the wrong named branch checked out, it restores the default branch
+before fast-forwarding. Dirty and detached worktrees are reported but not
+modified. Task worktrees are never modified.
 
 ## Create task worktrees
 
@@ -77,5 +80,6 @@ The helper blocks dirty worktrees and branches with unpushed commits. It uses `g
 - Every selected repository resolves inside the requested repositories root.
 - Default branches come from current remote refs.
 - Existing worktrees are reused only when path and branch both match.
-- Synchronization leaves task worktrees unchanged.
+- Synchronization restores clean persistent worktrees to their default branches
+  and leaves task worktrees unchanged.
 - Cleanup preserves dirty, unpushed, or unmerged work.

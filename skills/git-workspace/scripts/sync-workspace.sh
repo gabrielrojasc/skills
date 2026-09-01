@@ -153,6 +153,8 @@ sync_repo() {
   local outcome="failed"
   local default_branch=""
   local default_wt=""
+  local current_branch=""
+  local worktree_status=""
   local local_head=""
   local remote_head=""
 
@@ -177,26 +179,47 @@ sync_repo() {
     elif [ ! -d "$default_wt" ]; then
       log_warning "${repo_name}: default worktree registered but path is gone (run add-repo.sh to repair)"
       outcome="skipped"
-    elif ! configure_default_branch_tracking "$repo_path" "$default_branch"; then
-      log_warning "${repo_name}: could not set ${default_branch} to track origin/${default_branch}"
+    elif ! worktree_status="$(git -C "$default_wt" status --porcelain)"; then
+      log_warning "${repo_name}: could not inspect default worktree"
+      outcome="skipped"
+    elif [ -n "$worktree_status" ]; then
+      log_warning "${repo_name}: default worktree has local changes; skipping repair and fast-forward"
       outcome="skipped"
     else
-      if [ -n "$(git -C "$default_wt" status --porcelain 2>/dev/null)" ]; then
-        log_warning "${repo_name}: default worktree has local changes; skipping fast-forward"
+      current_branch="$(
+        git -C "$default_wt" symbolic-ref --quiet --short HEAD 2>/dev/null ||
+          true
+      )"
+
+      if [ -z "$current_branch" ]; then
+        log_warning "${repo_name}: default worktree has a detached HEAD; skipping automatic repair"
+        outcome="skipped"
+      elif [ "$current_branch" != "$default_branch" ] &&
+        ! git -C "$default_wt" switch --quiet "$default_branch"; then
+        log_warning "${repo_name}: could not restore ${default_branch}; it may be checked out elsewhere"
         outcome="skipped"
       else
-        local_head="$(git -C "$default_wt" rev-parse HEAD 2>/dev/null || true)"
-        remote_head="$(git -C "$default_wt" rev-parse "origin/${default_branch}" 2>/dev/null || true)"
+        if [ "$current_branch" != "$default_branch" ]; then
+          log_success "${repo_name}: restored ${default_branch} from ${current_branch}"
+        fi
 
-        if [ -n "$local_head" ] && [ "$local_head" = "$remote_head" ]; then
-          log_info "${repo_name}: ${default_branch} already up to date"
-          outcome="synced"
-        elif git -C "$default_wt" merge --ff-only "origin/${default_branch}" >/dev/null 2>&1; then
-          log_success "${repo_name}: ${default_branch} fast-forwarded to origin/${default_branch}"
-          outcome="synced"
-        else
-          log_warning "${repo_name}: ${default_branch} diverged from origin/${default_branch} (local commits); skipping"
+        if ! configure_default_branch_tracking "$repo_path" "$default_branch"; then
+          log_warning "${repo_name}: could not set ${default_branch} to track origin/${default_branch}"
           outcome="skipped"
+        else
+          local_head="$(git -C "$default_wt" rev-parse HEAD 2>/dev/null || true)"
+          remote_head="$(git -C "$default_wt" rev-parse "origin/${default_branch}" 2>/dev/null || true)"
+
+          if [ -n "$local_head" ] && [ "$local_head" = "$remote_head" ]; then
+            log_info "${repo_name}: ${default_branch} already up to date"
+            outcome="synced"
+          elif git -C "$default_wt" merge --ff-only "origin/${default_branch}" >/dev/null 2>&1; then
+            log_success "${repo_name}: ${default_branch} fast-forwarded to origin/${default_branch}"
+            outcome="synced"
+          else
+            log_warning "${repo_name}: ${default_branch} diverged from origin/${default_branch} (local commits); skipping"
+            outcome="skipped"
+          fi
         fi
       fi
     fi
