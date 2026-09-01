@@ -1,17 +1,18 @@
 ---
 name: file-pr
-description: Creates a draft PR. Use when asked to file or open one.
+description: Creates a ready PR. Use when asked to file or open one.
 ---
 
 # File a pull request
 
-Create one concise draft pull request whose title and description explain why
-the change matters.
+Create one concise ready-for-review pull request whose title and description
+explain why the change matters.
 
 The user's request to file, open, or create a pull request authorizes the
-read-only inspection, one necessary non-force branch push, and one draft pull
-request creation described here. It does not authorize code changes, rebases,
-comments, review-thread resolution, merge, closure, or marking the PR ready.
+read-only inspection, one necessary non-force branch push, and one
+ready-for-review pull request creation described here. It does not authorize
+code changes, rebases, comments, review-thread resolution, merge, closure, or
+changing the state of an existing pull request.
 
 ## Preflight
 
@@ -48,9 +49,9 @@ comments, review-thread resolution, merge, closure, or marking the PR ready.
 
 1. Push the current branch once when the remote branch is missing or behind. Use
    a normal push; never force-push.
-2. Create the pull request as a draft with the selected base branch, title, and
-   body.
-3. Read the created pull request back and verify its base, head, draft state,
+2. Create the pull request in ready-for-review state with the selected base
+   branch, title, and body.
+3. Read the created pull request back and verify its base, head, ready state,
    title, and body.
 4. Return the pull request URL and any unresolved limitation.
 
@@ -60,15 +61,15 @@ comments, review-thread resolution, merge, closure, or marking the PR ready.
 - Do not include unrelated commits or let the description expand the requested
   scope.
 - Do not create a second pull request for the same branch.
-- Do not comment, request reviewers, change labels, mark ready, merge, or close
-  unless the user separately asks.
+- Do not comment, request reviewers, change labels, change the state of an
+  existing pull request, merge, or close unless the user separately asks.
 - If authentication or repository permissions fail, follow the global external
   service recovery policy. Do not change authentication.
 
 ## Completion criteria
 
-- If a new pull request was required, exactly one draft pull request was created
-  for the branch.
+- If a new pull request was required, exactly one ready-for-review pull request
+  was created for the branch.
 - If an open pull request already existed, it was verified and returned with its
   current state unchanged.
 - The base and head branches are correct.

@@ -1,3 +1,3 @@
 interface:
   display_name: "File Pull Request"
-  short_description: "Creates a draft PR. Use when asked to file or open one."
+  short_description: "Creates a ready PR. Use when asked to file or open one."
