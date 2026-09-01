@@ -1,0 +1,3 @@
+interface:
+  display_name: "Linear GitHub Linking"
+  short_description: "Defines Linear links. Use when naming branches or linking PRs."

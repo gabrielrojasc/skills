@@ -1,0 +1,3 @@
+interface:
+  display_name: "Linear Work Structure"
+  short_description: "Structures Linear work. Use when planning levels or tickets."

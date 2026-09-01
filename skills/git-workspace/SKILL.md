@@ -52,6 +52,10 @@ Create the worktree before implementation when the current checkout is a persist
 
 Repeat `--repo` when one task changes multiple repositories. The helper creates the same branch and worktree name in each selected repository. Omit `--ticket` for work without a tracker issue.
 
+For Linear-tracked work, apply `linear-gh-linking` before selecting
+`--ticket`. Pass the exact executable issue or sub-issue ID. The helper keeps
+the lowercased ID in the branch name.
+
 Rerunning the same command reuses an exact registered worktree. A conflicting path, branch, or registration stops the run.
 
 ## Remove task worktrees
