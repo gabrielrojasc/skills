@@ -3,7 +3,7 @@
 ## Tracker and implementation workspace
 
 - I use Linear as my default issue tracker unless a repository states otherwise. Linear owns active scope, dependencies, ownership, and progress. Git owns code, branches, worktrees, and commits.
-- By default, write `to-spec` output under `~/tmp/specs/` as unpublished Markdown for review and iteration.
+- `to-spec` always writes an unpublished Markdown spec under `~/tmp/specs/`. It must not create or update Linear entities.
 - Use the approved spec as input to `to-tickets`; publish approved tickets to the chosen Linear project.
 - Fetching Linear data is read-only. Get my explicit approval before creating or updating issues, projects, comments, or workflow state, except status updates for authorized work: started when work begins, review when ready, and completed after verification.
 - Leave Linear labels unchanged unless I explicitly ask to create, apply, or remove one. Skill defaults do not count as approval.
