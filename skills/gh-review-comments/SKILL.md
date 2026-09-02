@@ -41,7 +41,14 @@ Use this skill when the user asks to:
    - **Dismiss with reply**: the comment is incorrect, stale, out of scope, or outweighed by existing constraints.
    - **Already addressed**: the diff or code already handles it; propose a short confirming reply only if useful.
    - Every item must get one of these recommendations. If a comment depends on product, ownership, rollout, or style preference, choose the best recommendation from the evidence and make the assumption explicit in the proposal.
-5. Produce a compact decision pack and ask for approval.
+5. Have independent subagents adversarially review every preliminary recommendation.
+   - For each actionable item, dispatch an independent judgment-tier subagent with the review comment, relevant code and diff evidence, preliminary classification, assessment, and proposed action. The subagent reviews only and makes no changes.
+   - The primary agent may revise recommendations, but only the assigned subagent's verdict satisfies this review gate. Never replace or waive the delegated review with primary-agent self-review.
+   - Ask it to make the strongest evidence-backed case that the recommendation is wrong, identify missed callers, contracts, tests, or edge cases, and propose a better recommendation when needed.
+   - Check each critique against the source evidence and revise the recommendation when the critique holds.
+   - Send the revised recommendation back to its assigned subagent. Continue the delegated review-revise loop until the subagent returns `No material objection` or further resolution requires evidence or a human choice outside the current scope.
+   - If a material disagreement remains, state it and the deciding assumption in the decision pack. Do not present disputed judgment as settled fact.
+6. Produce a compact decision pack and ask for approval.
    - Ask one concise chat approval question after the decision pack.
    - Do not edit code or reply on GitHub until the human approves the proposal or a subset of items.
 
