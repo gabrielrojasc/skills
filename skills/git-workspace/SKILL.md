@@ -61,6 +61,13 @@ the lowercased ID in the branch name.
 
 Rerunning the same command reuses an exact registered worktree. A conflicting path, branch, or registration stops the run.
 
+Fresh task branches have no upstream. On the first authorized push, use
+`git push -u origin HEAD` to track the matching remote task branch. Reusing or
+attaching an existing branch preserves its upstream configuration.
+
+Run `bash <SKILL_DIR>/tests/test-upstream.sh` to verify upstream handling with
+temporary local repositories. The test requires Bash and Git, with no network access.
+
 ## Remove task worktrees
 
 Cleanup is destructive. Present the exact worktrees and branches first, then get explicit human approval before running:

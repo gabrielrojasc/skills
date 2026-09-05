@@ -306,7 +306,8 @@ for i in "${!repo_paths[@]}"; do
       created=$((created + 1))
       ;;
     create)
-      if ! git -C "${repo_paths[$i]}" worktree add "${worktree_paths[$i]}" -b "$branch_name" "origin/${default_branches[$i]}" >/dev/null; then
+      # The default branch is a starting point; the task upstream is set on first push.
+      if ! git -C "${repo_paths[$i]}" worktree add --no-track "${worktree_paths[$i]}" -b "$branch_name" "origin/${default_branches[$i]}" >/dev/null; then
         log_error "Could not create ${worktree_paths[$i]}."
         rollback_created_worktrees "$i"
         exit 1
