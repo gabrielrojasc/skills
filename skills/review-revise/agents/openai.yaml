@@ -1,0 +1,5 @@
+interface:
+  display_name: "Review-revise"
+  short_description: "Reviews and revises. Use when adversarial loops are requested."
+policy:
+  allow_implicit_invocation: true

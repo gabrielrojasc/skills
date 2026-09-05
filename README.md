@@ -31,6 +31,7 @@ The repository does not provide a second skill installer. The `skills` CLI owns 
 - [`file-pr`](skills/file-pr/SKILL.md) reviews the committed branch diff and opens one concise ready-for-review pull request without changing code.
 - [`python-environments`](skills/python-environments/SKILL.md) creates and manages project-local Python environments with `uv venv` while preserving each repository's dependency workflow.
 - [`mermaid-validation`](skills/mermaid-validation/SKILL.md) renders and inspects changed Mermaid diagrams with Mermaid CLI.
+- [`review-revise`](skills/review-revise/SKILL.md) runs bounded adversarial review-revise loops with independent reviewers and evidence-backed revisions.
 
 Matt Pocock's skills cover general research, specification, implementation, TDD, architecture, and review. They are intentionally not copied here.
 
