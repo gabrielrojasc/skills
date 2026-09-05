@@ -1,6 +1,6 @@
 # Gabriel's agent skills
 
-Portable personal skills and workstation guidance for Codex and other compatible coding agents.
+Portable personal skills for Codex and other compatible coding agents.
 
 This repository contains behavior that is specific to Gabriel's workflow but reusable across projects. Third-party skills remain installed from their upstream repositories. Project-specific skills stay in the projects that own their assumptions.
 
@@ -34,23 +34,11 @@ The repository does not provide a second skill installer. The `skills` CLI owns 
 
 Matt Pocock's skills cover general research, specification, implementation, TDD, architecture, and review. They are intentionally not copied here.
 
-## Global guidance
-
-Print the Linear-first user-level `AGENTS.md` section:
-
-```bash
-scripts/render-global-agents-snippet.sh
-```
-
-The renderer writes to stdout only. See [`docs/global-agents-guidance.md`](docs/global-agents-guidance.md) for the ownership boundary and merge instructions.
-
 ## Repository layout
 
 ```text
 skills/       Installable personal skills
-scripts/      Repository validation and guidance rendering
-templates/    Source templates for generated guidance
-docs/         Supporting documentation
+scripts/      Repository validation
 ```
 
 ## Development

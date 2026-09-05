@@ -23,7 +23,7 @@ if ! git -C "$repo_root" diff --quiet --exit-code --; then
   fail "working tree differs from the staged snapshot; stage or restore changes before validation"
 fi
 
-if git -C "$repo_root" ls-files --others --exclude-standard -- README.md scripts skills templates | grep -q .; then
+if git -C "$repo_root" ls-files --others --exclude-standard -- README.md scripts skills | grep -q .; then
   fail "untracked validation inputs exist; stage or remove them before validation"
 fi
 
