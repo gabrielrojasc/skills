@@ -26,19 +26,20 @@ Use this skill when the user asks to:
    - If no PR is provided, use the PR associated with the current branch.
    - For multiple PRs, keep the findings grouped by PR.
 2. Fetch comments.
-   - Run `<SKILL_DIR>/scripts/fetch-pr-comments.py <pr> [<pr> ...]` for unresolved inline review threads.
-   - Unresolved review threads are the default.
+   - Run `<SKILL_DIR>/scripts/fetch-pr-comments.py <pr> [<pr> ...]` for unresolved inline review threads, top-level PR conversation comments, and review bodies by default.
    - Use `--all-threads` only when the user asks to inspect resolved threads too.
-   - Use `--include-context` only when top-level PR conversation comments or review bodies are needed. They can be noisy because bot summaries often include large generated reports.
-   - Treat top-level PR conversation comments and review bodies as context only. Do not turn review-summary text, bot summaries, or non-threadable nitpicks into reply targets.
+   - Use `--threads-only` only when the user limits triage to inline threads.
+   - Inspect each thread's `comments.pageInfo`. If `hasNextPage` is true, fetch remaining comments with `gh api graphql` using the thread ID and `endCursor`, continuing until complete. Missing pagination metadata also means completeness is unknown. If full history cannot be obtained, report the evidence gap instead of finalizing that item's triage and leave the thread open.
+   - Extract concrete concerns from `conversation_comments` and `reviews`, including bot summaries. Top-level feedback has no thread-resolution status; check whether the current code or later discussion addresses it.
+   - Merge duplicate concerns across sources, retaining their source URLs. Treat status reports, praise, and summaries without concrete concerns as context.
 3. Inspect the relevant code.
    - Read the cited files, diff hunks, tests, and nearby code before judging a comment.
    - If the local checkout is not the PR branch, prefer `gh pr diff <pr>` and read-only `gh api` lookups over changing branches.
    - Do not make code changes, post comments, resolve threads, or change PR state during assessment.
 4. Classify each actionable item.
-   - An actionable item is an unresolved review thread returned under `review_threads`.
+   - An actionable item is an unresolved review thread or a distinct concrete concern from a top-level comment or review body. Split independent concerns in one body into separate items.
    - **Fix**: the comment identifies a real defect, missing behavior, contract mismatch, test gap, or maintainability problem worth changing.
-   - **Dismiss with reply**: the comment is incorrect, stale, out of scope, or outweighed by existing constraints.
+   - **Dismiss**: the comment is incorrect, stale, out of scope, or outweighed by existing constraints. Propose a reply only when useful.
    - **Already addressed**: the diff or code already handles it; propose a short confirming reply only if useful.
    - Every item must get one of these recommendations. If a comment depends on product, ownership, rollout, or style preference, choose the best recommendation from the evidence and make the assumption explicit in the proposal.
 5. Have independent subagents adversarially review every preliminary recommendation.
@@ -51,6 +52,10 @@ Use this skill when the user asks to:
 6. Produce a compact decision pack and ask for approval.
    - Ask one concise chat approval question after the decision pack.
    - Do not edit code or reply on GitHub until the human approves the proposal or a subset of items.
+7. Complete approved actions and resolve addressed inline threads.
+   - For **Fix** and **Already addressed** items, verify that the current PR contains the correction and relevant checks pass before resolving. A local-only fix is not sufficient; preserve existing push approval gates.
+   - Check that every concern in the thread is addressed. Leave partially addressed, disputed, or blocked threads open.
+   - Resolve eligible threads with `resolveReviewThread`, confirm the returned `isResolved` state, and report any failures or threads left open.
 
 ## Decision pack format
 
@@ -62,7 +67,7 @@ Start with a compact rollup:
 - `Dismiss: <count>`
 - `Already addressed: <count>`
 
-Then list each unresolved item as a compact numbered block. Every block must include the finding, severity, assessment, and proposed action. Include the thread URL when it is useful for traceability or when proposing a reply.
+Then list each unresolved item as a compact numbered block. Every block must include the finding, severity, assessment, and proposed action. Include the source URL for traceability and identify whether it is an inline thread, conversation comment, or review body. For inline threads, include the intended resolution in the proposed action.
 
 ```markdown
 ## PR <number>: <title>
@@ -70,16 +75,16 @@ Then list each unresolved item as a compact numbered block. Every block must inc
 Verdict: Fix <count>, dismiss <count>, already addressed <count>.
 
 #: <item-number>
-<reviewer> finding: <path>:<line> - <short concern>
-Thread: <review-thread comment URL>
+<reviewer> finding: <location, if applicable> - <short concern>
+Source: <source type and URL>
 Severity: <P0 | P1 | P2 | P3 | Nit>
 Assessment: <short evidence-backed judgment, usually 2-5 sentences>
-Proposed action: <Fix | Dismiss with thread reply | Already addressed>. <concrete plan or reply rationale>
-Draft thread reply: <only for Dismiss with thread reply or Already addressed>
+Proposed action: <Fix | Dismiss | Already addressed>. <concrete plan or reply rationale>
+Draft reply: <if useful for Dismiss or Already addressed; state the destination>
 ────────────────────────────────────────
 ```
 
-For **Fix** items, omit `Draft thread reply` unless the user asked for fix-response text too. If extra evidence is needed, add one short `Evidence:` line rather than expanding the block into a mini-report. Keep replies concise and scoped to the reviewed code. Do not mention private chat context as evidence.
+For **Fix** items, omit `Draft reply` unless the user asked for fix-response text too. If extra evidence is needed, add one short `Evidence:` line rather than expanding the block into a mini-report. Keep replies concise and scoped to the reviewed code. Do not mention private chat context as evidence.
 
 Separate items with `────────────────────────────────────────` so each recommendation is visually distinct without expanding into a larger template.
 
@@ -93,17 +98,18 @@ After the decision pack, ask one concise approval question in chat. The user can
   trace the changed behavior through affected callers and consumers. Test the
   reported defect and any relevant edge or failure paths, then run the smallest
   suite that covers them.
-- Dismissal replies require explicit human approval and must target a review thread.
-- Resolving review threads requires explicit human approval separate from posting a reply unless the user already asked to resolve them.
+- Replies require explicit human approval of their text and destination. Top-level feedback does not authorize posting or resolving a review thread.
+- Approval to address a **Fix** or **Already addressed** inline item includes resolving its thread after verification, unless the user asks to leave it open. No second approval is needed. Approval to post a reply alone does not authorize resolution.
+- For **Dismiss** items, resolve only when the approved proposal explicitly includes resolution.
 - If the human approves only some items, handle only those items.
 
-## Posting replies after approval
+## Posting replies and resolving threads after approval
 
 Use the least broad mutation needed:
 
 - Inline review thread reply: `gh api graphql` with `addPullRequestReviewThreadReply`.
-- Resolve a thread only when approved: `gh api graphql` with `resolveReviewThread`.
-- Top-level PR comments are out of the default flow. Use `gh pr comment <pr> --body-file <file>` only when the user explicitly asks to post a top-level PR comment, and never as a substitute response for review-summary text or non-threadable nitpicks.
+- Resolve an eligible addressed thread: `gh api graphql` with `resolveReviewThread`, using the review thread's `id`, not a comment or review ID. Top-level comments and review bodies have no resolvable thread state.
+- For an approved response to a conversation comment or review body, use `gh pr comment <pr> --body-file <file>` and link the original source. This creates a new top-level comment; it does not reply to or resolve an inline thread.
 
 Prefer writing reply bodies to a temporary file and passing `--body-file` or `-F body=@<file>` so shell quoting cannot corrupt the message.
 
@@ -115,4 +121,12 @@ Prefer writing reply bodies to a temporary file and passing `--body-file` or `-F
 - Push back on weak review comments when evidence shows they are wrong.
 - Preserve read-only boundaries until the human approves implementation or replies.
 - For multiple PRs, avoid cross-contaminating evidence between PRs unless the same code path is explicitly shared.
-- Do not respond top-level on the PR to review-summary nitpicks, bot rollups, or comments that do not have a review thread. If a concern has no threadable comment, mention it as context only.
+- Judge concrete concerns by evidence, regardless of whether they came from an inline thread, a person, or a bot summary.
+
+## Verify the fetcher
+
+Run the offline regression checks after changing the helper:
+
+```bash
+python3 -B <SKILL_DIR>/tests/test-fetch-pr-comments.py
+```

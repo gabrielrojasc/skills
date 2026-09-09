@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 """
-Fetch GitHub pull request review threads for one or more PRs using the GitHub
-CLI.
+Fetch GitHub pull request feedback for one or more PRs using the GitHub CLI.
 
-Unresolved inline review threads are returned by default because that is the
-normal triage path.
+Return unresolved inline threads, top-level comments, and review bodies by default.
 
 Usage:
   fetch-pr-comments.py https://github.com/owner/repo/pull/123
   fetch-pr-comments.py owner/repo#123 456
-  fetch-pr-comments.py --include-context owner/repo#123
+  fetch-pr-comments.py --threads-only owner/repo#123
   fetch-pr-comments.py --all-threads owner/repo#123
   fetch-pr-comments.py
 
@@ -58,6 +56,7 @@ query(
           originalStartLine
           resolvedBy { login }
           comments(first: 100) {
+            pageInfo { hasNextPage endCursor }
             nodes {
               id
               url
@@ -133,6 +132,7 @@ query(
           originalStartLine
           resolvedBy { login }
           comments(first: 100) {
+            pageInfo { hasNextPage endCursor }
             nodes {
               id
               url
@@ -268,6 +268,7 @@ def fetch_pr(owner: str, repo: str, number: int, include_context: bool, include_
     if include_context:
         cursors.update({"commentsCursor": None, "reviewsCursor": None})
 
+    finished: set[str] = set()
     pr_meta: dict[str, Any] | None = None
     query = CONTEXT_QUERY if include_context else THREADS_QUERY
 
@@ -291,19 +292,23 @@ def fetch_pr(owner: str, repo: str, number: int, include_context: bool, include_
                 "reviewDecision": pr["reviewDecision"],
             }
 
-        threads_page = pr["reviewThreads"]
-        extend_unique(threads, seen_threads, threads_page.get("nodes") or [])
-        cursors["threadsCursor"] = page_info(threads_page)
-
+        connections = [("reviewThreads", "threadsCursor", threads, seen_threads)]
         if include_context:
-            comments_page = pr["comments"]
-            reviews_page = pr["reviews"]
-            extend_unique(comments, seen_comments, comments_page.get("nodes") or [])
-            extend_unique(reviews, seen_reviews, reviews_page.get("nodes") or [])
-            cursors["commentsCursor"] = page_info(comments_page)
-            cursors["reviewsCursor"] = page_info(reviews_page)
+            connections.extend([
+                ("comments", "commentsCursor", comments, seen_comments),
+                ("reviews", "reviewsCursor", reviews, seen_reviews),
+            ])
+        for field, cursor, target, seen in connections:
+            # A completed connection must stay finished while others paginate.
+            if cursor in finished:
+                continue
+            page = pr[field]
+            extend_unique(target, seen, page.get("nodes") or [])
+            cursors[cursor] = page_info(page)
+            if cursors[cursor] is None:
+                finished.add(cursor)
 
-        if not any(cursors.values()):
+        if len(finished) == len(cursors):
             break
 
     if pr_meta is None:
@@ -330,7 +335,7 @@ def fetch_pr(owner: str, repo: str, number: int, include_context: bool, include_
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Fetch unresolved review threads for GitHub pull requests."
+        description="Fetch unresolved threads, top-level comments, and review bodies for GitHub PRs."
     )
     parser.add_argument(
         "prs",
@@ -342,11 +347,20 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Include resolved review threads. By default only unresolved threads are returned.",
     )
-    parser.add_argument(
-        "--include-context",
-        action="store_true",
-        help="Also include top-level PR conversation comments and review bodies.",
+    context = parser.add_mutually_exclusive_group()
+    context.add_argument(
+        "--threads-only",
+        dest="include_context",
+        action="store_false",
+        help="Fetch only inline review threads, omitting top-level comments and review bodies.",
     )
+    context.add_argument(
+        "--include-context",
+        dest="include_context",
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
+    parser.set_defaults(include_context=True)
     parser.add_argument(
         "--unresolved-only",
         action="store_true",
