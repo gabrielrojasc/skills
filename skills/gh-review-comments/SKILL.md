@@ -43,7 +43,7 @@ Use this skill when the user asks to:
    - **Already addressed**: the diff or code already handles it; propose a short confirming reply only if useful.
    - Every item must get one of these recommendations. If a comment depends on product, ownership, rollout, or style preference, choose the best recommendation from the evidence and make the assumption explicit in the proposal.
 5. Have independent subagents adversarially review every preliminary recommendation.
-   - For each actionable item, dispatch an independent judgment-tier subagent with the review comment, relevant code and diff evidence, preliminary classification, assessment, and proposed action. The subagent reviews only and makes no changes.
+   - Dispatch independent reviewers for every actionable item. Related items may share a reviewer; require a separate verdict for each item. Choose each reviewer's model and effort using the active agent-selection policy. Provide the comments, relevant code and diff evidence, classifications, assessments, and proposed actions. Reviewers make no changes.
    - The primary agent may revise recommendations, but only the assigned subagent's verdict satisfies this review gate. Never replace or waive the delegated review with primary-agent self-review.
    - Ask it to make the strongest evidence-backed case that the recommendation is wrong, identify missed callers, contracts, tests, or edge cases, and propose a better recommendation when needed.
    - Check each critique against the source evidence and revise the recommendation when the critique holds.

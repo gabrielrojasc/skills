@@ -1,6 +1,6 @@
 ---
 name: evidence-comparison-report
-description: Builds comparison reports. Use when the result must be reusable.
+description: Compares options. Use when creating a comparison report.
 ---
 
 # Evidence comparison report
@@ -16,7 +16,7 @@ Before research begins, establish:
 - The material decision criteria and hard exclusions.
 - An absolute output path inside a user-approved writable workspace.
 
-The current request must explicitly authorize a persistent artifact. Prior context may inform the report, but it does not authorize a filesystem write. If the request does not establish an output destination, propose one and get approval before writing.
+Write only with explicit approval for the persistent artifact and its output destination. Carry that approval forward from earlier in the conversation unless the user narrows or revokes it. If either approval is missing, propose the artifact or destination and get approval before writing.
 
 ## Workflow
 

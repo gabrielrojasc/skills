@@ -18,6 +18,10 @@ The default-branch worktree is for browsing and synchronization. Implementation 
 
 Resolve `<SKILL_DIR>` as the directory containing this `SKILL.md` before running a bundled helper.
 
+The helpers require Python 3.10+, Git, and Bash. All Python code ships inside
+this skill; no packages or installation step are needed. Keep the bundled
+`scripts/` directory intact when copying the skill.
+
 ## Add or repair a repository
 
 ```bash
@@ -65,9 +69,6 @@ Fresh task branches have no upstream. On the first authorized push, use
 `git push -u origin HEAD` to track the matching remote task branch. Reusing or
 attaching an existing branch preserves its upstream configuration.
 
-Run `bash <SKILL_DIR>/tests/test-upstream.sh` to verify upstream handling with
-temporary local repositories. The test requires Bash and Git, with no network access.
-
 ## Remove task worktrees
 
 Cleanup is destructive. Present the exact worktrees and branches first, then get explicit human approval before running:
@@ -81,6 +82,17 @@ Cleanup is destructive. Present the exact worktrees and branches first, then get
 ```
 
 The helper blocks dirty worktrees and branches with unpushed commits. It uses `git worktree remove` and safe branch deletion with `git branch -d`. Never replace those operations with force deletion.
+
+## Tests
+
+```bash
+bash <SKILL_DIR>/tests/test-upstream.sh
+uv run --no-project --with pytest pytest <SKILL_DIR>/tests/test_workspace.py
+```
+
+Both suites use temporary local repositories without network access. uv may
+download pytest on first use. The Python suite runs a standalone copy of the
+skill from an unrelated working directory.
 
 ## Completion criteria
 

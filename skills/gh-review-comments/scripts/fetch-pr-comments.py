@@ -84,7 +84,10 @@ query(
   $number: Int!,
   $commentsCursor: String,
   $reviewsCursor: String,
-  $threadsCursor: String
+  $threadsCursor: String,
+  $includeComments: Boolean!,
+  $includeReviews: Boolean!,
+  $includeThreads: Boolean!
 ) {
   repository(owner: $owner, name: $repo) {
     pullRequest(number: $number) {
@@ -95,7 +98,7 @@ query(
       state
       isDraft
       reviewDecision
-      comments(first: 100, after: $commentsCursor) {
+      comments(first: 100, after: $commentsCursor) @include(if: $includeComments) {
         pageInfo { hasNextPage endCursor }
         nodes {
           id
@@ -106,7 +109,7 @@ query(
           author { login }
         }
       }
-      reviews(first: 100, after: $reviewsCursor) {
+      reviews(first: 100, after: $reviewsCursor) @include(if: $includeReviews) {
         pageInfo { hasNextPage endCursor }
         nodes {
           id
@@ -117,7 +120,7 @@ query(
           author { login }
         }
       }
-      reviewThreads(first: 100, after: $threadsCursor) {
+      reviewThreads(first: 100, after: $threadsCursor) @include(if: $includeThreads) {
         pageInfo { hasNextPage endCursor }
         nodes {
           id
@@ -220,7 +223,7 @@ def resolve_pr(spec: str | None) -> tuple[str, str, int]:
     return resolve_with_gh(spec)
 
 
-def graphql(owner: str, repo: str, number: int, query: str, cursors: dict[str, str | None]) -> dict[str, Any]:
+def graphql(owner: str, repo: str, number: int, query: str, variables: dict[str, str | bool | None]) -> dict[str, Any]:
     cmd = [
         "gh",
         "api",
@@ -235,8 +238,10 @@ def graphql(owner: str, repo: str, number: int, query: str, cursors: dict[str, s
         f"number={number}",
     ]
 
-    for name, value in cursors.items():
-        if value:
+    for name, value in variables.items():
+        if isinstance(value, bool):
+            cmd.extend(["-F", f"{name}={str(value).lower()}"])
+        elif value:
             cmd.extend(["-F", f"{name}={value}"])
 
     return run_json(cmd, stdin=query)
@@ -267,13 +272,20 @@ def fetch_pr(owner: str, repo: str, number: int, include_context: bool, include_
     cursors: dict[str, str | None] = {"threadsCursor": None}
     if include_context:
         cursors.update({"commentsCursor": None, "reviewsCursor": None})
+    pending = set(cursors)
 
-    finished: set[str] = set()
     pr_meta: dict[str, Any] | None = None
     query = CONTEXT_QUERY if include_context else THREADS_QUERY
 
-    while True:
-        payload = graphql(owner, repo, number, query, cursors)
+    while pending:
+        variables: dict[str, str | bool | None] = dict(cursors)
+        if include_context:
+            variables.update({
+                "includeComments": "commentsCursor" in pending,
+                "includeReviews": "reviewsCursor" in pending,
+                "includeThreads": "threadsCursor" in pending,
+            })
+        payload = graphql(owner, repo, number, query, variables)
         errors = payload.get("errors")
         if errors:
             raise RuntimeError(json.dumps(errors, indent=2))
@@ -292,24 +304,18 @@ def fetch_pr(owner: str, repo: str, number: int, include_context: bool, include_
                 "reviewDecision": pr["reviewDecision"],
             }
 
-        connections = [("reviewThreads", "threadsCursor", threads, seen_threads)]
-        if include_context:
-            connections.extend([
-                ("comments", "commentsCursor", comments, seen_comments),
-                ("reviews", "reviewsCursor", reviews, seen_reviews),
-            ])
-        for field, cursor, target, seen in connections:
-            # A completed connection must stay finished while others paginate.
-            if cursor in finished:
+        for cursor, field, target, seen in (
+            ("threadsCursor", "reviewThreads", threads, seen_threads),
+            ("commentsCursor", "comments", comments, seen_comments),
+            ("reviewsCursor", "reviews", reviews, seen_reviews),
+        ):
+            if cursor not in pending:
                 continue
             page = pr[field]
             extend_unique(target, seen, page.get("nodes") or [])
             cursors[cursor] = page_info(page)
             if cursors[cursor] is None:
-                finished.add(cursor)
-
-        if len(finished) == len(cursors):
-            break
+                pending.remove(cursor)
 
     if pr_meta is None:
         raise RuntimeError(f"GitHub returned no PR data for {owner}/{repo}#{number}")

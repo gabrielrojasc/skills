@@ -59,6 +59,44 @@ run bash "${skill_dir}/scripts/sync-workspace.sh" --repos-root "$repos_root" --j
 assert_upstream "${repo_path}/main" origin/main
 printf 'PASS: sync repairs missing default upstream\n'
 
+original_head="$(git -C "${repo_path}/main" rev-parse HEAD)"
+run git -C "${repo_path}/main" switch -c feature/repair-check
+run git -C "${fixture_dir}/remote" -c user.name=Fixture -c user.email=fixture@example.invalid \
+  -c commit.gpgsign=false commit --allow-empty -m 'Advance remote'
+run bash "${skill_dir}/scripts/add-repo.sh" --repos-root "$repos_root" \
+  --repo-name sample "${fixture_dir}/remote"
+[ "$(git -C "${repo_path}/main" symbolic-ref --short HEAD)" = main ]
+[ "$(git -C "$repo_path" rev-parse feature/repair-check)" = "$original_head" ]
+[ "$(git -C "${repo_path}/main" rev-parse HEAD)" = "$(git -C "$repo_path" rev-parse origin/main)" ]
+printf 'PASS: repair restores default branch without advancing the task branch\n'
+
+run git -C "${repo_path}/main" switch --detach "$original_head"
+if bash "${skill_dir}/scripts/add-repo.sh" --repos-root "$repos_root" \
+  --repo-name sample "${fixture_dir}/remote" >"${fixture_dir}/command.log" 2>&1; then
+  printf 'FAIL: repair accepted a detached worktree\n' >&2
+  exit 1
+fi
+[ "$(git -C "${repo_path}/main" rev-parse HEAD)" = "$original_head" ]
+if git -C "${repo_path}/main" symbolic-ref --quiet HEAD; then
+  printf 'FAIL: repair changed detached HEAD to a branch\n' >&2
+  exit 1
+fi
+printf 'PASS: repair preserves detached HEAD\n'
+
+run git -C "${repo_path}/main" switch feature/repair-check
+printf 'uncommitted work\n' >"${repo_path}/main/local-work.txt"
+if bash "${skill_dir}/scripts/add-repo.sh" --repos-root "$repos_root" \
+  --repo-name sample "${fixture_dir}/remote" >"${fixture_dir}/command.log" 2>&1; then
+  printf 'FAIL: repair accepted a dirty worktree\n' >&2
+  exit 1
+fi
+[ "$(git -C "${repo_path}/main" symbolic-ref --short HEAD)" = feature/repair-check ]
+[ "$(git -C "${repo_path}/main" rev-parse HEAD)" = "$original_head" ]
+[ "$(cat "${repo_path}/main/local-work.txt")" = 'uncommitted work' ]
+mv "${repo_path}/main/local-work.txt" "${fixture_dir}/preserved-work.txt"
+run git -C "${repo_path}/main" switch main
+printf 'PASS: repair preserves dirty worktree and branch\n'
+
 for tracking_mode in true false always inherit simple; do
   run git -C "$repo_path" config branch.autoSetupMerge "$tracking_mode"
   run bash "${skill_dir}/scripts/create-task-worktree.sh" --repos-root "$repos_root" \

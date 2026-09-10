@@ -1,16 +1,16 @@
 ---
 name: file-pr
-description: Creates a ready PR. Use when asked to file or open one.
+description: Creates a PR. Use when asked to file or open one.
 ---
 
 # File a pull request
 
-Create one concise ready-for-review pull request whose title and description
-explain why the change matters.
+Create one concise pull request whose title and description explain why the
+change matters.
 
 The user's request to file, open, or create a pull request authorizes the
-read-only inspection, one necessary non-force branch push, and one
-ready-for-review pull request creation described here. It does not authorize
+read-only inspection, one necessary non-force branch push, and one pull request
+creation described here. It does not authorize
 code changes, rebases, comments, review-thread resolution, merge, closure, or
 changing the state of an existing pull request.
 
@@ -49,9 +49,9 @@ changing the state of an existing pull request.
 
 1. Push the current branch once when the remote branch is missing or behind. Use
    a normal push; never force-push.
-2. Create the pull request in ready-for-review state with the selected base
-   branch, title, and body.
-3. Read the created pull request back and verify its base, head, ready state,
+2. Create the pull request in ready-for-review state unless the user or repository
+   explicitly requests a draft. Use the selected base branch, title, and body.
+3. Read the created pull request back and verify its base, head, requested draft or ready state,
    title, and body.
 4. Return the pull request URL and any unresolved limitation.
 
@@ -60,7 +60,9 @@ changing the state of an existing pull request.
 - Do not change code while preparing the pull request.
 - Do not include unrelated commits or let the description expand the requested
   scope.
-- Do not create a second pull request for the same branch.
+- If a pull request is already open for the branch, return it. Create another
+  only after earlier pull requests are closed or merged and the user explicitly
+  approves creating another.
 - Do not comment, request reviewers, change labels, change the state of an
   existing pull request, merge, or close unless the user separately asks.
 - If authentication or repository permissions fail, follow the global external
@@ -68,8 +70,8 @@ changing the state of an existing pull request.
 
 ## Completion criteria
 
-- If a new pull request was required, exactly one ready-for-review pull request
-  was created for the branch.
+- If a new pull request was required, exactly one pull request was created for
+  the branch in the requested draft or ready state.
 - If an open pull request already existed, it was verified and returned with its
   current state unchanged.
 - The base and head branches are correct.

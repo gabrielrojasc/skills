@@ -45,8 +45,10 @@ unclear.
 A narrow task may require no upstream lookup. Attribute a finding to Google or
 claim Google-style compliance only after checking the relevant live page.
 
-If a required live page is unavailable, report that and ask whether to continue
-with a best-effort editorial pass.
+If a required live page is unavailable, report the gap and continue authorized
+work that does not depend on it. Ask whether to use editorial judgment for the
+blocked portion; leave it unresolved until the user approves a fallback or the
+source becomes available.
 
 ## Workflow
 

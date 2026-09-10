@@ -5,7 +5,7 @@ description: Manages Python venvs. Use when setting up or repairing one.
 
 # Python environments
 
-Use `uv venv` for every Python virtual environment. Keep Python interpreters,
+Use `uv venv` when creating Python virtual environments. Keep Python interpreters,
 tools, and project dependencies out of global language installations.
 
 ## Precedence
@@ -26,8 +26,8 @@ workflow to uv.
 
 1. Identify the project root, required Python version, dependency manager, and
    documented setup command.
-2. Inspect any existing environment before replacing it. Reuse it when it was
-   created by `uv`, uses a compatible Python version, and is healthy.
+2. Inspect any existing environment before replacing it. Reuse it when it uses
+   a compatible Python version and is healthy, regardless of which tool created it.
 3. Create a missing or approved replacement environment with `uv venv`.
    Request the repository's Python version explicitly when configuration does
    not make the choice unambiguous:
@@ -67,7 +67,7 @@ workflow to uv.
 
 ## Completion criteria
 
-- The environment was created by `uv venv` or an existing compatible uv-created
+- The environment was created by `uv venv` or an existing compatible, healthy
   environment was reused.
 - `python` resolves inside the project environment and reports a compatible
   version.

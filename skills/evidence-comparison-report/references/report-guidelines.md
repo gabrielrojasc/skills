@@ -7,7 +7,8 @@ Prefer evidence in this order:
 1. Primary sources such as official specifications, policies, pricing, changelogs, source code, and scientific papers.
 2. Independent tests with disclosed methods.
 3. Real-world reports from owners, users, forums, and long-term reviews.
-4. Counterevidence such as known failures, complaints, and findings that challenge the leading recommendation.
+
+Rank supporting evidence and counterevidence by the same source-quality criteria. Include known failures, complaints, and findings that challenge the leading recommendation.
 
 Treat search snippets, affiliate roundups, marketing claims, and uncited assertions as weak evidence.
 

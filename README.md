@@ -28,7 +28,7 @@ The repository does not provide a second skill installer. The `skills` CLI owns 
 - [`evidence-comparison-report`](skills/evidence-comparison-report/SKILL.md) creates persistent, auditable comparison reports with explicit write authority and evidence controls.
 - [`gh-review-comments`](skills/gh-review-comments/SKILL.md) fetches unresolved GitHub review threads, top-level comments, and review bodies by default and proposes fix, dismissal, or already-addressed decisions before any mutation.
 - [`developer-documentation-style`](skills/developer-documentation-style/SKILL.md) reads the live Google guide before writing, editing, or reviewing developer documentation.
-- [`file-pr`](skills/file-pr/SKILL.md) reviews the committed branch diff and opens one concise ready-for-review pull request without changing code.
+- [`file-pr`](skills/file-pr/SKILL.md) reviews the committed branch diff and opens one concise pull request without changing code.
 - [`python-environments`](skills/python-environments/SKILL.md) creates and manages project-local Python environments with `uv venv` while preserving each repository's dependency workflow.
 - [`mermaid-validation`](skills/mermaid-validation/SKILL.md) renders and inspects changed Mermaid diagrams with Mermaid CLI.
 - [`review-revise`](skills/review-revise/SKILL.md) runs bounded adversarial review-revise loops with independent reviewers and evidence-backed revisions.
@@ -44,13 +44,30 @@ scripts/      Repository validation
 
 ## Development
 
-After changing a skill, metadata file, or script, run:
+Validation requires Python 3.10+, Git, and Bash, with no Python packages.
+After changing a skill, metadata file, or script, stage the changes and run:
 
 ```bash
 scripts/validate-skills.sh
 ```
 
-The validator checks skill names, strict Codex metadata shape, invocation-policy consistency, README links, script executability, syntax, retired AF directories, and whitespace errors in staged or unstaged changes.
+The validator requires a staged snapshot with no unstaged changes or untracked
+validation inputs. It checks skill names, strict Codex metadata shape,
+invocation-policy consistency, README links, script executability, syntax,
+retired AF directories, and whitespace errors.
+
+Run all Python tests with uv and pytest:
+
+```bash
+uv run --no-project --with pytest pytest scripts/tests skills/*/tests
+```
+
+uv supplies pytest in a temporary environment. The helpers and validator still
+use only the Python standard library. Run the shell regression suite separately:
+
+```bash
+bash skills/git-workspace/tests/test-upstream.sh
+```
 
 ## License
 
