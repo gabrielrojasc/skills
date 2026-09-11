@@ -1,0 +1,5 @@
+interface:
+  display_name: "PR review"
+  short_description: "Reviews GitHub PRs. Use when reviewing PRs or your queue."
+policy:
+  allow_implicit_invocation: true

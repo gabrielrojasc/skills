@@ -123,8 +123,9 @@ class Validator:
                 disabled = fields.get("disable-model-invocation") == "true"
                 if disabled != (metadata.get("allow_implicit_invocation") == "false"):
                     self.fail(f"{name} invocation policy disagrees between SKILL.md and agents/openai.yaml")
-        if f"skills/{name}/" not in readme:
-            self.fail(f"README.md does not link skills/{name}/")
+        relative = skill_dir.relative_to(self.root).as_posix()
+        if f"{relative}/" not in readme:
+            self.fail(f"README.md does not link {relative}/")
 
     def validate_scripts(self) -> None:
         for directory in (self.root / "scripts", self.root / "skills"):
@@ -157,11 +158,25 @@ class Validator:
             self.fail(f"cannot read README.md: {exc}")
             readme = ""
         skill_root = self.root / "skills"
-        skill_dirs = sorted(path for path in skill_root.iterdir() if path.is_dir()) if skill_root.is_dir() else []
+        skill_dirs = []
+        categories = []
+        for path in sorted(skill_root.iterdir()) if skill_root.is_dir() else []:
+            if not path.is_dir():
+                continue
+            children = sorted(child for child in path.iterdir() if child.is_dir())
+            if (path / "SKILL.md").is_file() or (path / "agents").is_dir() or not children:
+                skill_dirs.append(path)
+            else:
+                categories.append(path)
+                skill_dirs.extend(children)
+        names: set[str] = set()
         for skill_dir in skill_dirs:
+            if skill_dir.name in names:
+                self.fail(f"duplicate skill name: {skill_dir.name}")
+            names.add(skill_dir.name)
             self.validate_skill(skill_dir, readme)
-            if skill_dir.name.startswith("af-"):
-                self.fail("retired af-* skill directories remain")
+        if any(path.name.startswith("af-") for path in skill_dirs + categories):
+            self.fail("retired af-* skill directories remain")
         if not skill_dirs:
             self.fail("no skills found")
         self.validate_scripts()

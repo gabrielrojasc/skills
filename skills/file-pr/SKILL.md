@@ -57,12 +57,6 @@ changing the state of an existing pull request.
 
 ## Guardrails
 
-- Do not change code while preparing the pull request.
-- Do not include unrelated commits or let the description expand the requested
-  scope.
-- If a pull request is already open for the branch, return it. Create another
-  only after earlier pull requests are closed or merged and the user explicitly
-  approves creating another.
 - Do not comment, request reviewers, change labels, change the state of an
   existing pull request, merge, or close unless the user separately asks.
 - If authentication or repository permissions fail, follow the global external

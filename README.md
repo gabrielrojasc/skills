@@ -22,6 +22,8 @@ The repository does not provide a second skill installer. The `skills` CLI owns 
 
 ## Skills
 
+### General
+
 - [`git-workspace`](skills/git-workspace/SKILL.md) manages bare-container repositories under `~/git`, persistent default-branch worktrees, and isolated task worktrees.
 - [`linear-gh-linking`](skills/linear-gh-linking/SKILL.md) keeps Linear issues attached to their Git branches and pull requests with accurate status semantics.
 - [`linear-work-structure`](skills/linear-work-structure/SKILL.md) chooses among Linear initiatives, projects, milestones, issues, and sub-issues before any tracker mutation.
@@ -35,11 +37,16 @@ The repository does not provide a second skill installer. The `skills` CLI owns 
 
 Matt Pocock's skills cover general research, specification, implementation, TDD, architecture, and review. They are intentionally not copied here.
 
+### ZeroFox
+
+- [`pr-review`](skills/zerofox/pr-review/SKILL.md) reviews PRs using ZeroFox review roles and standards, with checks for unnecessary complexity and documentation quality, independent verification, and approval before posting.
+
 ## Repository layout
 
 ```text
-skills/       Installable personal skills
-scripts/      Repository validation
+skills/          General personal skills
+skills/zerofox/  ZeroFox-specific skills
+scripts/         Repository validation
 ```
 
 ## Development
@@ -59,7 +66,7 @@ retired AF directories, and whitespace errors.
 Run all Python tests with uv and pytest:
 
 ```bash
-uv run --no-project --with pytest pytest scripts/tests skills/*/tests
+uv run --no-project --with pytest pytest scripts/tests skills
 ```
 
 uv supplies pytest in a temporary environment. The helpers and validator still

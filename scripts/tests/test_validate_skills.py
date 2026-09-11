@@ -82,6 +82,29 @@ def test_unstaged_and_untracked_inputs_are_rejected(repo):
     assert_invalid(repo, "untracked validation inputs exist")
 
 
+def test_category_skill_and_inventory_path(repo):
+    category = repo / "skills/zerofox"
+    category.mkdir()
+    (repo / "skills/sample").rename(category / "sample")
+    git(repo, "add", ".")
+    assert_invalid(repo, "README.md does not link skills/zerofox/sample/")
+    write(repo, "README.md", "[Sample](skills/zerofox/sample/)\n")
+    git(repo, "add", ".")
+    assert validate(repo) == (0, "")
+    (category / "sample/agents/openai.yaml").unlink()
+    git(repo, "add", ".")
+    assert_invalid(repo, "missing agents/openai.yaml")
+
+
+def test_duplicate_names_across_categories_are_rejected(repo):
+    write(repo, "skills/zerofox/sample/SKILL.md",
+          f"---\nname: sample\ndescription: {DESCRIPTION}\n---\n")
+    write(repo, "skills/zerofox/sample/agents/openai.yaml", METADATA)
+    write(repo, "README.md", "skills/sample/\nskills/zerofox/sample/\n")
+    git(repo, "add", ".")
+    assert_invalid(repo, "duplicate skill name: sample")
+
+
 @pytest.mark.parametrize("description, expected", [
     ("x. Use when y.", "25-64 characters"),
     ("x" * 65 + ". Use when testing.", "25-64 characters"),

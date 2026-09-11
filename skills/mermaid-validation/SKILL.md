@@ -15,9 +15,7 @@ the bundled helper.
 
 1. Identify every Mermaid block or `.mmd` file changed by the task.
 2. Use the repository's Mermaid validation command when one exists. Otherwise,
-   render each diagram outside the sandbox with the bundled helper. It prefers a
-   repository-local `mmdc`, then `mmdc` on `PATH`, and points Puppeteer at the
-   installed Chrome executable:
+   render each diagram outside the sandbox with the bundled helper:
 
    ```bash
    <SKILL_DIR>/scripts/render-mermaid.sh --input <diagram.mmd>

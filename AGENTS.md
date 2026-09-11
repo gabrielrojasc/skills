@@ -9,7 +9,7 @@
 
 ## Skill structure
 
-- Put each installable skill under `skills/<name>/`.
+- Put each installable skill under `skills/<name>/` or `skills/<category>/<name>/`. Keep ZeroFox-specific skills under `skills/zerofox/`.
 - Give every skill a `SKILL.md` whose frontmatter name matches its directory.
 - Add `agents/openai.yaml` for Codex display metadata and invocation policy.
 - Write each description as a compact, unquoted, single-line `<what it does>. Use when <trigger>.` entrypoint. Keep the `SKILL.md` description and `agents/openai.yaml` `interface.short_description` identical so agents receive the same capability and trigger from either source.

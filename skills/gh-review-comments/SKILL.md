@@ -53,21 +53,16 @@ Use this skill when the user asks to:
    - Ask one concise chat approval question after the decision pack.
    - Do not edit code or reply on GitHub until the human approves the proposal or a subset of items.
 7. Complete approved actions and resolve addressed inline threads.
-   - For **Fix** and **Already addressed** items, verify that the current PR contains the correction and relevant checks pass before resolving. A local-only fix is not sufficient; preserve existing push approval gates.
+   - For **Fix** and **Already addressed** items, verify that the current PR contains the correction and relevant local checks pass before resolving. A local-only fix is not sufficient; preserve existing push approval gates.
+   - Never wait for CI to resolve an addressed thread. Pending or failed CI does not block resolution; handle CI failures separately afterward. Local checks cover the fix and its affected behavior.
    - Check that every concern in the thread is addressed. Leave partially addressed, disputed, or blocked threads open.
-   - Resolve eligible threads with `resolveReviewThread`, confirm the returned `isResolved` state, and report any failures or threads left open.
+   - Before ending, resolve every eligible approved thread with `resolveReviewThread` and confirm the returned `isResolved` state. List each remaining approved thread with its specific blocker or the user's instruction to leave it open. An explanation of unfinished work does not complete the action.
 
 ## Decision pack format
 
 Keep the proposal compact enough to make a decision without becoming a wall of text. Prefer numbered blocks over tables. Do not force a rigid template when a shorter recommendation is clearer.
 
-Start with a compact rollup:
-
-- `Fix: <count>`
-- `Dismiss: <count>`
-- `Already addressed: <count>`
-
-Then list each unresolved item as a compact numbered block. Every block must include the finding, severity, assessment, and proposed action. Include the source URL for traceability and identify whether it is an inline thread, conversation comment, or review body. For inline threads, include the intended resolution in the proposed action.
+List each unresolved item as a compact numbered block. Every block must include the finding, severity, assessment, and proposed action. Include the source URL for traceability and identify whether it is an inline thread, conversation comment, or review body. For inline threads, include the intended resolution in the proposed action.
 
 ```markdown
 ## PR <number>: <title>
@@ -86,9 +81,7 @@ Draft reply: <if useful for Dismiss or Already addressed; state the destination>
 
 For **Fix** items, omit `Draft reply` unless the user asked for fix-response text too. If extra evidence is needed, add one short `Evidence:` line rather than expanding the block into a mini-report. Keep replies concise and scoped to the reviewed code. Do not mention private chat context as evidence.
 
-Separate items with `────────────────────────────────────────` so each recommendation is visually distinct without expanding into a larger template.
-
-After the decision pack, ask one concise approval question in chat. The user can approve all, approve specific item numbers, skip items, or ask for revisions.
+The user can approve all items, approve a subset, skip items, or request revisions.
 
 ## Approval rules
 
