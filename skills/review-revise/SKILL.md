@@ -5,7 +5,7 @@ description: Reviews and revises. Use when adversarial loops are requested.
 
 # Review-revise
 
-Run a bounded adversarial review of code, prose, plans, or recommendations.
+Run an adversarial review of code, prose, plans, or recommendations.
 Use when invoked by name or when the user explicitly asks for an adversarial
 review-revise loop. Ordinary review or implementation requests do not trigger it.
 
@@ -14,8 +14,9 @@ review-revise loop. Ordinary review or implementation requests do not trigger it
 1. Establish the target, requirements, evidence, and authorized edits from the
    current task. A review-only request permits revising the assessment or proposed
    patch, not changing the underlying artifact. Preserve the task's approval gates.
-   Default to one reviewer and at most three review rounds. Honor explicit counts
-   and budgets. State these defaults briefly before dispatch.
+   Default to one reviewer with no fixed round limit. Honor explicit reviewer
+   counts and user-specified budgets. State the reviewer count and any explicit
+   budget briefly before dispatch.
 
 2. Dispatch independent, read-only subagents. Give each the target or exact
    revision, requirements, constraints, relevant source locations, and one bounded
@@ -48,13 +49,22 @@ review-revise loop. Ordinary review or implementation requests do not trigger it
    reviewer whose assignment is affected must review the latest revision. Count
    each review-and-response cycle as one round; parallel reviewers share a round.
 
-5. Stop when all assigned reviewers return `No material objection` for the current
-   target and required checks pass. Otherwise repeat within the budget. Stop early
-   when a round produces no progress on unresolved objections. At the round limit,
-   report remaining objections and any changes still awaiting review. A budget
-   limit, unavailable reviewer, or unresolved disagreement is not a clean result.
+5. Finish when all assigned reviewers return `No material objection` for the
+   current target and required checks pass. Otherwise, the main agent assesses
+   progress after each round. Continue while another round has a concrete path
+   to resolve an objection or verify a revision. A high round count alone is
+   not a reason to stop.
+
+   Stop when the main agent judges the loop is stalling: objections repeat
+   without new evidence, revisions cycle between equivalent alternatives, or
+   further progress requires unavailable evidence or a decision outside scope.
+   Explain why another round would not help, citing the unresolved findings and
+   attempts made. Honor any user-specified budget. Stalling, exhausted budgets,
+   unavailable reviewers, and unresolved disagreements are not clean results.
 
 ## Report
 
 Summarize the changes, checks, reviewer count, rounds used, and remaining
-objections or unverified changes. Keep the report proportional to the work.
+objections or unverified changes. If the loop stalled, state "Stopped after
+<N> rounds because <specific reason>" and what would allow progress to resume.
+Keep the report proportional to the work.

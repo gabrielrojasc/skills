@@ -95,15 +95,30 @@ Inspect additions and modifications for:
 - Comments that merely narrate code, boilerplate explanations, unsupported
   claims, and prose that obscures the actual behavior. Consult unslop for prose.
 
-For each finding, show the concrete maintenance or comprehension cost and a
-smaller alternative that preserves required behavior. Check callers, framework
-behavior, and repository conventions before declaring something unnecessary.
-For non-obvious code simplifications, compare minimal before/after sketches
-in the reviewer's notes.
+Report unnecessary complexity, duplication, noise, or misleading information
+introduced or changed by the diff when you can identify the smallest adequate correction
+that preserves required behavior, useful information, contracts, and repository
+conventions.
 
-Judge the addition itself. Do not speculate about AI authorship. Punctuation
-preferences, unfamiliar patterns, and unrelated existing debt are not findings.
-In posted drafts, name the specific problem rather than calling it "slop."
+A finding need not demonstrate a bug or major maintenance cost.
+Small size alone neither qualifies nor disqualifies it.
+
+Do not report equally valid alternatives, personal preferences, or changes
+justified only by speculative future benefits. Keep corrections local and
+proportionate; avoid broad redesign for a small improvement.
+
+Inspect relevant callers, framework behavior, configuration, and intended readers
+before proposing a correction. Preserve useful rationale, documented contracts, and actual interface
+boundaries. Missing evidence is a verification gap, not proof of redundancy.
+
+Group repeated instances that share one correction into a single finding.
+Cleanup findings are nonblocking unless they independently meet the blocker
+or major-debt threshold.
+
+For non-obvious code simplifications, compare minimal before/after sketches
+in the reviewer's notes. Do not speculate about AI authorship or flag unrelated
+existing debt. In posted drafts, name the specific problem rather than calling
+it "slop."
 
 When the diff changes documentation, agent instructions, or documentation
 automation, reviewers and verifiers must read
@@ -130,8 +145,8 @@ API Specialist lens (source: Linear doc `api-specialist-role-summary-9525ac5b9fc
 
 1. READ-ONLY outside the assigned artifact outputs: no posting, repository edits, or other local or external mutations. Drafts only.
 2. Fetch PR metadata, diff, and existing review threads (`gh pr view/diff`, `gh api .../pulls/<n>/comments`); never repeat a point already raised or resolved in existing threads. Standards agent additionally: if the requesting user has prior reviews on the PR, report the status of each earlier thread (addressed / unaddressed / author replied).
-3. Report blockers (broken behavior, real defects, security holes, missing/wrong requirements) and major tech-debt introduction. The Standards axis may also report actionable unnecessary-code, prose, or documentation findings under its criteria. These are nonblocking unless they independently meet the blocker or major-debt threshold. No style-only findings or praise. If nothing qualifies, return APPROVE with zero comments.
-4. Place a finding inline when a specific changed line owns the problem. If no changed line honestly owns it, draft it for the review body; never invent an inline anchor. Each draft states the problem in as few words as possible + a concrete example of what goes wrong. Prefer casual questions ("do we need X here so Y actually happens?") over prescriptions when the author is senior or the fix is obvious.
+3. Report blockers (broken behavior, real defects, security holes, missing/wrong requirements) and major tech-debt introduction. The Standards axis also reports cleanup findings under the Unnecessary code and prose criteria and documentation findings under the linked Documentation and agent instructions guidance, including losses caused by deletion. Apply the cleanup severity rule to both. No preference-only findings or praise. If nothing qualifies, return APPROVE with zero comments.
+4. Place a finding inline when a specific changed line owns the problem. If no changed line honestly owns it, draft it for the review body; never invent an inline anchor. Each draft states the problem concisely. For defects and spec gaps, give a concrete example of what goes wrong. For cleanup, identify what is unnecessary or misleading and the proposed correction. Prefer casual questions ("do we need X here so Y actually happens?") over prescriptions when the author is senior or the fix is obvious.
 5. Write the complete result to the assigned artifact using this fixed output format: `## Target head` (`headRefOid`), `## Verdict` (APPROVE / COMMENT / REQUEST_CHANGES + one line), `## Comment drafts` (`- **file:line** — text` with NEW-file line numbers, or `- **review body** — text`), `## Notes for the reviewer (not for posting)`. Spec agents use `## Spec verdict` / `## Spec findings` and quote the ticket line per finding. Then return only the artifact path and verdict line.
 6. For dependency-bump PRs: the review question is upgrade risk — CI state, changelog breaking changes, whether the repo uses removed APIs, lockfile consistency (pyproject.toml and poetry.lock must change together).
 
@@ -147,9 +162,9 @@ access restrictions.
 
 Per draft comment, the verifier returns exactly one verdict, each with one line of evidence (code excerpt, thread link, or ticket quote):
 
-- **confirmed** — the claim is veridical: any cited file:line exists in the diff, review-body placement has no honest inline anchor, the stated failure/consequence actually follows, nothing elsewhere in the PR or codebase already handles it, and it meets the Phase 3 finding criteria. For cleanup findings, independently verify the stated cost and that the smaller alternative preserves required behavior and information. Challenge whether the simplification is worth changing, not just whether it is possible. For documentation, check both whether the content belongs and what would be lost by removing it.
+- **confirmed** — the claim is veridical: any cited file:line exists in the diff, review-body placement has no honest inline anchor, the stated defect or cleanup concern is supported by the source evidence, nothing elsewhere in the PR or codebase already handles it, and it meets the Phase 3 finding criteria. For cleanup findings, confirm the unnecessary complexity, duplication, noise, or misinformation and that the correction preserves required behavior, useful information, contracts, and repository conventions. For documentation, check both whether the content belongs and what would be lost by removing it.
 - **revise** — the underlying concern is real but the claim, anchor, or consequence is off. Verifier returns a corrected draft.
-- **refuted** — the claim does not hold (misread code, behavior already handled, framework covers it, already raised in an existing thread, or true-but-below-the-bar). Dropped.
+- **refuted** — the claim does not hold (misread code, behavior already handled, framework covers it, already raised in an existing thread, or outside the Phase 3 finding criteria). Refute preference-only or unsupported cleanup findings, not findings merely because they are small. Dropped.
 
 The verifier may also report **new findings** it noticed while checking; these enter the pool as unverified drafts under the verifier's own axis. A finding that clearly belongs to the other axis is routed to that axis's pool for its own verification pass instead.
 
@@ -172,15 +187,15 @@ One PR at a time, straightforward, minimal words. For each:
 2. **Default triage:** read the artifacts and show both axes separately when a Spec agent ran: Standards verdict + drafts, then Spec verdict + findings. Show every Phase 4-confirmed draft with its inline or review-body placement and ask which to keep, reword, or drop. Keep the axes separate and preserve their order. Record each decision in `triage.md`. A keep decision changes the local review package; it does not authorize posting.
 3. **Explanation aid, only on request:** when the user says they do not understand a finding or asks to go through findings one by one, pause default triage and show only the current finding:
    - linked location
-   - plain explanation of what the code does, what is wrong or missing, and the concrete consequence
+   - plain explanation of what the code does, then the finding using the Phase 3 drafting criteria
    - why it meets the finding criteria and whether it is blocking
    - inline or review-body placement, and why
    - exact draft comment, plus the ticket quote for a Spec finding
 
    Ask whether the explanation makes sense and whether to keep, reword, or drop the finding. Wait for the response before showing the next finding. Use this aid only for the requested review; return to default triage on later PRs unless the user asks again.
-4. After the confirmed findings, show refuted and dropped notes with their reasons. Never merge or rerank across axes. If asked whether a comment is worth keeping, apply the Phase 3 criteria. For cleanup findings, weigh the demonstrated benefit against the change required. Recommend dropping preference-only or negligible improvements.
+4. After the confirmed findings, show refuted and dropped notes with their reasons. Never merge or rerank across axes. If asked whether a comment is worth keeping, apply the Phase 3 criteria. Do not recommend dropping a confirmed cleanup finding solely for being minor.
 5. **Link every file mention to the PR.** Any file cited in drafts, findings, or notes shown to the user becomes a markdown link to the PR's Files-changed view focused on that file: `[<path>:<line>](https://github.com/<owner>/<repo>/pull/<n>/files#diff-<hash>R<line>)`, where `<hash>` is the hex SHA-256 of the file path (`printf '%s' '<path>' | shasum -a 256`; omit `R<line>` when no line). Compute all hashes for a PR in one command. Submitted comment bodies stay plain because GitHub anchors them inline.
-6. Draft comments in lowercase: problem + consequence, no praise, no follow-up-ticket suggestions.
+6. Draft comments in lowercase using the Phase 3 drafting criteria. No praise or follow-up-ticket suggestions.
 7. Assemble one review package after triage: recommended review event (`APPROVE`, `REQUEST_CHANGES`, or `COMMENT`), every kept inline comment in order, and a review body only for kept findings without an honest inline anchor. Leave the review body empty when every kept finding is inline. Save it to `final-review.md`, show the exact package, and ask for explicit approval to submit that review. Per-finding decisions and the artifact itself are not submission approval.
 8. Immediately before submission, repeat the freshness check, verify every target line still exists in the diff, and verify that `final-review.md` still matches the approved package. If the head changed, rerun Phases 3-4 against the full new diff. Rebuild the artifact and request fresh explicit approval after any head or package change.
 9. Submit the approved package once through the reviews endpoint, with all inline comments in the same request. Use the exact approved event, body, and comments. Omit `-f body` when the review body is empty. Do not publish standalone PR comments:
