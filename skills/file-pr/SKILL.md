@@ -8,11 +8,15 @@ description: Creates a PR. Use when asked to file or open one.
 Create one concise pull request whose title and description explain why the
 change matters.
 
-The user's request to file, open, or create a pull request authorizes the
-read-only inspection, one necessary non-force branch push, and one pull request
-creation described here. It does not authorize
-code changes, rebases, comments, review-thread resolution, merge, closure, or
-changing the state of an existing pull request.
+Interpret the PR request using the full conversation. A request to file a PR
+for agreed work authorizes completing that implementation, running its checks,
+committing the relevant changes, one necessary non-force branch push, and
+creating the PR. Preserve explicit instructions such as "don't commit yet"
+and other applicable approval gates.
+
+The request does not expand the agreed scope or authorize unrelated edits,
+rebases, comments, review-thread resolution, merge, closure, or changing the
+state of an existing PR.
 
 ## Preflight
 
@@ -23,11 +27,13 @@ changing the state of an existing pull request.
 3. Check whether an open or closed pull request already exists for the branch.
    If one is open, verify and return it without changing its state. If one is
    closed or merged, report it and ask before creating another pull request.
-4. Review the complete commit list and diff against the base branch. Confirm that
-   the committed changes match the user's goal and contain no unrelated work.
-5. If relevant changes remain uncommitted, or the committed diff does not match
-   the requested goal, stop and report the mismatch. Do not edit or commit code
-   as part of this skill.
+4. Review the commit list, diff against the base branch, and uncommitted changes.
+   Determine the intended scope from the conversation and repository evidence.
+5. Finish and validate the agreed work, then commit only its relevant changes
+   using repository conventions. Preserve unrelated work. Ask only when a
+   material scope decision or an unmet approval gate prevents progress.
+   Before publishing, verify that the complete committed diff matches the
+   agreed scope. Uncommitted work alone is not a reason to stop.
 6. Inspect recent merged pull request titles and the repository's documented
    conventions before choosing the title and body format.
 
