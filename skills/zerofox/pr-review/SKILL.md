@@ -62,11 +62,11 @@ Report blockers (broken behavior, real defects, security holes, missing or wrong
 - a second copy the next edit will miss;
 - a condition that cannot be false or code that cannot run, when you can name the case a reader would wrongly assume exists;
 - a rule in the repository's docs or `riskive/python-standards` that the change breaks; or
-- unnecessary code or prose from the list below, which later readers must read, trust, or maintain for nothing.
+- code that does nothing or prose from the list below, which later readers must read, trust, or maintain for nothing.
 
 The bar works in both directions. A finding with a consequence is reported however small it is. A true observation without one goes in the notes however tempting it is, along with preferences, equally valid alternatives, and speculative future benefits. "Cleaner", "could be shorter", "the precedent does it the other way", or log volume alone is not a consequence. A documentation loss caused by deletion is tested by the documentation guidance instead.
 
-Hold every PR to this bar for unnecessary code and prose: redundant wrappers, speculative abstractions, duplicated state, needless configuration, custom logic that an existing framework hook covers, defensive checks for impossible states, comments that narrate code, boilerplate docstrings, and unsupported claims. Apply unslop to prose. Allow none of it in any PR. Group repeated instances that share one fix into a single finding. Name the specific problem rather than calling it slop, and don't speculate about who or what wrote it.
+Hold every PR to this bar for unnecessary code and prose: redundant wrappers, speculative abstractions, duplicated state, needless configuration, custom logic that an existing framework hook covers, defensive checks for impossible states, comments that narrate code, and unsupported claims. Apply unslop to prose. Allow none of it in any PR. Short docstrings are fine even when they restate the code, especially on classes; flag a docstring only when it is wrong or misleading, or long enough that keeping it in sync with the code is real work. Group instances only when they share the same problem and the same fix; a misleading claim and a redundant one are separate findings. Name the specific problem rather than calling it slop, and don't speculate about who or what wrote it.
 
 When a broken standards rule is the only consequence, the draft cites the doc and line, then names the change, and says nothing else. The team settled the impact when it wrote the rule.
 
@@ -86,7 +86,7 @@ No draft reaches the user unverified. After an axis's reviewer returns, the orch
 
 The verifier returns one verdict per ID with one line of evidence:
 
-- **confirmed:** the claim, anchor, and consequence hold, nothing elsewhere already handles it, and it meets the finding bar. A rule-only draft that argues impact is trimmed to the citation and the change and still confirmed; the verifier keeps the removed argument in its evidence.
+- **confirmed:** the claim, anchor, and consequence hold, nothing elsewhere already handles it, and it meets the finding bar. For unnecessary code or prose, check each grouped instance: removing it must lose nothing a reader uses. Drop the instances that fail, and refute the finding if none are left. A rule-only draft that argues impact is trimmed to the citation and the change and still confirmed; the verifier keeps the removed argument in its evidence.
 - **revise:** the concern is real but the claim, anchor, or consequence is off. Include a corrected draft.
 - **refuted:** the claim doesn't hold or the finding misses the bar. Never refute a finding for being small.
 
