@@ -9,6 +9,8 @@ Review one or more GitHub PRs with independent reviewer and verifier subagents, 
 
 Keep every draft local until the user explicitly approves the complete review for that PR in this session. Subagents are read-only outside their assigned files.
 
+Ask every question, including triage and approval, as plain text at the end of a chat message. Never use a question or multiple-choice tool such as `AskUserQuestion` or `request_user_input`: its fixed options can't express decisions like "keep S1, reword S2 to ...".
+
 ## Setup
 
 Accept PR URLs or `<repo>#<number>` refs. Resolve a bare number against the current directory's repository when it is a git checkout; otherwise ask.
