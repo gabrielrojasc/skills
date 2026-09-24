@@ -39,7 +39,7 @@ Matt Pocock's skills cover general research, specification, implementation, TDD,
 
 ### ZeroFox
 
-- [`pr-review`](skills/zerofox/pr-review/SKILL.md) reviews PRs using ZeroFox review roles and standards, with checks for unnecessary complexity and documentation quality, independent verification, and approval before posting.
+- [`pr-review`](skills/zerofox/pr-review/SKILL.md) reviews PRs against repository and ZeroFox Python standards, applies the api-specialist lens to every riskive/API PR and adds a spec review for its own team's authors, verifies every finding independently, and posts one review only after approval.
 
 ## Repository layout
 

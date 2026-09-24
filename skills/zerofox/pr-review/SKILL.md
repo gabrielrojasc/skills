@@ -1,220 +1,119 @@
 ---
 name: pr-review
-description: Reviews GitHub PRs. Use when reviewing PRs or your queue.
+description: Reviews GitHub PRs. Use when reviewing a PR.
 ---
 
-# PR Review
+# PR review
 
-Review queue workflow: discover -> user picks -> subagent reviews -> verification loop -> per-PR triage. Self-contained; does not depend on any other review skill.
+Review one or more GitHub PRs with independent reviewer and verifier subagents, triage the verified findings with the user, and submit one review per PR. The skill is self-contained and does not depend on any other review skill.
 
-**Hard rule: keep every draft local until the user explicitly approves the complete review for that PR in this session. Submit all approved findings as one review.** Subagents are read-only outside their assigned review-artifact files.
+Keep every draft local until the user explicitly approves the complete review for that PR in this session. Subagents are read-only outside their assigned files.
 
-## Modes
+## Setup
 
-- **Queue mode** (default, no arguments): run all five phases.
-- **Direct mode** (user provides one or more PR URLs or `<repo>#<number>` refs, e.g. `/pr-review https://github.com/riskive/API/pull/5314`): skip Phases 1-2 entirely — no queue discovery, no specialist-approval filter, no triage table. Go straight to Phase 3 for the given PRs (picking the lens by repo as usual), then Phases 4-5. A bare number without a repo: resolve against the current directory's repo if it is a git checkout, otherwise ask.
+Accept PR URLs or `<repo>#<number>` refs. Resolve a bare number against the current directory's repository when it is a git checkout; otherwise ask.
 
-## Local review artifacts
+Create a private run directory with `mktemp -d` under `${TMPDIR:-/tmp}` and mode `0700`. Give each PR a folder named `<owner>__<repo>__<number>__<short-head-sha>`. It holds `standards.md`, `spec.md`, `verify-<axis>-<round>-input.md`, `verify-<axis>-<round>.md`, `triage.md`, `final-review.md`, and `review.json`. These files, not the conversation, are the source of truth for draft text, so a summarized conversation can't change what gets posted. Give subagents absolute paths to the files they write. Report the run directory path in updates and in the final tally.
 
-Before Phase 3, fetch each selected PR's `headRefOid`, then create a private run directory under the operating system's temporary directory:
+Every Markdown file starts with `## Target head` and the head SHA it was produced against. `review.json` records the head in `commit_id`. Reject any file whose target head differs from its folder's head. If a PR's head moves before submission, start a new folder for the new head and rerun review and verification against the full diff.
 
-```bash
-umask 077
-PR_REVIEW_RUN_DIR="$(mktemp -d "${TMPDIR:-/tmp}/pr-review.XXXXXX")" || exit 1
-chmod 700 "$PR_REVIEW_RUN_DIR" || exit 1
-printf '%s\n' "$PR_REVIEW_RUN_DIR"
-```
+## Choose the review
 
-Write an immutable `manifest.json` with `createdAt` and each PR's `url`, `repository`, `number`, and initial `headRefOid`. Maintain `run-state.json` through atomic replacement; it records each PR's current and prior heads, in-flight and accepted attempt IDs per stage, and run status. Store artifacts under `<run-dir>/<owner>__<repo>__<number>/<headRefOid>/`:
+| PR | Standards axis | Spec axis |
+|---|---|---|
+| riskive/API, author is an active member of `t-executive-protection` | Repository and Python standards, api-specialist lens | Yes |
+| riskive/API, any other author | Repository and Python standards, api-specialist lens | No |
+| Other Python repositories | Repository and Python standards | Yes |
+| Non-Python repositories | Repository conventions | Yes |
+| Dependency bumps (for example, renovate) | Upgrade risk | No |
 
-```text
-standards/review/attempts/<attempt-id>/result.md
-standards/verify-<round>/attempts/<attempt-id>/input.md
-standards/verify-<round>/attempts/<attempt-id>/result.md
-spec/review/attempts/<attempt-id>/result.md
-spec/verify-<round>/attempts/<attempt-id>/input.md
-spec/verify-<round>/attempts/<attempt-id>/result.md
-triage.md
-final-review.md
-```
+Dependency bumps take the upgrade-risk row in every repository, riskive/API included. Check team membership with `gh api orgs/riskive/teams/t-executive-protection/memberships/<author>`: Only `state: active` counts as a member; `pending` or a 404 does not.
 
-Omit Spec files when that axis does not run. These files are the source of truth for draft text, verification results, triage decisions, and the assembled review. Conversation updates may summarize them but must include the run path.
+Python standards live in `riskive/python-standards` under `docs/`. List the directory and fetch the files relevant to the diff as raw content.
 
-Artifact rules:
+The api-specialist lens (source: Linear doc `api-specialist-role-summary-9525ac5b9fc7`; re-fetch it if it may have changed) checks adherence to API patterns and standards, code placement and organization, use of Django and DRF to reduce risk and debt, code smells, and consistency across implementations. The lens excludes validating business correctness or acceptance criteria, which the Spec axis covers when it runs, and solving the team's problems for them.
 
-1. Before each dispatch, create a unique attempt directory with `mktemp -d`, then record its assignment in `run-state.json`. Give the subagent literal absolute paths for its partial output and final output inside that directory. Inputs are read-only. A grouped reviewer gets one attempt directory per PR. Never reuse an attempt ID or redispatch an in-flight assignment until the prior agent is known to have stopped.
-2. A producer writes its complete fixed-format output to the partial path, validates every required heading, then atomically renames it to the unused final path. Only the final path counts as complete. Record the accepted attempt in `run-state.json`. Attempt outputs are immutable; the orchestrator updates `run-state.json`, `triage.md`, and `final-review.md` through validated temporary files and atomic replacement.
-3. The orchestrator assigns stable axis-prefixed finding IDs when it creates the first verification input. Preserve each ID through revisions, later verification rounds, triage, and the assembled review. Give verifier-added findings new IDs before their next verification round.
-4. Verifier output uses this exact structure: `## Target head`; `## Results`, with one `- [<ID>] <confirmed|revise|refuted> — <evidence>` entry per input finding and the corrected draft after evidence for `revise` or for a `confirmed` entry the verifier trimmed; and `## New findings`, with unnumbered draft text. The verifier must not open or search reviewer output, earlier verification output, or sibling artifacts. It may read only its assigned input artifact and primary sources.
-5. `triage.md` contains `## Target head` and `## Decisions`, with one finding ID, decision, anchor, and exact draft per entry; refuted and dropped entries also include the reason or sticking point; entries the verifier trimmed also include the impact argument it removed. `final-review.md` contains `## Target head`, `## Event`, `## Review body`, and `## Inline comments`, with each finding ID, path, line, and exact body. Validate every required field or heading before accepting any artifact.
-6. Every reviewer and verifier records the target head SHA and checks it before and after analysis. Discard the output if the head changed. Update `run-state.json`, create a new head directory, and rerun Phases 3-4 against the full new diff before rebuilding triage or the final review.
-7. Temporary storage survives context compaction but is not permanent; the operating system may purge it. If the run path is unavailable after compaction, enumerate `pr-review.*/manifest.json` under the same temporary root. Consider only non-symlink run directories and manifests owned by the current UID, require directory mode `0700`, validate the manifest schema and exact requested PR identity, re-fetch each live head SHA, then ask the user to select among matches. Never infer posting approval from an artifact or run selection. Keep the run directory by default and report its path in the final tally.
+For non-Python infrastructure, also check secrets handling, environment separation, and pipeline correctness against sibling `riskive/*-terra` repositories and `riskive/zf-ci` workflows. For dependency bumps, review CI state, changelog breaking changes, uses of removed APIs, and lockfile consistency (`pyproject.toml` and `poetry.lock` change together).
 
-## Phase 1: Discover the queue
+## Review
 
-Direct requests only (not team-based):
-
-```bash
-gh api graphql -f query='query { search(query: "org:riskive is:pr is:open user-review-requested:@me", type: ISSUE, first: 50) { issueCount nodes { ... on PullRequest { number title url repository { nameWithOwner } author { login } isDraft updatedAt } } } }'
-```
-
-**riskive/API only:** drop PRs already approved by an api-specialist. Fetch the roster and each API PR's reviews; a PR is dismissed from the queue when a member (other than the user) has a current review with state `APPROVED` (dismissed approvals do not count):
-
-```bash
-gh api "orgs/riskive/teams/api-specialists/members?per_page=100" --jq '.[].login'
-gh api "repos/riskive/API/pulls/<n>/reviews" --jq '.[] | "\(.user.login) \(.state)"'
-```
-
-This specialist-approval filter applies ONLY to riskive/API. For other repos, existing approvals are just context for the user's skip decision.
-
-## Phase 2: User picks (before spending anything on reviews)
-
-Present the queue as a table: PR link, repo, title, author, draft?, last update, existing human reviews/approvals. Recommend skips (draft PRs on hold, PRs with several active human reviewers, bot-flagged renovate bumps) but let the user decide. Only the PRs the user selects proceed to Phase 3.
-
-## Phase 3: Fan out reviewers (two axes per PR)
-
-Per selected PR, spawn **two parallel read-only subagents** — a Standards agent and a Spec agent (group sibling PRs like identical renovate configs into one Standards agent; renovate PRs and **riskive/API PRs** get no Spec agent — for riskive/API the review is an api-specialist review and AC validation is outside that role). Run all agents in parallel, in the background. Give a grouped agent one artifact output pair per PR. The axes are deliberately separate: standards-clean code can implement the wrong thing, and spec-faithful code can break conventions — keep the reports apart so one axis never masks the other.
+For each PR, run one Standards subagent and, when the table calls for it, one Spec subagent, in parallel and in the background. Sibling PRs with identical changes, such as matching renovate configs, may share one Standards agent with a folder per PR. Keep the axes in separate reports so one never masks the other: standards-clean code can implement the wrong thing, and spec-faithful code can break conventions.
 
 ### Standards axis
 
-Judges code, documentation, and agent instructions. **Must NOT check the ticket, spec, or acceptance criteria** — that is the Spec agent's job, and for riskive/API it is explicitly outside the api-specialist role.
+The Standards agent judges code, documentation, and agent instructions against the chosen standards. It does not check the ticket or acceptance criteria. Use Fowler's code smells (*Refactoring*, chapter 3) as shared vocabulary; repository conventions override them.
 
-Lens by repo:
-- **riskive/API**: api-specialist lens (below) + python standards.
-- **Any other Python repo**: normal review grounded in python standards.
-- **Non-Python** (terra/infra, Java, JS): normal review; for infra check secrets handling, env separation, pipeline correctness against sibling `riskive/*-terra` repos and `riskive/zf-ci` workflows.
-
-On top of the lens, give the agent this smell baseline as tech-debt vocabulary (Fowler, *Refactoring* ch.3) . Report only findings meeting the criteria below; repository conventions override the baseline: duplicated code, shotgun surgery (one change scattered across many files), divergent change (one module edited for unrelated reasons), primitive obsession, data clumps, repeated switches, speculative generality, feature envy, message chains, middle man, mysterious name, refused bequest.
-
-#### Unnecessary code and prose
-
-Inspect additions and modifications for:
-
-- Redundant wrappers, speculative abstractions, duplicated state, unnecessary
-  configuration, and custom logic already covered by existing framework hooks.
-- Comments that merely narrate code, boilerplate explanations, unsupported
-  claims, and prose that obscures the actual behavior. Consult unslop for prose.
-
-Report unnecessary complexity, duplication, or misleading information
-introduced or changed by the diff only when you can name both the smallest
-adequate correction and a concrete consequence of leaving it as is. Later rules
-call this the consequence criterion. A consequence is one of: a caller or reader
-who gets something wrong; a second copy that the next edit will miss; a
-condition that cannot be false or code that cannot run, when you can name the
-case a reader would wrongly assume exists; or a rule in the repository's own
-docs or in `riskive/python-standards` that the change breaks. When the cited
-rule is the finding's only consequence, the draft is at most two sentences: cite
-the doc and line, then name the concrete change. In that case, do not argue
-impact in either direction; the team settled that when it wrote the rule. Put
-any mitigation you found there in the notes. "Cleaner", "redundant", "the
-precedent does it the other way", "could be shorter", or log volume alone is not
-a consequence. A true observation with no consequence goes in the reviewer's
-notes, not the drafts. The correction must preserve required behavior, useful
-information, contracts, and repository conventions.
-
-Size is not a criterion in either direction.
-
-Do not report equally valid alternatives, personal preferences, or changes
-justified only by speculative future benefits. Keep corrections local and
-proportionate; avoid broad redesign for a small improvement.
-
-Inspect relevant callers, framework behavior, configuration, and intended readers
-before proposing a correction. Preserve useful rationale, documented contracts, and actual interface
-boundaries. Missing evidence is a verification gap, not proof of redundancy.
-
-Group repeated instances that share one correction into a single finding.
-Cleanup findings are nonblocking unless they independently meet the blocker
-or major-debt threshold.
-
-For non-obvious code simplifications, compare minimal before/after sketches
-in the reviewer's notes. Do not speculate about AI authorship or flag unrelated
-existing debt. In posted drafts, name the specific problem rather than calling
-it "slop."
-
-When the diff changes documentation, agent instructions, or documentation
-automation, reviewers and verifiers must read
-[Documentation and agent instructions](references/documentation-review.md).
+When the diff changes documentation, agent instructions, or documentation automation, reviewers and verifiers read [Documentation and agent instructions](references/documentation-review.md).
 
 ### Spec axis
 
-Not spawned for riskive/API PRs (api-specialist review only). Judges whether the diff implements what was asked. The spec lives on the ticket linked to the PR:
+The Spec agent judges whether the diff implements what the originating ticket asks:
 
-1. Find the originating ticket: Jira key (e.g. `ZFE-1234`) or Linear ref in the PR title, branch name, body, or commit messages.
-2. Fetch it: `acli jira workitem view <key> --fields '*all'` (Jira) or the Linear MCP `get_issue` (Linear).
-3. Compare the diff against the ticket's requirements/acceptance criteria. Report only: (a) requirements missing or partially implemented; (b) requirements that look implemented but wrong. Quote the ticket line per finding. **Do NOT flag extra changes riding along** — scope creep is fine; only flag riding-along code that is itself wrong or risky.
-4. No ticket found or no real spec on it → report "no spec available" and stop; don't invent requirements from the PR description.
+1. Find the Jira key or Linear ref in the PR title, branch, body, or commits. Fetch it with `acli jira workitem view <key> --fields '*all'` or the Linear MCP `get_issue`.
+2. Report only requirements that are missing, partial, or implemented wrong, and quote the ticket line for each. Extra changes are fine unless they are themselves wrong or risky.
+3. If there is no ticket or no real spec on it, report "no spec available" and stop. Don't infer requirements from the PR description.
 
-Python standards (fetch what's relevant: STYLE_GUIDELINES, DJANGO_CONVENTIONS, TESTING, INTEGRATIONS_CONVENTIONS, DEPENDENCIES):
+### Finding bar
+
+Report blockers (broken behavior, real defects, security holes, missing or wrong requirements) and major tech-debt introduction. Report only problems the diff introduces, including breakage it causes in unchanged code and requirements it leaves missing. Don't flag unrelated existing debt. Every other finding needs a consequence of leaving it as is:
+
+- a caller or reader who will get something wrong;
+- a second copy the next edit will miss;
+- a condition that cannot be false or code that cannot run, when you can name the case a reader would wrongly assume exists; or
+- a rule in the repository's docs or `riskive/python-standards` that the change breaks; or
+- unnecessary code or prose from the list below, which later readers must read, trust, or maintain for nothing.
+
+The bar works in both directions. A finding with a consequence is reported however small it is. A true observation without one goes in the notes however tempting it is, along with preferences, equally valid alternatives, and speculative future benefits. "Cleaner", "could be shorter", "the precedent does it the other way", or log volume alone is not a consequence. A documentation loss caused by deletion is tested by the documentation guidance instead.
+
+Hold every PR to this bar for unnecessary code and prose: redundant wrappers, speculative abstractions, duplicated state, needless configuration, custom logic that an existing framework hook covers, defensive checks for impossible states, comments that narrate code, boilerplate docstrings, and unsupported claims. Apply unslop to prose. Allow none of this in any PR, and name the specific consequence in each draft. Group repeated instances that share one fix into a single finding. Name the specific problem rather than calling it slop, and don't speculate about who or what wrote it.
+
+When a broken standards rule is the only consequence, the draft cites the doc and line, then names the change, and says nothing else. The team settled the impact when it wrote the rule.
+
+Inspect callers, framework behavior, and configuration before proposing a correction. The correction must preserve required behavior, useful information, contracts, and conventions, and should be local and proportionate. Missing evidence is a verification gap, not proof of redundancy. Cleanup findings are nonblocking unless they independently meet the blocker or major-debt bar.
+
+### Rules for every reviewer
+
+1. Read the PR metadata, diff, and existing review threads. Don't repeat a point already raised or resolved. If the user reviewed the PR before, report the status of each of their earlier threads: addressed, unaddressed, or author replied.
+2. Anchor a finding inline when a specific changed line owns the problem; otherwise draft it for the review body. Never invent an anchor.
+3. Each draft states the problem concisely. For defects and spec gaps, give a concrete example of what goes wrong. For cleanup, say what is unnecessary or misleading, its consequence, and the correction. Prefer a casual question ("do we need X here so Y happens?") when the author is senior or the fix is obvious.
+4. Write the result with headings `## Target head`, `## Verdict` (APPROVE, COMMENT, or REQUEST_CHANGES with one line of reasoning), `## Comment drafts` (`- **file:line** — text` using new-file line numbers, or `- **review body** — text`), and `## Notes for the reviewer (not for posting)`. Spec agents use `## Spec verdict` and `## Spec findings`. Return only the file path and the verdict line.
+5. If nothing qualifies, return APPROVE with no drafts. No praise.
+
+## Verify
+
+No draft reaches the user unverified. After an axis's reviewer returns, the orchestrator assigns stable axis-prefixed IDs (`S1`, `P1`) and writes only the IDs, draft text, and any `user-promoted` marker to the round's input file. A fresh, read-only verifier per axis per round checks every draft against the diff and source at the target head, existing threads, the applicable standards, and, for Spec, the ticket. It reads only its input file and primary sources, never other files in the run directory.
+
+The verifier returns one verdict per ID with one line of evidence:
+
+- **confirmed:** the claim, anchor, and consequence hold, nothing elsewhere already handles it, and it meets the finding bar. A rule-only draft that argues impact is trimmed to the citation and the change and still confirmed; the verifier keeps the removed argument in its evidence.
+- **revise:** the concern is real but the claim, anchor, or consequence is off. Include a corrected draft.
+- **refuted:** the claim doesn't hold or the finding misses the bar. Never refute a finding for being small.
+
+For a `user-promoted` draft, check only the claim and anchor.
+
+The verifier may add new findings. They get fresh IDs and go through the next round with the revised drafts. An agent never verifies a draft it wrote or revised. Stop after three rounds; anything still unconfirmed is dropped and listed as "unverified, dropped" with its sticking point. Then the orchestrator sets the axis verdict from the confirmed set. Nonblocking findings alone mean COMMENT, not REQUEST_CHANGES. Refuted and dropped drafts stay in `triage.md` with their reasons so the user can overrule.
+
+## Triage
+
+Take one PR at a time, in few words.
+
+1. Re-check `updatedAt`, `headRefOid`, `reviews`, and `state`. A moved head, a merge, or a close changes the plan.
+2. Show the Standards verdict and confirmed drafts, then the Spec verdict and findings, each with its placement and any trimmed impact argument. Ask which to keep, reword, or drop, and record decisions in `triage.md`. Then show refuted and dropped drafts with reasons, and the reviewer notes.
+3. When the user doesn't understand a finding or asks to go one by one, show only that finding: its location, what the code does, the finding, why it meets the bar and whether it blocks, its placement, and the exact draft. Wait for a decision before the next one.
+4. A note the user wants raised becomes a new draft marked `user-promoted`. It gets one verification round for claim and anchor only; the user's decision replaces the consequence test.
+5. Link every file mention shown to the user to the PR's Files changed view: `[<path>:<line>](https://github.com/<owner>/<repo>/pull/<n>/files#diff-<sha256 of path>R<line>)`. Posted comment bodies stay plain.
+6. Write posted comments in lowercase, with no praise or follow-up-ticket suggestions.
+
+## Submit
+
+Assemble `final-review.md` with the review event, every kept inline comment in order, and a review body only for kept findings without an inline anchor. Show the exact package and ask for explicit approval. Keep decisions on individual findings are not approval to submit.
+
+Immediately before submitting, re-check the head, confirm every target line is still in the diff, and confirm `final-review.md` matches what the user approved. Build `review.json` in the PR folder from that file and confirm its head, event, body, and comments match it. Any change means rebuilding the package and asking again. Submit it once, as one review with all inline comments, and publish no standalone PR comments:
 
 ```bash
-gh api -H "Accept: application/vnd.github.raw" repos/riskive/python-standards/contents/docs/<file>.md
+gh api repos/<owner>/<repo>/pulls/<n>/reviews -X POST --input <pr-folder>/review.json
 ```
 
-API Specialist lens (source: Linear doc `api-specialist-role-summary-9525ac5b9fc7` — re-fetch if it may have changed): ensure adherence to API patterns and standards; verify proper code placement and logical organization; encourage leveraging the framework (Django/DRF) to minimize risk and tech debt; identify code smells and inconsistencies; promote consistency across implementations. OUT of scope: validating business correctness or acceptance criteria, solving the team's problems for them.
+The JSON has `commit_id` (the verified head), `event`, `body` (omit when empty), and `comments`, each with `path`, `line`, `side: "RIGHT"`, and `body`.
 
-### Rules for every subagent prompt (both axes)
-
-1. READ-ONLY outside the assigned artifact outputs: no posting, repository edits, or other local or external mutations. Drafts only.
-2. Fetch PR metadata, diff, and existing review threads (`gh pr view/diff`, `gh api .../pulls/<n>/comments`); never repeat a point already raised or resolved in existing threads. Standards agent additionally: if the requesting user has prior reviews on the PR, report the status of each earlier thread (addressed / unaddressed / author replied), and apply the changed-code limit. Under it, new drafts are blockers plus findings on code changed since the user's last real pass. A real pass is the user's latest review (`gh api --paginate repos/<owner>/<repo>/pulls/<n>/reviews`) with a nonempty body or at least one comment whose `in_reply_to_id` is null; attribute comments to reviews by `pull_request_review_id`. Thread replies alone also create reviews and do not count. If that pass's `.commit_id` is the current head, nothing has changed. Otherwise fetch `gh api repos/<owner>/<repo>/compare/<base branch>...<sha>` for both heads. Changed code is the added or removed lines in the current head's `.files[].patch` that the earlier head's patch for that file lacks. Ignore hunk headers and context lines, which a rebase shifts, and name hunks by the current head's numbering. If no review qualifies, if either head or the `.commit_id` is unavailable, if a compare reports 300 files, or if a file with nonzero `changes` has no `patch`, treat the whole diff as changed and say so in the notes. Other new nonblocking findings on code the user already reviewed go in the notes, not the drafts; the author has already paid for one pass over that code.
-3. Report blockers (broken behavior, real defects, security holes, missing/wrong requirements) and major tech-debt introduction. The Standards axis also reports cleanup findings under the Unnecessary code and prose criteria and documentation findings under the linked Documentation and agent instructions guidance, including losses caused by deletion. Apply the consequence criterion to every nonblocking finding except a documentation loss caused by deletion, which the linked guidance tests. No preference-only findings or praise. If nothing qualifies, return APPROVE with zero comments.
-4. Place a finding inline when a specific changed line owns the problem. If no changed line honestly owns it, draft it for the review body; never invent an inline anchor. Each draft states the problem concisely. For defects and spec gaps, give a concrete example of what goes wrong. For cleanup, identify what is unnecessary or misleading, the consequence of leaving it, and the proposed correction. Prefer casual questions ("do we need X here so Y actually happens?") over prescriptions when the author is senior or the fix is obvious.
-5. Write the complete result to the assigned artifact using this fixed output format: `## Target head` (`headRefOid`), `## Verdict` (APPROVE / COMMENT / REQUEST_CHANGES + one line), `## Comment drafts` (`- **file:line** — text` with NEW-file line numbers, or `- **review body** — text`), `## Notes for the reviewer (not for posting)`. Spec agents use `## Spec verdict` / `## Spec findings` and quote the ticket line per finding. Then return only the artifact path and verdict line.
-6. For dependency-bump PRs: the review question is upgrade risk — CI state, changelog breaking changes, whether the repo uses removed APIs, lockfile consistency (pyproject.toml and poetry.lock must change together).
-
-## Phase 4: Verification loop (mandatory gate)
-
-**No draft comment reaches the user unverified.** After a PR's reviewer agents return, spawn a **fresh read-only verifier subagent per axis** (Standards and Spec verified separately, same as they were reviewed). Batch all of an axis's drafts into one verifier per round — no per-comment agents.
-
-Independently verify every finding against the diff, source files at the target
-head, existing review discussions, and applicable repository standards. For Spec
-findings, also check the originating ticket. Treat the reviewer's claims and PR
-description as unverified. Follow the artifact rules for inputs, outputs, and
-access restrictions.
-
-Per draft comment, the verifier returns exactly one verdict, each with one line of evidence (code excerpt, thread link, or ticket quote):
-
-- **confirmed** — the claim is veridical: any cited file:line exists in the diff, review-body placement has no honest inline anchor, the stated defect or cleanup concern is supported by the source evidence, nothing elsewhere in the PR or codebase already handles it, and it meets the Phase 3 finding criteria. For cleanup findings, confirm the unnecessary complexity, duplication, or misinformation, that the stated consequence holds against the source (the caller or reader, the second copy, or the always-true condition or unreachable code exists and the draft names the case a reader would wrongly assume; the cited standards rule says what the draft claims and applies to this code), and that the correction preserves required behavior, useful information, contracts, and repository conventions. For documentation, check both whether the content belongs and what would be lost by removing it. For a `user-promoted` entry, check only the claim and the anchor. A standards-rule-only draft that runs past two sentences or argues impact is trimmed to the two-sentence form and confirmed in the same round. The trimmed text goes on the entry's draft line and the impact argument stays in evidence. The orchestrator copies that argument into the entry's `triage.md` note so the user sees it.
-- **revise** — the underlying concern is real but the claim, anchor, or consequence is off. Verifier returns a corrected draft.
-- **refuted** — the claim does not hold (misread code, behavior already handled, framework covers it, already raised in an existing thread, or outside the Phase 3 finding criteria). Refute cleanup findings whose consequence is missing or does not hold, and preference-only findings. Do not refute a finding merely because it is small, and do not refute a `user-promoted` entry for a missing consequence. Dropped.
-
-The verifier may also report **new findings** it noticed while checking; these enter the pool as unverified drafts under the verifier's own axis, subject to the same Phase 3 rule 3 gates and, on a PR the user already reviewed, the same changed-code limit as Standards agent drafts. A finding that clearly belongs to the other axis is routed to that axis's pool for its own verification pass instead.
-
-Loop rules:
-
-1. Revised and new drafts are unverified — they go to a fresh verifier in the next round. An agent never verifies a draft it wrote or revised. A same-round trim under `confirmed` is not a revision. Write only each finding's ID and draft text to the next round's input artifact, plus the `user-promoted` marker where Phase 5 rule 4 applies; exclude the previous verifier's evidence and reasoning.
-2. Repeat until every surviving draft is **confirmed**, up to 3 rounds. Anything still unconfirmed after round 3 — including new findings surfaced in the final round, which by construction have no round left to be checked in — is dropped from the drafts and listed under notes as "unverified, dropped" with the sticking point.
-3. After the loop terminates, the orchestrator (not a subagent) recomputes the axis verdict (APPROVE / COMMENT / REQUEST_CHANGES) once, to match the surviving confirmed set. Use COMMENT when only nonblocking cleanup findings remain. Cleanup alone does not justify REQUEST_CHANGES.
-4. Refuted and dropped drafts are not silently discarded: carry their IDs, text, and reasons into `triage.md` so the user can overrule.
-
-## Phase 5: Per-PR triage loop
-
-One PR at a time, straightforward, minimal words. For each:
-
-1. **Freshness check first** — the queue and reviews go stale fast:
-   ```bash
-   gh pr view <n> --repo <repo> --json updatedAt,headRefOid,reviews,state
-   ```
-   New approval by an api-specialist (riskive/API), new pushes after the agent reviewed, or merged/closed state all change the decision. If the head moved, update the run state and rerun Phases 3-4 against the full new diff before showing drafts — a confirmation is only valid for the SHA it was checked against.
-2. **Default triage:** read the artifacts and show both axes separately when a Spec agent ran: Standards verdict + drafts, then Spec verdict + findings. Show every Phase 4-confirmed draft with its inline or review-body placement, plus the impact argument for a trimmed entry, and ask which to keep, reword, or drop. Keep the axes separate and preserve their order. Record each decision in `triage.md`. A keep decision changes the local review package; it does not authorize posting.
-3. **Explanation aid, only on request:** when the user says they do not understand a finding or asks to go through findings one by one, pause default triage and show only the current finding:
-   - linked location
-   - plain explanation of what the code does, then the finding using the Phase 3 drafting criteria
-   - why it meets the finding criteria and whether it is blocking
-   - inline or review-body placement, and why
-   - exact draft comment, plus the ticket quote for a Spec finding
-
-   Ask whether the explanation makes sense and whether to keep, reword, or drop the finding. Wait for the response before showing the next finding. Use this aid only for the requested review; return to default triage on later PRs unless the user asks again.
-4. After the confirmed findings, show refuted and dropped notes with their reasons, then the reviewer's notes, which are not posted as written. A note the user wants raised becomes a new draft with a fresh ID, marked `user-promoted` in the verification input, and gets one extra verification round for claim and anchor only. The user's keep decision replaces the consequence criterion for it. Never merge or rerank across axes. If asked whether a comment is worth keeping, apply the Phase 3 criteria. A confirmed finding is kept for its consequence, not judged by its size.
-5. **Link every file mention to the PR.** Any file cited in drafts, findings, or notes shown to the user becomes a markdown link to the PR's Files-changed view focused on that file: `[<path>:<line>](https://github.com/<owner>/<repo>/pull/<n>/files#diff-<hash>R<line>)`, where `<hash>` is the hex SHA-256 of the file path (`printf '%s' '<path>' | shasum -a 256`; omit `R<line>` when no line). Compute all hashes for a PR in one command. Submitted comment bodies stay plain because GitHub anchors them inline.
-6. Draft comments in lowercase using the Phase 3 drafting criteria. No praise or follow-up-ticket suggestions.
-7. Assemble one review package after triage: recommended review event (`APPROVE`, `REQUEST_CHANGES`, or `COMMENT`), every kept inline comment in order, and a review body only for kept findings without an honest inline anchor. Leave the review body empty when every kept finding is inline. Save it to `final-review.md`, show the exact package, and ask for explicit approval to submit that review. Per-finding decisions and the artifact itself are not submission approval.
-8. Immediately before submission, repeat the freshness check, verify every target line still exists in the diff, and verify that `final-review.md` still matches the approved package. If the head changed, rerun Phases 3-4 against the full new diff. Rebuild the artifact and request fresh explicit approval after any head or package change.
-9. Submit the approved package once through the reviews endpoint, with all inline comments in the same request. Use the exact approved event, body, and comments. Omit `-f body` when the review body is empty. Do not publish standalone PR comments:
-   ```bash
-   gh api repos/<owner>/<repo>/pulls/<n>/reviews -X POST \
-     -f event=<APPROVE|REQUEST_CHANGES|COMMENT> -f body='<review body>' \
-     -f 'comments[][path]=<path>' -F 'comments[][line]=<line>' \
-     -f 'comments[][side]=RIGHT' -f 'comments[][body]=<text>'
-   ```
-   Repeat the `comments[]` fields for each kept inline comment. The review is the submission unit.
-10. Track outcomes; end with the run-directory path and a tally: reviews posted / user-approved directly / skipped / deferred, and flag any PR where the user is the only human reviewer.
+End with the run directory path and, per PR, whether the review was posted, skipped, or deferred.
