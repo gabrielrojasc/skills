@@ -95,11 +95,21 @@ The verifier may add new findings. They get fresh IDs and go through the next ro
 
 ## Triage
 
-Take one PR at a time, in few words.
+Take one PR at a time.
 
 1. Re-check `updatedAt`, `headRefOid`, `reviews`, and `state`. A moved head, a merge, or a close changes the plan.
-2. Show the Standards verdict and confirmed drafts, then the Spec verdict and findings, each with its placement and any trimmed impact argument. Ask which to keep, reword, or drop, and record decisions in `triage.md`. Then show refuted and dropped drafts with reasons, and the reviewer notes.
-3. When the user doesn't understand a finding or asks to go one by one, show only that finding: its location, what the code does, the finding, why it meets the bar and whether it blocks, its placement, and the exact draft. Wait for a decision before the next one.
+2. Show the Standards verdict and findings, then the Spec verdict and findings. Give each confirmed finding its own block so the user can decide without opening any file:
+
+   ```markdown
+   **S1** · blocking · inline at [path:line](link)
+   Problem: what the code does, and the concrete input or case where it goes wrong.
+   Why it matters: who is affected and how. For Spec, quote the ticket line.
+   Comment:
+   > the exact draft that would be posted
+   ```
+
+   Keep the problem and the reason to a sentence or two each, but always show the full draft. Add the trimmed impact argument when the verifier removed one. Ask which to keep, reword, or drop, and record decisions in `triage.md`. Then show refuted and dropped drafts with reasons, and the reviewer notes.
+3. When the user asks to go one by one, show one block at a time, with a short explanation of the surrounding code, and wait for a decision before the next.
 4. A note the user wants raised becomes a new draft marked `user-promoted`. It gets one verification round for claim and anchor only; the user's decision replaces the consequence test.
 5. Link every file mention shown to the user to the PR's Files changed view: `[<path>:<line>](https://github.com/<owner>/<repo>/pull/<n>/files#diff-<sha256 of path>R<line>)`. Posted comment bodies stay plain.
 6. Write posted comments in lowercase, with no praise or follow-up-ticket suggestions.
