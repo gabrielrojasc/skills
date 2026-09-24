@@ -15,19 +15,18 @@ Accept PR URLs or `<repo>#<number>` refs. Resolve a bare number against the curr
 
 Create a private run directory with `mktemp -d` under `${TMPDIR:-/tmp}` and mode `0700`. Give each PR a folder named `<owner>__<repo>__<number>__<short-head-sha>`. It holds `standards.md`, `spec.md`, `verify-<axis>-<round>-input.md`, `verify-<axis>-<round>.md`, `triage.md`, `final-review.md`, and `review.json`. These files, not the conversation, are the source of truth for draft text, so a summarized conversation can't change what gets posted. Give subagents absolute paths to the files they write. Report the run directory path in updates and in the final tally.
 
-Every Markdown file starts with `## Target head` and the head SHA it was produced against. `review.json` records the head in `commit_id`. Reject any file whose target head differs from its folder's head. If a PR's head moves before submission, start a new folder for the new head and rerun review and verification against the full diff.
+Every Markdown file starts with `## Target head` and the head SHA it was produced against. `review.json` records the head in `commit_id`. Reject any file whose target head differs from its folder's head. If the head moves before submission, follow [When the head moves](#when-the-head-moves).
 
 ## Choose the review
 
 | PR | Standards axis | Spec axis |
 |---|---|---|
-| riskive/API, author is an active member of `t-executive-protection` | Repository and Python standards, api-specialist lens | Yes |
-| riskive/API, any other author | Repository and Python standards, api-specialist lens | No |
+| riskive/API | Repository and Python standards, api-specialist lens | Only when the author is an active member of `t-executive-protection` |
 | Other Python repositories | Repository and Python standards | Yes |
 | Non-Python repositories | Repository conventions | Yes |
 | Dependency bumps (for example, renovate) | Upgrade risk | No |
 
-Dependency bumps take the upgrade-risk row in every repository, riskive/API included. Check team membership with `gh api orgs/riskive/teams/t-executive-protection/memberships/<author>`: Only `state: active` counts as a member; `pending` or a 404 does not.
+Dependency bumps take the upgrade-risk row in every repository, riskive/API included. Check team membership with `gh api orgs/riskive/teams/t-executive-protection/memberships/<author>`: only `state: active` counts as a member; `pending` or a 404 does not.
 
 Python standards live in `riskive/python-standards` under `docs/`. List the directory and fetch the files relevant to the diff as raw content.
 
@@ -59,13 +58,13 @@ Report blockers (broken behavior, real defects, security holes, missing or wrong
 
 - a caller or reader who will get something wrong;
 - a second copy the next edit will miss;
-- a condition that cannot be false or code that cannot run, when you can name the case a reader would wrongly assume exists; or
+- a condition that cannot be false or code that cannot run, when you can name the case a reader would wrongly assume exists;
 - a rule in the repository's docs or `riskive/python-standards` that the change breaks; or
 - unnecessary code or prose from the list below, which later readers must read, trust, or maintain for nothing.
 
 The bar works in both directions. A finding with a consequence is reported however small it is. A true observation without one goes in the notes however tempting it is, along with preferences, equally valid alternatives, and speculative future benefits. "Cleaner", "could be shorter", "the precedent does it the other way", or log volume alone is not a consequence. A documentation loss caused by deletion is tested by the documentation guidance instead.
 
-Hold every PR to this bar for unnecessary code and prose: redundant wrappers, speculative abstractions, duplicated state, needless configuration, custom logic that an existing framework hook covers, defensive checks for impossible states, comments that narrate code, boilerplate docstrings, and unsupported claims. Apply unslop to prose. Allow none of this in any PR, and name the specific consequence in each draft. Group repeated instances that share one fix into a single finding. Name the specific problem rather than calling it slop, and don't speculate about who or what wrote it.
+Hold every PR to this bar for unnecessary code and prose: redundant wrappers, speculative abstractions, duplicated state, needless configuration, custom logic that an existing framework hook covers, defensive checks for impossible states, comments that narrate code, boilerplate docstrings, and unsupported claims. Apply unslop to prose. Allow none of it in any PR. Group repeated instances that share one fix into a single finding. Name the specific problem rather than calling it slop, and don't speculate about who or what wrote it.
 
 When a broken standards rule is the only consequence, the draft cites the doc and line, then names the change, and says nothing else. The team settled the impact when it wrote the rule.
 
@@ -97,7 +96,7 @@ The verifier may add new findings. They get fresh IDs and go through the next ro
 
 Take one PR at a time.
 
-1. Re-check `updatedAt`, `headRefOid`, `reviews`, and `state`. A moved head, a merge, or a close changes the plan.
+1. Re-check `updatedAt`, `headRefOid`, `reviews`, and `state`. A moved head follows [When the head moves](#when-the-head-moves); a merge or close ends the review.
 2. Show the Standards verdict and findings, then the Spec verdict and findings. Give each confirmed finding its own block so the user can decide without opening any file:
 
    ```markdown
@@ -115,11 +114,22 @@ Take one PR at a time.
 6. Link every file mention shown to the user to the PR's Files changed view: `[<path>:<line>](https://github.com/<owner>/<repo>/pull/<n>/files#diff-<sha256 of path>R<line>)`. Posted comment bodies stay plain.
 7. Write posted comments in lowercase, with no praise or follow-up-ticket suggestions.
 
+## When the head moves
+
+Start a folder for the new head and carry forward the finding IDs, drafts, and any triage decisions. Don't restart triage.
+
+1. A fresh verifier checks every carried finding against the new head, with the same inputs and limits as in Verify. Each gets one verdict: **still applies** (re-anchored to its new line), **fixed** (name the commit that resolved it), or **changed** (still real, but the claim, anchor, or draft needs a revision, which the verifier supplies).
+2. A reviewer per axis reviews only the commits added since the reviewed head (`compare/<old-head>...<new-head>`). If that compare's `status` is not `ahead`, as after a rebase or force-push, it reviews the full diff instead. Its drafts go through Verify as usual.
+3. Findings that still apply keep the user's earlier decision, and the user isn't asked about them again. Fixed findings are dropped. Show one message with what needs a decision (changed findings, new findings, and findings not yet triaged, in the triage format) and a one-line list of what carried over or was fixed, then ask one question. If nothing needs a decision, say so and go straight to the package.
+4. Rebuild the package and ask for approval, marking which comments carried over unchanged.
+
+If the head moves again, repeat against the latest head.
+
 ## Submit
 
-Assemble `final-review.md` with the review event, every kept inline comment in order, and a review body only for kept findings without an inline anchor. Show the exact package and ask for explicit approval. Keep decisions on individual findings are not approval to submit.
+Assemble `final-review.md` with the review event, every kept inline comment in order, and a review body only for kept findings without an inline anchor. Show the exact package and ask for explicit approval. Deciding to keep a finding is not approval to submit.
 
-Immediately before submitting, re-check the head, confirm every target line is still in the diff, and confirm `final-review.md` matches what the user approved. Build `review.json` in the PR folder from that file and confirm its head, event, body, and comments match it. Any change means rebuilding the package and asking again. Submit it once, as one review with all inline comments, and publish no standalone PR comments:
+Immediately before submitting, re-check the head, confirm every target line is still in the diff, and confirm `final-review.md` matches what the user approved. Build `review.json` in the PR folder from that file and confirm its head, event, body, and comments match it. A moved head follows [When the head moves](#when-the-head-moves). Any other change means rebuilding the package and asking again. Submit it once, as one review with all inline comments, and publish no standalone PR comments:
 
 ```bash
 gh api repos/<owner>/<repo>/pulls/<n>/reviews -X POST --input <pr-folder>/review.json
