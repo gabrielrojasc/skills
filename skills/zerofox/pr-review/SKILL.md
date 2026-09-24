@@ -36,7 +36,7 @@ For non-Python infrastructure, also check secrets handling, environment separati
 
 ## Review
 
-For each PR, run one Standards subagent and, when the table calls for it, one Spec subagent, in parallel and in the background. Sibling PRs with identical changes, such as matching renovate configs, may share one Standards agent with a folder per PR. Keep the axes in separate reports so one never masks the other: standards-clean code can implement the wrong thing, and spec-faithful code can break conventions.
+For each PR, run one Standards subagent and, when the table calls for it, one Spec subagent. Start every PR's reviewers at once, in the background. Each axis moves to verification as soon as its own reviewer returns, without waiting for the other axis or other PRs. Wait only when no work can proceed. Sibling PRs with identical changes, such as matching renovate configs, may share one Standards agent with a folder per PR. Keep the axes in separate reports so one never masks the other: standards-clean code can implement the wrong thing, and spec-faithful code can break conventions.
 
 ### Standards axis
 
@@ -94,7 +94,7 @@ The verifier may add new findings. They get fresh IDs and go through the next ro
 
 ## Triage
 
-Take one PR at a time.
+Take one PR at a time, in the order they finish verification, and carry it through triage and submission before showing the next. Other PRs keep reviewing and verifying in the background, but the user sees only one open decision at a time; about other PRs, send only short progress notes, never findings or questions.
 
 1. Re-check `updatedAt`, `headRefOid`, `reviews`, and `state`. A moved head follows [When the head moves](#when-the-head-moves); a merge or close ends the review.
 2. Show the Standards verdict and findings, then the Spec verdict and findings. Give each confirmed finding its own block so the user can decide without opening any file:
@@ -119,7 +119,7 @@ Take one PR at a time.
 Start a folder for the new head and carry forward the finding IDs, drafts, and any triage decisions. Don't restart triage.
 
 1. A fresh verifier checks every carried finding against the new head, with the same inputs and limits as in Verify. Each gets one verdict: **still applies** (re-anchored to its new line), **fixed** (name the commit that resolved it), or **changed** (still real, but the claim, anchor, or draft needs a revision, which the verifier supplies).
-2. A reviewer per axis reviews only the commits added since the reviewed head (`compare/<old-head>...<new-head>`). If that compare's `status` is not `ahead`, as after a rebase or force-push, it reviews the full diff instead. Its drafts go through Verify as usual.
+2. In parallel with step 1, a reviewer per axis reviews only the commits added since the reviewed head (`compare/<old-head>...<new-head>`). If that compare's `status` is not `ahead`, as after a rebase or force-push, it reviews the full diff instead. Its drafts go through Verify as usual.
 3. Findings that still apply keep the user's earlier decision, and the user isn't asked about them again. Fixed findings are dropped. Show one message with what needs a decision (changed findings, new findings, and findings not yet triaged, in the triage format) and a one-line list of what carried over or was fixed, then ask one question. If nothing needs a decision, say so and go straight to the package.
 4. Rebuild the package and ask for approval, marking which comments carried over unchanged.
 
@@ -137,4 +137,4 @@ gh api repos/<owner>/<repo>/pulls/<n>/reviews -X POST --input <pr-folder>/review
 
 The JSON has `commit_id` (the verified head), `event`, `body` (omit when empty), and `comments`, each with `path`, `line`, `side: "RIGHT"`, and `body`.
 
-End with the run directory path and, per PR, whether the review was posted, skipped, or deferred.
+Then move to the next ready PR. End with the run directory path and, per PR, whether the review was posted, skipped, or deferred.
