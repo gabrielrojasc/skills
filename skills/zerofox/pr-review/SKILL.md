@@ -23,6 +23,14 @@ decisions like "keep S1, reword S2 to ...".
 Accept PR URLs or `<repo>#<number>` refs. Resolve a bare number against the
 current directory's repository when it is a git checkout; otherwise ask.
 
+When a tool to set the session title is available, set it once the PRs are
+resolved. Use `RV <repo>#<n>: <short PR summary>` for one PR, or
+`RV <repo>#<n> +<count>` for several, so the number stays visible in a narrow
+title. Add the owner only when it isn't `riskive`. Shorten long repository names
+the way the team does, such as `ep-api` for `executive-protection-api`, `go-ep`
+for `go-executive-protection`, and `ds-sdk` for `datasource-sdk`. Without such a
+tool, skip this step.
+
 Create a private run directory with `mktemp -d` under `${TMPDIR:-/tmp}` and mode
 `0700`. Give each PR a folder named
 `<owner>__<repo>__<number>__<short-head-sha>`. It holds `standards.md`,
@@ -48,9 +56,9 @@ submission, follow [When the head moves](#when-the-head-moves).
 | Dependency bumps (for example, renovate) | Upgrade risk | No |
 
 Dependency bumps take the upgrade-risk row in every repository, riskive/API
-included. Check team membership with `gh api
-orgs/riskive/teams/t-executive-protection/memberships/<author>`: only `state:
-active` counts as a member; `pending` or a 404 does not.
+included. Check team membership with
+`gh api orgs/riskive/teams/t-executive-protection/memberships/<author>`: only
+`state: active` counts as a member; `pending` or a 404 does not.
 
 Python standards live in `riskive/python-standards` under `docs/`. List the
 directory and fetch the files relevant to the diff as raw content.
@@ -221,9 +229,8 @@ questions.
    follows [When the head moves](#when-the-head-moves); a merge or close ends
    the review.
 2. Show the Standards verdict and findings, then the Spec verdict and findings.
-   Give each confirmed finding its own heading and each field its own
-   paragraph, so the user can scan the batch and decide without opening any
-   file:
+   Give each confirmed finding its own heading and each field its own paragraph,
+   so the user can scan the batch and decide without opening any file:
 
    ```markdown
    ### S1 · blocking
