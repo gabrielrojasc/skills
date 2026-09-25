@@ -34,7 +34,7 @@ installation, updates, and lock tracking.
 - [`linear-gh-linking`](skills/linear-gh-linking/SKILL.md) keeps Linear issues
   attached to their Git branches and pull requests with accurate status
   semantics.
-- [`linear-work-structure`](skills/linear-work-structure/SKILL.md) chooses among
+- [`linear-work-breakdown`](skills/linear-work-breakdown/SKILL.md) chooses among
   Linear initiatives, projects, milestones, issues, and sub-issues before any
   tracker mutation.
 - [`gh-review-comments`](skills/gh-review-comments/SKILL.md) fetches unresolved

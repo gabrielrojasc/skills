@@ -34,6 +34,8 @@
 - Wrap Markdown prose at 80 columns. Leave headings, tables, code blocks, and
   links that can't break as they are.
 - Keep `README.md` and the skill inventory in sync.
+- When a changed skill has a same-named skill in `riskive/ai-tooling`, propose
+  the matching team PR. The team copy may differ from this one.
 - Run `scripts/validate-skills.sh` after changing skills, metadata, or scripts.
 - Preserve approval gates for external writes, worktree removal, and branch
   deletion.
