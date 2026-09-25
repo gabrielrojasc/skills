@@ -38,9 +38,3 @@ the bundled helper.
 - Do not install Mermaid CLI globally. The helper's optional `npx` path runs the
   package without a global installation.
 - Preserve the diagram's intended meaning while fixing syntax or layout.
-
-## Completion criteria
-
-- Every changed Mermaid diagram renders successfully with `mmdc`.
-- Relevant rendered output was visually inspected.
-- Validation leaves no unrequested repository files or global installation.
