@@ -82,14 +82,17 @@ attaching an existing branch preserves its upstream configuration.
 ## Remove task worktrees
 
 Cleanup is destructive. Present the exact worktrees and branches first, then get
-explicit human approval before running:
+explicit human approval. Several tasks may be approved together from one list;
+run the helper once per task. After approval, pass `--yes`, because the helper's
+own prompt can't be answered from an agent shell and exits with an error:
 
 ```bash
 <SKILL_DIR>/scripts/remove-task-worktree.sh \
   --repos-root ~/git \
   --repo <repo> \
   --ticket <LINEAR-123> \
-  --task <short-name>
+  --task <short-name> \
+  --yes
 ```
 
 The helper blocks dirty worktrees and branches with unpushed commits. It uses
@@ -106,12 +109,3 @@ uv run --no-project --with pytest pytest <SKILL_DIR>/tests/test_workspace.py
 Both suites use temporary local repositories without network access. uv may
 download pytest on first use. The Python suite runs a standalone copy of the
 skill from an unrelated working directory.
-
-## Completion criteria
-
-- Every selected repository resolves inside the requested repositories root.
-- Default branches come from current remote refs.
-- Existing worktrees are reused only when path and branch both match.
-- Synchronization restores clean persistent worktrees to their default branches
-  and leaves task worktrees unchanged.
-- Cleanup preserves dirty, unpushed, or unmerged work.

@@ -195,8 +195,9 @@ def remove_tasks(args: Namespace) -> int:
         except EOFError:
             answer = ""
         if answer not in ("y", "Y"):
-            log("info", "Aborted.")
-            return 0
+            # Nonzero so a declined or unanswered prompt never reads as success.
+            log("error", "Aborted. Nothing was removed.")
+            return 1
 
     failed = 0
     for plan in plans:

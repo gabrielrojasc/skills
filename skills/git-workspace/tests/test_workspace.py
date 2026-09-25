@@ -278,11 +278,20 @@ def test_list_continues_when_git_cannot_enumerate_worktrees(workspace):
     assert re.search(r"Task worktrees:\s+1", output)
 
 
-def test_remove_decline_then_yes_removes_only_matching_task(workspace):
+@pytest.mark.parametrize("answer", ["n\n", ""], ids=["declined", "no-input"])
+def test_remove_without_confirmation_fails_and_keeps_task(workspace, answer):
+    # An agent shell has no stdin, so an unanswered prompt must not look like
+    # a successful cleanup.
     repo, _ = workspace.add("sample")
     workspace.create("sample")
-    workspace.remove("sample", input="n\n")
+    output = workspace.remove("sample", input=answer, ok=False)
+    assert "Aborted" in output
     assert (repo / "sample").is_dir()
+
+
+def test_remove_yes_removes_only_matching_task(workspace):
+    repo, _ = workspace.add("sample")
+    workspace.create("sample")
     workspace.remove("sample", "sample", "--yes")
     assert not (repo / "sample").exists()
     workspace.assert_no_branch(repo, "feature/sample")
