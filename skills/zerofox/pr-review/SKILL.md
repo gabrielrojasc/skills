@@ -221,15 +221,25 @@ questions.
    follows [When the head moves](#when-the-head-moves); a merge or close ends
    the review.
 2. Show the Standards verdict and findings, then the Spec verdict and findings.
-   Give each confirmed finding its own block so the user can decide without
-   opening any file:
+   Give each confirmed finding its own heading and each field its own
+   paragraph, so the user can scan the batch and decide without opening any
+   file:
 
    ```markdown
-   **S1** · blocking · inline at [path:line](link)
-   Problem: what the code does, and the concrete input or case where it goes wrong.
-   Why it matters: who is affected and how. For Spec, quote the ticket line.
-   Comment:
+   ### S1 · blocking
+
+   Inline at [path:line](link)
+
+   **Problem:** what the code does, and the concrete input or case where it
+   goes wrong.
+
+   **Why it matters:** who is affected and how. For Spec, quote the ticket line.
+
+   **Comment:**
+
    > the exact draft that would be posted
+
+   ---
    ```
 
    Keep the problem and the reason to a sentence or two each, but always show

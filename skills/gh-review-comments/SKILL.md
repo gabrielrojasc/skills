@@ -127,38 +127,52 @@ Use this skill when the user asks to:
 
 ## Decision pack format
 
-Keep the proposal compact enough to make a decision without becoming a wall of
-text. Prefer numbered blocks over tables. Do not force a rigid template when a
-shorter recommendation is clearer.
-
-List each unresolved item as a compact numbered block. Every block must include
-the finding, severity, assessment, and proposed action. Include the source URL
-for traceability and identify whether it is an inline thread, conversation
-comment, or review body. For inline threads, include the intended resolution in
-the proposed action.
+The pack exists for deciding, not implementing. Give each item a short block
+that says what the reviewer wants, whether it holds, and what you would do, so
+the user can decide without opening a link. Give each item its own heading and
+each field its own paragraph so the pack scans easily. Work out detailed steps,
+test matrices, and file-by-file edits after approval.
 
 ```markdown
 ## PR <number>: <title>
 
-Verdict: Fix <count>, dismiss <count>, already addressed <count>.
+Fix <n> · dismiss <n> · already addressed <n>
 
-#: <item-number>
-<reviewer> finding: <location, if applicable> - <short concern>
-Source: <source type and URL>
-Severity: <P0 | P1 | P2 | P3 | Nit>
-Assessment: <short evidence-backed judgment>
-Proposed action: <Fix | Dismiss | Already addressed>. <concrete plan or reply rationale>
-Draft reply: <if useful for Dismiss or Already addressed; state the destination>
-────────────────────────────────────────
+### 1 · Fix · P2
+
+[path:line](link) · [thread](url)
+
+**Concern:** what the reviewer says is wrong, in plain words.
+
+**Assessment:** whether it holds and why, in a sentence or two.
+
+**Plan:** the change and its scope in a sentence or two, including dependencies
+such as "after #127 merges".
+
+**Reply:**
+
+> the exact text, only when one is proposed
+
+---
 ```
 
-For **Fix** items, omit `Draft reply` unless the user asked for fix-response
-text too. If extra evidence is needed, add one short `Evidence:` line rather
-than expanding the block into a mini-report. Keep replies concise and scoped to
-the reviewed code. Do not mention private chat context as evidence.
+- Number items continuously across PRs so every ID is unique.
+- Use Fix for any item that needs a code or test change, even when part of it is
+  already handled. Already addressed means only a reply or thread resolution
+  remains.
+- Link file mentions to the PR's Files changed view:
+  `[<path>:<line>](https://github.com/<owner>/<repo>/pull/<n>/files#diff-<sha256
+  of path>R<line>)`. Link the source as `[thread]`, `[comment]`, or `[review]`
+  instead of a bare URL.
+- Add a `Disputed:` line when a reviewer disagreement remains, naming the
+  deciding assumption.
+- List anything proposed beyond the comments, such as a follow-up issue or a
+  change in another PR, as its own numbered item at the end in the same format.
+- Keep replies concise and scoped to the reviewed code. Don't mention private
+  chat context as evidence.
 
-The user can approve all items, approve a subset, skip items, or request
-revisions.
+End with one question. The user may approve all, approve or skip items by ID, or
+ask to revise any item.
 
 ## Approval rules
 
