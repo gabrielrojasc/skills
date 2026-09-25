@@ -92,7 +92,7 @@ The verifier returns one verdict per ID with one line of evidence:
 
 For a `user-promoted` draft, check only the claim and anchor.
 
-The verifier may add new findings. They get fresh IDs and go through the next round with the revised drafts. An agent never verifies a draft it wrote or revised. Stop after three rounds; anything still unconfirmed is dropped and listed as "unverified, dropped" with its sticking point. Then the orchestrator sets the axis verdict from the confirmed set. Nonblocking findings alone mean COMMENT, not REQUEST_CHANGES. Refuted and dropped drafts stay in `triage.md` with their reasons so the user can overrule.
+The verifier may add new findings. They get fresh IDs and go through the next round with the revised drafts. An agent never verifies a draft it wrote or revised. After each round that leaves drafts unconfirmed, a fresh read-only progress agent reads the round files so far and decides whether another round can make progress. It doesn't judge the findings. It stops the loop when objections repeat without new evidence, revisions cycle between equivalent drafts, or resolution needs evidence or a decision outside the review. Anything still unconfirmed then is dropped and listed as "unverified, dropped" with its sticking point and the progress agent's reason. Then the orchestrator sets the axis verdict from the confirmed set. Nonblocking findings alone mean COMMENT, not REQUEST_CHANGES. Refuted and dropped drafts stay in `triage.md` with their reasons so the user can overrule.
 
 ## Triage
 

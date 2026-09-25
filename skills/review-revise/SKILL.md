@@ -50,17 +50,20 @@ review-revise loop. Ordinary review or implementation requests do not trigger it
    each review-and-response cycle as one round; parallel reviewers share a round.
 
 5. Finish when all assigned reviewers return `No material objection` for the
-   current target and required checks pass. Otherwise, the main agent assesses
-   progress after each round. Continue while another round has a concrete path
-   to resolve an objection or verify a revision. A high round count alone is
-   not a reason to stop.
+   current target and required checks pass. Otherwise, after each round a fresh
+   read-only progress agent reads the objections, dispositions, and revisions so
+   far and decides whether another round can make progress. It doesn't judge the
+   objections themselves. Continue while another round has a concrete path to
+   resolve an objection or verify a revision. A high round count alone is not a
+   reason to stop.
 
-   Stop when the main agent judges the loop is stalling: objections repeat
+   The progress agent stops the loop when it is stalling: objections repeat
    without new evidence, revisions cycle between equivalent alternatives, or
    further progress requires unavailable evidence or a decision outside scope.
-   Explain why another round would not help, citing the unresolved findings and
-   attempts made. Honor any user-specified budget. Stalling, exhausted budgets,
-   unavailable reviewers, and unresolved disagreements are not clean results.
+   Report its reason why another round would not help, citing the unresolved
+   findings and attempts made. Honor any user-specified budget. Stalling,
+   exhausted budgets, unavailable reviewers, and unresolved disagreements are
+   not clean results.
 
 ## Report
 
