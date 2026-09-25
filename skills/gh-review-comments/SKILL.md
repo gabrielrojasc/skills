@@ -73,9 +73,9 @@ Use this skill when the user asks to:
      proposal.
 5. Have independent subagents adversarially review every preliminary
    recommendation.
-   - Dispatch independent reviewers for every actionable item, all at once and
-     in the background, as soon as a PR's recommendations are ready. Each
-     reviewer's loop runs independently; don't hold one item's round for
+   - Dispatch an independent reviewer in the background for each actionable item
+     as soon as that item is classified, without waiting for the rest of its PR.
+     Each reviewer's loop runs independently; don't hold one item's round for
      another's. Related items may share a reviewer; require a separate verdict
      for each item. Choose each reviewer's model and effort using the active
      agent-selection policy. Provide the comments, relevant code and diff
