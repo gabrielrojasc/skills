@@ -27,7 +27,6 @@ The repository does not provide a second skill installer. The `skills` CLI owns 
 - [`git-workspace`](skills/git-workspace/SKILL.md) manages bare-container repositories under `~/git`, persistent default-branch worktrees, and isolated task worktrees.
 - [`linear-gh-linking`](skills/linear-gh-linking/SKILL.md) keeps Linear issues attached to their Git branches and pull requests with accurate status semantics.
 - [`linear-work-structure`](skills/linear-work-structure/SKILL.md) chooses among Linear initiatives, projects, milestones, issues, and sub-issues before any tracker mutation.
-- [`evidence-comparison-report`](skills/evidence-comparison-report/SKILL.md) creates persistent, auditable comparison reports with explicit write authority and evidence controls.
 - [`gh-review-comments`](skills/gh-review-comments/SKILL.md) fetches unresolved GitHub review threads, top-level comments, and review bodies by default and proposes fix, dismissal, or already-addressed decisions before any mutation.
 - [`developer-documentation-style`](skills/developer-documentation-style/SKILL.md) reads the live Google guide before writing, editing, or reviewing developer documentation.
 - [`file-pr`](skills/file-pr/SKILL.md) reviews the committed branch diff and opens one concise pull request without changing code.
