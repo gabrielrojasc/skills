@@ -8,11 +8,11 @@ description: Creates a PR. Use when asked to file or open one.
 Create one concise pull request whose title and description explain why the
 change matters.
 
-Interpret the PR request using the full conversation. A request to file a PR
-for agreed work authorizes completing that implementation, running its checks,
+Interpret the PR request using the full conversation. A request to file a PR for
+agreed work authorizes completing that implementation, running its checks,
 committing the relevant changes, one necessary non-force branch push, and
-creating the PR. Preserve explicit instructions such as "don't commit yet"
-and other applicable approval gates.
+creating the PR. Preserve explicit instructions such as "don't commit yet" and
+other applicable approval gates.
 
 The request does not expand the agreed scope or authorize unrelated edits,
 rebases, comments, review-thread resolution, merge, closure, or changing the
@@ -27,13 +27,14 @@ state of an existing PR.
 3. Check whether an open or closed pull request already exists for the branch.
    If one is open, verify and return it without changing its state. If one is
    closed or merged, report it and ask before creating another pull request.
-4. Review the commit list, diff against the base branch, and uncommitted changes.
-   Determine the intended scope from the conversation and repository evidence.
+4. Review the commit list, diff against the base branch, and uncommitted
+   changes. Determine the intended scope from the conversation and repository
+   evidence.
 5. Finish and validate the agreed work, then commit only its relevant changes
    using repository conventions. Preserve unrelated work. Ask only when a
-   material scope decision or an unmet approval gate prevents progress.
-   Before publishing, verify that the complete committed diff matches the
-   agreed scope. Uncommitted work alone is not a reason to stop.
+   material scope decision or an unmet approval gate prevents progress. Before
+   publishing, verify that the complete committed diff matches the agreed scope.
+   Uncommitted work alone is not a reason to stop.
 6. Inspect recent merged pull request titles and the repository's documented
    conventions before choosing the title and body format.
 
@@ -41,8 +42,8 @@ state of an existing PR.
 
 - Use the repository's title convention. Prefer a concise title that states the
   user-visible or operational reason for the change.
-- Open the body with a plain-language explanation of the problem from the
-  user's request.
+- Open the body with a plain-language explanation of the problem from the user's
+  request.
 - Explain the solution after the problem. Do not lead with a file or commit
   inventory.
 - Include validation performed and any known limitations.
@@ -55,10 +56,11 @@ state of an existing PR.
 
 1. Push the current branch once when the remote branch is missing or behind. Use
    a normal push; never force-push.
-2. Create the pull request in ready-for-review state unless the user or repository
-   explicitly requests a draft. Use the selected base branch, title, and body.
-3. Read the created pull request back and verify its base, head, requested draft or ready state,
-   title, and body.
+2. Create the pull request in ready-for-review state unless the user or
+   repository explicitly requests a draft. Use the selected base branch, title,
+   and body.
+3. Read the created pull request back and verify its base, head, requested draft
+   or ready state, title, and body.
 4. Return the pull request URL and any unresolved limitation.
 
 ## Guardrails

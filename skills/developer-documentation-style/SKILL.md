@@ -15,8 +15,8 @@ workflow. Google has not authored or endorsed it.
 
 ## Scope
 
-Use this skill for READMEs, tutorials, procedures, conceptual documentation,
-CLI reference, API reference prose, and documentation reviews. Apply it to code
+Use this skill for READMEs, tutorials, procedures, conceptual documentation, CLI
+reference, API reference prose, and documentation reviews. Apply it to code
 comments only when the user explicitly asks.
 
 A review is read-only. Return findings and suggested changes without modifying
@@ -73,8 +73,8 @@ For a review, report only material findings. Each finding includes:
 - A concrete correction.
 
 Cite the official page for every finding attributed to Google. Separate
-technical ambiguity from editorial findings. If no material findings remain,
-say so.
+technical ambiguity from editorial findings. If no material findings remain, say
+so.
 
 For a rewrite, return revised copy and list unresolved technical ambiguities
 separately. Do not invent behavior, requirements, or claims to improve the

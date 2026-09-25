@@ -25,11 +25,11 @@ to a higher level.
   not replace dependency links.
 - **Issue:** an independently assignable unit with a verifiable completion
   condition. Use issue relations for real blockers.
-- **Sub-issue:** a contained part of a parent issue, including work too large for
-  one issue but too small for a project or pieces split across teammates. The
-  parent remains the useful planning unit. Promote a child to an issue when it
-  needs independent design, prioritization, dependencies outside the parent, or
-  a lifecycle of its own.
+- **Sub-issue:** a contained part of a parent issue, including work too large
+  for one issue but too small for a project or pieces split across teammates.
+  The parent remains the useful planning unit. Promote a child to an issue when
+  it needs independent design, prioritization, dependencies outside the parent,
+  or a lifecycle of its own.
 
 Use labels or views for cross-cutting categories. Do not create a new project
 only to group work by discipline, component, or team.

@@ -6,8 +6,8 @@ description: Defines Linear links. Use when naming branches or linking PRs.
 # Linear GitHub linking
 
 Supply Linear linking rules to the workflows that own Git branches and pull
-requests. `git-workspace` creates branches. `file-pr` pushes branches and creates
-pull requests. This skill selects issue IDs and relationship semantics.
+requests. `git-workspace` creates branches. `file-pr` pushes branches and
+creates pull requests. This skill selects issue IDs and relationship semantics.
 Repository conventions take precedence over its examples.
 
 ## Choose the issue
@@ -37,8 +37,8 @@ when the delivered work genuinely spans them.
 
 ## Link the pull request
 
-The issue ID in the branch name or pull request title is enough to create a
-link and may trigger the team's configured workflow automation.
+The issue ID in the branch name or pull request title is enough to create a link
+and may trigger the team's configured workflow automation.
 
 Add a magic word when the branch does not contain every intended issue or when
 the relationship must control merge automation.

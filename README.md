@@ -2,7 +2,10 @@
 
 Portable personal skills for Codex and other compatible coding agents.
 
-This repository contains behavior that is specific to Gabriel's workflow but reusable across projects. Third-party skills remain installed from their upstream repositories. Project-specific skills stay in the projects that own their assumptions.
+This repository contains behavior that is specific to Gabriel's workflow but
+reusable across projects. Third-party skills remain installed from their
+upstream repositories. Project-specific skills stay in the projects that own
+their assumptions.
 
 ## Install
 
@@ -18,27 +21,49 @@ Install them globally:
 npx skills add gabrielrojasc/skills -g
 ```
 
-The repository does not provide a second skill installer. The `skills` CLI owns installation, updates, and lock tracking.
+The repository does not provide a second skill installer. The `skills` CLI owns
+installation, updates, and lock tracking.
 
 ## Skills
 
 ### General
 
-- [`git-workspace`](skills/git-workspace/SKILL.md) manages bare-container repositories under `~/git`, persistent default-branch worktrees, and isolated task worktrees.
-- [`linear-gh-linking`](skills/linear-gh-linking/SKILL.md) keeps Linear issues attached to their Git branches and pull requests with accurate status semantics.
-- [`linear-work-structure`](skills/linear-work-structure/SKILL.md) chooses among Linear initiatives, projects, milestones, issues, and sub-issues before any tracker mutation.
-- [`gh-review-comments`](skills/gh-review-comments/SKILL.md) fetches unresolved GitHub review threads, top-level comments, and review bodies by default and proposes fix, dismissal, or already-addressed decisions before any mutation.
-- [`developer-documentation-style`](skills/developer-documentation-style/SKILL.md) reads the live Google guide before writing, editing, or reviewing developer documentation.
-- [`file-pr`](skills/file-pr/SKILL.md) reviews the committed branch diff and opens one concise pull request without changing code.
-- [`python-environments`](skills/python-environments/SKILL.md) creates and manages project-local Python environments with `uv venv` while preserving each repository's dependency workflow.
-- [`mermaid-validation`](skills/mermaid-validation/SKILL.md) renders and inspects changed Mermaid diagrams with Mermaid CLI.
-- [`review-revise`](skills/review-revise/SKILL.md) runs adversarial review-revise loops with independent reviewers until findings are resolved or an independent progress agent stops a stalled loop.
+- [`git-workspace`](skills/git-workspace/SKILL.md) manages bare-container
+  repositories under `~/git`, persistent default-branch worktrees, and isolated
+  task worktrees.
+- [`linear-gh-linking`](skills/linear-gh-linking/SKILL.md) keeps Linear issues
+  attached to their Git branches and pull requests with accurate status
+  semantics.
+- [`linear-work-structure`](skills/linear-work-structure/SKILL.md) chooses among
+  Linear initiatives, projects, milestones, issues, and sub-issues before any
+  tracker mutation.
+- [`gh-review-comments`](skills/gh-review-comments/SKILL.md) fetches unresolved
+  GitHub review threads, top-level comments, and review bodies by default and
+  proposes fix, dismissal, or already-addressed decisions before any mutation.
+- [`developer-documentation-style`](skills/developer-documentation-style/SKILL.md)
+  reads the live Google guide before writing, editing, or reviewing developer
+  documentation.
+- [`file-pr`](skills/file-pr/SKILL.md) reviews the committed branch diff and
+  opens one concise pull request without changing code.
+- [`python-environments`](skills/python-environments/SKILL.md) creates and
+  manages project-local Python environments with `uv venv` while preserving each
+  repository's dependency workflow.
+- [`mermaid-validation`](skills/mermaid-validation/SKILL.md) renders and
+  inspects changed Mermaid diagrams with Mermaid CLI.
+- [`review-revise`](skills/review-revise/SKILL.md) runs adversarial
+  review-revise loops with independent reviewers until findings are resolved or
+  an independent progress agent stops a stalled loop.
 
-Matt Pocock's skills cover general research, specification, implementation, TDD, architecture, and review. They are intentionally not copied here.
+Matt Pocock's skills cover general research, specification, implementation, TDD,
+architecture, and review. They are intentionally not copied here.
 
 ### ZeroFox
 
-- [`pr-review`](skills/zerofox/pr-review/SKILL.md) reviews PRs against repository and ZeroFox Python standards, applies the api-specialist lens to every riskive/API PR and adds a spec review for its own team's authors, verifies every finding independently, and posts one review only after approval.
+- [`pr-review`](skills/zerofox/pr-review/SKILL.md) reviews PRs against
+  repository and ZeroFox Python standards, applies the api-specialist lens to
+  every riskive/API PR and adds a spec review for its own team's authors,
+  verifies every finding independently, and posts one review only after
+  approval.
 
 ## Repository layout
 
@@ -50,8 +75,8 @@ scripts/         Repository validation
 
 ## Development
 
-Validation requires Python 3.10+, Git, and Bash, with no Python packages.
-After changing a skill, metadata file, or script, stage the changes and run:
+Validation requires Python 3.10+, Git, and Bash, with no Python packages. After
+changing a skill, metadata file, or script, stage the changes and run:
 
 ```bash
 scripts/validate-skills.sh
