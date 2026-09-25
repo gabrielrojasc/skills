@@ -10,9 +10,9 @@ change matters.
 
 Interpret the PR request using the full conversation. A request to file a PR for
 agreed work authorizes completing that implementation, running its checks,
-committing the relevant changes, one necessary non-force branch push, and
-creating the PR. Preserve explicit instructions such as "don't commit yet" and
-other applicable approval gates.
+committing the relevant changes, one necessary branch push, and creating the PR.
+Preserve explicit instructions such as "don't commit yet" and other applicable
+approval gates.
 
 The request does not expand the agreed scope or authorize unrelated edits,
 rebases, comments, review-thread resolution, merge, closure, or changing the
@@ -51,16 +51,20 @@ state of an existing PR.
   the template does not require.
 - Include screenshots, recordings, or artifact links only when they already
   exist within the authorized scope.
+- For Linear-tracked work, apply `linear-gh-linking` to choose the issue
+  references and relationship words.
 
 ## Publish
 
 1. Push the current branch once when the remote branch is missing or behind. Use
-   a normal push; never force-push.
+   a normal push. If the branch is yours and was rebased onto its base, use
+   `git push --force-with-lease`. Never force-push in any other case.
 2. Create the pull request in ready-for-review state unless the user or
    repository explicitly requests a draft. Use the selected base branch, title,
    and body.
 3. Read the created pull request back and verify its base, head, requested draft
-   or ready state, title, and body.
+   or ready state, title, and body. For Linear-tracked work, also run
+   `linear-gh-linking`'s link verification.
 4. Return the pull request URL and any unresolved limitation.
 
 ## Guardrails
@@ -69,14 +73,3 @@ state of an existing PR.
   existing pull request, merge, or close unless the user separately asks.
 - If authentication or repository permissions fail, follow the global external
   service recovery policy. Do not change authentication.
-
-## Completion criteria
-
-- If a new pull request was required, exactly one pull request was created for
-  the branch in the requested draft or ready state.
-- If an open pull request already existed, it was verified and returned with its
-  current state unchanged.
-- The base and head branches are correct.
-- For a newly created pull request, the title follows repository conventions and
-  the body explains the problem, solution, and validation.
-- The returned URL opens the verified pull request.
