@@ -15,8 +15,11 @@ Repository conventions take precedence over its examples.
 1. Apply these rules only to Linear-tracked work. Work without a Linear issue
    needs no Linear link.
 2. Confirm that the work has an executable Linear issue or sub-issue.
-   - If none exists, stop before branching and apply `linear-work-structure` to
-     propose the missing executable work.
+   - If none exists, stop before branching. When the work fits one issue,
+     propose it inline with its title, team, assignee, and completion condition,
+     following the user's team and assignee defaults, and create it after
+     approval. Apply `linear-work-structure` only when the work needs more than
+     one issue.
    - If one may exist but its exact ID is unavailable, retrieve it through a
      read-only Linear lookup. If it cannot be verified, stop and request the ID.
 3. Preserve the verified ID. Do not infer it from another tracker or reuse its
@@ -68,13 +71,3 @@ that:
 
 For a local branch created by `git-workspace`, attachment verification remains
 pending until a publication-owning workflow runs.
-
-## Completion criteria
-
-- Every intended Linear issue and relationship type is identified.
-- For a new Linear-tracked branch, `git-workspace` receives the exact issue ID.
-- For a published pull request, every intended Linear attachment and
-  relationship type is verified.
-- Branch-only work reports that attachment verification is pending.
-- Repository branch and pull request conventions remain intact.
-- No closing relationship claims more completion than the pull request delivers.
