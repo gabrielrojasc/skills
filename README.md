@@ -1,6 +1,6 @@
 # Gabriel's agent skills
 
-Portable personal skills for Codex and other compatible coding agents.
+Gabriel's reusable agent skills for Claude Code, Codex, and other coding agents.
 
 This repository contains behavior that is specific to Gabriel's workflow but
 reusable across projects. Third-party skills remain installed from their
