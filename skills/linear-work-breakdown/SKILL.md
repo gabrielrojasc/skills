@@ -5,95 +5,135 @@ description: Structures Linear work. Use when planning levels or tickets.
 
 # Linear work breakdown
 
-Choose the smallest Linear level that gives the work the ownership, visibility,
-and dependency tracking it needs. Produce a proposal first. Do not create or
-update Linear work without explicit user approval.
+Place work in the right Linear layer, from initiative to sub-issue, and create
+it the way the team expects. An organization's documented Linear conventions
+override these defaults.
 
-Linking a branch or pull request to an existing issue belongs to
-`linear-gh-linking`, not this skill. So do day-to-day triage and status updates
-inside an existing project.
+## When to use
 
-## Choose the level
+- Choosing the layer for new work: initiative, sub-initiative, project,
+  milestone, issue, or sub-issue.
+- Turning an accepted proposal into Linear structure.
+- Deciding where a bug or sustaining item goes.
+- Reviewing an existing structure.
 
-Start with the outcome, then apply these tests. Choose the level from the item's
-role, not its current title. Improve a vague title instead of promoting the item
-to a higher level. An initiative title states the outcome, not a codename:
-"Guided setup: halve time to first working account", not "Guided setup".
+## When not to use
 
-- **Initiative:** a broader objective served by multiple independently managed
-  projects. Use it to explain why those projects belong together.
-- **Project:** a coordinated body of issues with one clear terminal outcome and
-  a bounded lifecycle. The outcome may be a shipped change or a decision.
-- **Milestone:** a meaningful stage within one project's outcome, such as an
-  internal release or public launch. Use milestones for delivery checkpoints,
-  not to hide separate discovery and implementation projects. A milestone does
-  not replace dependency links.
-- **Issue:** an independently assignable unit with a verifiable completion
-  condition. Use issue relations for real blockers.
-- **Sub-issue:** a contained part of a parent issue, including work too large
-  for one issue but too small for a project or pieces split across teammates.
-  The parent remains the useful planning unit. Promote a child to an issue when
-  it needs independent design, prioritization, dependencies outside the parent,
-  or a lifecycle of its own.
+- Linking branches and pull requests to issues. Use `linear-gh-linking`.
+- Work tracked outside Linear.
 
-Use labels or views for cross-cutting categories. Do not create a new project
-only to group work by discipline, component, or team.
+## Propose the full structure
 
-## Separate discovery from implementation
+Propose the hierarchy the work needs, including initiatives and sub-initiatives,
+with your reasoning. Some choices need sign-off from whoever owns product and
+planning decisions: whether an initiative or sub-initiative exists, whether a
+project is communicable, its outcome, and its priority. Mark those as pending
+that sign-off so the user can settle them with the owner, and don't record them
+as final until the owner agrees. Don't create or change Linear work without
+explicit user approval.
 
-When a well-defined effort feels like a project of projects, it is: split it
-into discovery and implementation projects instead of one project for the whole
-workstream.
+## Layers
 
-Create a discovery project when its terminal output is a go, change, or stop
-decision and implementation is not yet approved. Put experiments and comparisons
-inside that project as issues. End with an issue that records the decision and
-supporting evidence.
+- **Initiative:** a high-level goal that groups projects, such as "halve billing
+  support tickets this quarter".
+- **Sub-initiative:** groups projects that share a domain, product, or mission
+  under one outcome. Nothing ships as the sub-initiative itself; if it could
+  ship on its own, it is a project. It may sit under more than one initiative.
+- **Project:** shippable on its own, with a clear goal and a target date. See
+  the boundary test below.
+- **Milestone:** a stage of one project, seeded by the project's template when
+  it has one.
+- **Issue:** the base ticket, clear enough for the assignee to do the work and
+  for teammates to know what is happening.
+- **Sub-issue:** an atomic, independently executable piece of its issue.
 
-Create a separate implementation project only after the decision authorizes it.
-Its terminal output is working behavior. Keep discovery and implementation in
-separate projects; milestones record delivery checkpoints within either project.
+Improve a vague title instead of promoting the work to a higher layer. A project
+doesn't need an initiative.
 
-Alternative approaches belong as discovery issues while they are being compared.
-After selection, each approach pursued toward working behavior gets its own
-implementation project. Record each experiment's result on its issue, and
-collect decisions in the discovery project's description as experiments close.
+## The project boundary is the release
+
+Ask "would this be announced or released separately, or bundled with the rest?",
+not "could engineering build it on its own?" Independently buildable features
+that reach users together are one project, with each feature as an issue. Two
+approaches to one goal that ship at different times are separate projects. An
+issue with its own user-facing outcome becomes a project.
+
+Discovery and investigation are a milestone inside the project, not a separate
+project.
+
+## Communicable or not
+
+A project is communicable when users would notice the change, or when whoever
+supports them needs training or communication to handle it. Otherwise it is
+non-communicable, such as a language version upgrade. Communicable projects need
+release communication, such as release notes or an announcement;
+non-communicable projects still get an outcome, a target date, and milestones,
+but no release communication. The product owner makes the call; say which way
+you lean and why.
+
+## Create from templates
+
+- Use the team's project and issue templates when they exist. If none fits, say
+  so.
+- New issues go to the team's triage inbox. If the issue belongs to a project,
+  set the project, except for bugs, which follow "Sustaining work and bugs"
+  below.
+- Labels come from the template. Don't add others unless asked.
+
+## Milestones
+
+- Keep the template's stages and add one only when the project needs it. Delete
+  stages the project won't use instead of leaving them empty.
+- Give every milestone a target date.
+- Each issue belongs to exactly one milestone.
+- A project can't pass a milestone until that milestone's issues are done.
+
+## Before In Development
+
+A project needs a target date and an agreed outcome before it moves to In
+Development, In Progress, or the team's equivalent status. Check for both. If
+one is missing, propose it and mark it pending the owner's agreement.
+
+## Sustaining work and bugs
+
+- Sustaining work and tech debt are standalone team issues that go through
+  triage. Make a project only when the work is project-sized.
+- A bug goes into a project, in the milestone where it was found, only when it
+  belongs to that active project and blocks its release. Otherwise it stays a
+  team issue through triage, even if it loosely relates to a sub-initiative.
 
 ## Record dependencies
 
 Use `blocked by` only for a prerequisite that prevents work from starting or
-finishing. Do not encode preference or ordinary ordering as a blocker. Use
+finishing. Don't encode preference or ordinary ordering as a blocker. Use
 project dependencies when one whole project gates another. The unblocked issues
 form the executable frontier.
 
-Classify every executable unit as an issue or sub-issue. When the user invokes
-`to-tickets`, let it draft vertical slices and blocking edges, then apply this
-skill's issue and sub-issue tests to place each slice. This skill owns that
-placement and the surrounding Linear levels. `to-tickets` must preserve the
-approved parent and sub-issue hierarchy when publishing tickets.
+When the user invokes `to-tickets`, let it draft vertical slices and blocking
+edges, then apply this skill's issue and sub-issue tests to place each slice.
+This skill owns that placement and the surrounding Linear levels. `to-tickets`
+must preserve the approved parent and sub-issue hierarchy when publishing
+tickets.
 
-## Produce the proposal
+## Output
 
-Show the proposed structure as a tree. Include initiatives, projects,
-milestones, issues, and sub-issues when the proposal uses them. Annotate every
-project with its terminal output and every real dependency inline. For example:
+A proposed tree, with each choice pending sign-off named with its owner:
 
 ```text
-Initiative: Improve account setup
-├── Project: Validate guided setup [output: go, change, or stop decision]
-│   ├── Issue: Define success measures
-│   ├── Issue: Test the guided setup
-│   └── Issue: Record the recommendation [blocked by: test]
-└── Project: Ship guided setup [output: working customer behavior]
-    ├── Milestone: Internal release
-    │   ├── Issue: Implement guided setup
-    │   │   ├── Sub-issue: Add completion-state persistence
-    │   │   └── Sub-issue: Instrument setup completion
-    │   └── Issue: Run internal release [blocked by: implement guided setup]
-    └── Milestone: Public release
-        └── Issue: Release guided setup [blocked by: run internal release]
+Sub-initiative: Guided setup: halve time to first working account
+├── Project: Guided setup wizard
+│   ├── Milestone: Discovery / Investigation
+│   │   └── Issue: Test the guided setup with five users
+│   ├── Milestone: Development
+│   │   └── Issue: Implement guided setup
+│   │       ├── Sub-issue: Add completion-state persistence
+│   │       └── Sub-issue: Instrument setup completion
+│   └── Milestone: Release
+│       └── Issue: Release guided setup [blocked by: implement guided setup]
+└── Project: Setup progress emails
+Pending sign-off: sub-initiative and outcomes (product owner)
 ```
 
-For an existing Linear structure, show `current -> proposed` for every move and
-name the decision rule that requires it. State uncertain ownership, scope, or
-outcomes instead of inventing them.
+For an existing structure, show `current -> proposed` for every move and name
+the rule that requires it. State uncertain ownership, scope, or outcomes instead
+of inventing them.

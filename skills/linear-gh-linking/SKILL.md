@@ -18,8 +18,10 @@ Repository conventions take precedence over its examples.
    - If none exists, stop before branching. When the work fits one issue,
      propose it inline with its title, team, assignee, and completion condition,
      following the user's team and assignee defaults, and create it after
-     approval. Apply `linear-work-breakdown` only when the work needs more than
-     one issue.
+     approval. Use the team's issue template when one exists, file the issue in
+     the team's triage inbox, and set its project when the work belongs to one.
+     Apply `linear-work-breakdown` only when the work needs more than one
+     issue.
    - If one may exist but its exact ID is unavailable, retrieve it through a
      read-only Linear lookup. If it cannot be verified, stop and request the ID.
 3. Preserve the verified ID. Do not infer it from another tracker or reuse its
