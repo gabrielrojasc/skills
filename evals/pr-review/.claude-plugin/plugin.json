@@ -1,0 +1,5 @@
+{
+  "name": "pr-review-eval",
+  "version": "0.0.0",
+  "description": "Offline eval harness for the pr-review skill."
+}

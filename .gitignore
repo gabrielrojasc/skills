@@ -1,3 +1,6 @@
 .DS_Store
 __pycache__/
 .pytest_cache/
+
+# pr-review eval run output
+evals/pr-review/evals/results/
