@@ -56,9 +56,17 @@ submission, follow [When the head moves](#when-the-head-moves).
 | Dependency bumps (for example, renovate) | Upgrade risk | No |
 
 Dependency bumps take the upgrade-risk row in every repository, riskive/API
-included. Check team membership with
-`gh api orgs/riskive/teams/t-executive-protection/memberships/<author>`: only
-`state: active` counts as a member; `pending` or a 404 does not.
+included.
+
+Decide `t-executive-protection` membership from the team roster. The membership
+endpoint returns 404 when the token can't see memberships, so a 404 there proves
+nothing. Read `members_count` from
+`gh api orgs/riskive/teams/t-executive-protection` and the logins from
+`gh api orgs/riskive/teams/t-executive-protection/members --paginate`.
+The author is a member when listed, and not a member only when the roster is
+complete: its length equals `members_count`. If the roster can't be read
+completely, membership is unknown. Start the Standards axis, which is the same
+either way, and ask the user whether to run the Spec axis.
 
 Python standards live in `riskive/python-standards` under `docs/`. List the
 directory and fetch the files relevant to the diff as raw content.
@@ -173,8 +181,9 @@ nonblocking unless they independently meet the blocker or major-debt bar.
    obvious.
 4. Write the result with headings `## Target head`, `## Verdict` (APPROVE,
    COMMENT, or REQUEST_CHANGES with one line of reasoning), `## Comment drafts`
-   (`- **file:line** — text` using new-file line numbers, or `- **review body**
-   — text`), and `## Notes for the reviewer (not for posting)`. Spec agents use
+   (`- **file:line** — text` using new-file line numbers, or
+   `- **review body** — text`), and
+   `## Notes for the reviewer (not for posting)`. Spec agents use
    `## Spec verdict` and `## Spec findings`. Return only the file path and the
    verdict line.
 5. If nothing qualifies, return APPROVE with no drafts. No praise.
@@ -263,9 +272,13 @@ questions.
 5. A note the user wants raised becomes a new draft marked `user-promoted`. It
    gets one verification round for claim and anchor only; the user's decision
    replaces the consequence test.
-6. Link every file mention shown to the user to the PR's Files changed view:
-   `[<path>:<line>](https://github.com/<owner>/<repo>/pull/<n>/files#diff-<sha256
-   of path>R<line>)`. Posted comment bodies stay plain.
+6. Link every file mention shown to the user to the PR's Files changed view
+   with this pattern, leaving no space between the hash and `R<line>`. Posted
+   comment bodies stay plain.
+
+   ```text
+   [<path>:<line>](https://github.com/<owner>/<repo>/pull/<n>/files#diff-<sha256-of-path>R<line>)
+   ```
 7. Write posted comments in lowercase, with no praise or follow-up-ticket
    suggestions.
 
