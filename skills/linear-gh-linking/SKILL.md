@@ -1,6 +1,6 @@
 ---
 name: linear-gh-linking
-description: Defines Linear links. Use when naming branches or linking PRs.
+description: Defines Linear links. Use when starting work or linking PRs.
 ---
 
 # Linear GitHub linking
@@ -16,12 +16,15 @@ Repository conventions take precedence over its examples.
    needs no Linear link.
 2. Confirm that the work has an executable Linear issue or sub-issue.
    - If none exists, stop before branching. When the work fits one issue,
-     propose it inline with its title, team, assignee, and completion condition,
-     following the user's team and assignee defaults, and create it after
-     approval. Use the team's issue template when one exists, file the issue in
-     the team's triage inbox, and set its project when the work belongs to one.
-     A bug joins a project only when it blocks that project's release. Apply
-     `linear-work-breakdown` only when the work needs more than one issue.
+     propose it inline with its title, team, assignee, issue template, project
+     and milestone (if any), and completion condition, following the user's team
+     and assignee defaults, and create it after approval. Use the team's issue
+     template when one exists; if none fits, create it untemplated and say so.
+     File the issue in the team's triage inbox, and set its project and
+     milestone when the work belongs to one. If the milestone is unclear, say so
+     in the proposal. A bug joins a project only when it blocks that project's
+     release, in the milestone where it was found. Apply `linear-work-breakdown`
+     only when the work needs more than one issue.
    - If one may exist but its exact ID is unavailable, retrieve it through a
      read-only Linear lookup. If it cannot be verified, stop and request the ID.
 3. Preserve the verified ID. Do not infer it from another tracker or reuse its

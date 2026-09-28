@@ -76,8 +76,8 @@ you lean and why.
 - Use the team's project and issue templates when they exist. If none fits, say
   so.
 - New issues go to the team's triage inbox. If the issue belongs to a project,
-  set the project, except for bugs, which follow "Sustaining work and bugs"
-  below.
+  set the project and the milestone it belongs to, except for bugs, which follow
+  "Sustaining work and bugs" below.
 - Labels come from the template. Don't add others unless asked.
 
 ## Milestones
@@ -85,7 +85,8 @@ you lean and why.
 - Keep the template's stages and add one only when the project needs it. Delete
   stages the project won't use instead of leaving them empty.
 - Give every milestone a target date.
-- Each issue belongs to exactly one milestone.
+- A project issue sits in one milestone and doesn't move between milestones.
+  Standalone team issues have none.
 - A project can't pass a milestone until that milestone's issues are done.
 
 ## Before In Development
@@ -117,11 +118,12 @@ tickets.
 
 ## Output
 
-A proposed tree, with each choice pending sign-off named with its owner:
+A proposed tree, with each project marked communicable or not and each choice
+pending sign-off named with its owner:
 
 ```text
 Sub-initiative: Guided setup: halve time to first working account
-├── Project: Guided setup wizard
+├── Project: Guided setup wizard [proposed: communicable]
 │   ├── Milestone: Discovery / Investigation
 │   │   └── Issue: Test the guided setup with five users
 │   ├── Milestone: Development
@@ -130,8 +132,9 @@ Sub-initiative: Guided setup: halve time to first working account
 │   │       └── Sub-issue: Instrument setup completion
 │   └── Milestone: Release
 │       └── Issue: Release guided setup [blocked by: implement guided setup]
-└── Project: Setup progress emails
-Pending sign-off: sub-initiative and outcomes (product owner)
+└── Project: Setup progress emails [proposed: communicable]
+Pending sign-off: sub-initiative, communicability, and outcomes (product owner),
+  project and milestone target dates (engineering lead with product owner)
 ```
 
 For an existing structure, show `current -> proposed` for every move and name
