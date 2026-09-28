@@ -20,8 +20,8 @@ Repository conventions take precedence over its examples.
      following the user's team and assignee defaults, and create it after
      approval. Use the team's issue template when one exists, file the issue in
      the team's triage inbox, and set its project when the work belongs to one.
-     Apply `linear-work-breakdown` only when the work needs more than one
-     issue.
+     A bug joins a project only when it blocks that project's release. Apply
+     `linear-work-breakdown` only when the work needs more than one issue.
    - If one may exist but its exact ID is unavailable, retrieve it through a
      read-only Linear lookup. If it cannot be verified, stop and request the ID.
 3. Preserve the verified ID. Do not infer it from another tracker or reuse its
@@ -29,13 +29,25 @@ Repository conventions take precedence over its examples.
 
 ## Link the branch
 
-Tell `git-workspace` to pass the exact issue ID through `--ticket ENG-123`. Its
-helper lowercases the ID while preserving the repository's required branch
-prefix. For example:
+Name branches with [Conventional Branch](https://conventionalbranch.org/) and
+the lowercased issue ID, unless the repository documents another convention:
 
 ```text
-feature/eng-123-short-description
+<type>/<issue-id>-<short-description>
+feature/eng-123-guided-setup
 ```
+
+Take the type from the issue's type:
+
+| Issue type | Branch type |
+|---|---|
+| Feature | `feature/` |
+| Bug | `bugfix/`, or `hotfix/` when its priority is Urgent |
+| Sustaining | `chore/` |
+| Task | `chore/` |
+
+With `git-workspace`, pass the issue ID through `--ticket ENG-123` and the type
+through `--branch-prefix`. The helper lowercases the ID.
 
 Prefer one primary Linear issue per branch. A pull request may link other issues
 when the delivered work genuinely spans them.
