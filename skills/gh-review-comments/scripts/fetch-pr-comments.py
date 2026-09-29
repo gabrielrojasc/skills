@@ -67,7 +67,7 @@ query(
               line
               originalLine
               diffHunk
-              author { login }
+              author { login __typename }
             }
           }
         }
@@ -106,7 +106,7 @@ query(
           body
           createdAt
           updatedAt
-          author { login }
+          author { login __typename }
         }
       }
       reviews(first: 100, after: $reviewsCursor) @include(if: $includeReviews) {
@@ -117,7 +117,7 @@ query(
           state
           body
           submittedAt
-          author { login }
+          author { login __typename }
         }
       }
       reviewThreads(first: 100, after: $threadsCursor) @include(if: $includeThreads) {
@@ -146,7 +146,7 @@ query(
               line
               originalLine
               diffHunk
-              author { login }
+              author { login __typename }
             }
           }
         }

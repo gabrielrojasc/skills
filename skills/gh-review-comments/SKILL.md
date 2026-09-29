@@ -153,6 +153,8 @@ such as "after #127 merges".
 
 > the exact text, only when one is proposed
 
+**Reaction:** 👍 or 👎, only for a bot comment
+
 ---
 ```
 
@@ -168,6 +170,10 @@ such as "after #127 merges".
   deciding assumption.
 - List anything proposed beyond the comments, such as a follow-up issue or a
   change in another PR, as its own numbered item at the end in the same format.
+- Propose a reaction for every item raised by a bot, whose `author.__typename`
+  is `Bot`, so the bot learns from the outcome: 👍 when it found a real issue
+  (Fix or Already addressed), 👎 when it was incorrect, stale, or not useful.
+  Skip bot status reports and summaries without a concrete concern.
 - Keep replies concise and scoped to the reviewed code. Don't mention private
   chat context as evidence.
 
@@ -191,6 +197,8 @@ ask to revise any item.
 - For **Dismiss** items, resolve only when the approved proposal explicitly
   includes resolution.
 - If the human approves only some items, handle only those items.
+- Approving an item includes its proposed reaction. Add it after the item's
+  decision is final, even when no reply is posted.
 
 ## Posting replies and resolving threads after approval
 
@@ -204,6 +212,9 @@ Use the least broad mutation needed:
 - For an approved response to a conversation comment or review body, use `gh pr
   comment <pr> --body-file <file>` and link the original source. This creates a
   new top-level comment; it does not reply to or resolve an inline thread.
+- React to a bot comment: `gh api graphql` with `addReaction`, using the
+  comment's or review's `id` and `THUMBS_UP` or `THUMBS_DOWN`. Add approved
+  reactions in parallel.
 
 Prefer writing reply bodies to a temporary file and passing `--body-file` or `-F
 body=@<file>` so shell quoting cannot corrupt the message.
