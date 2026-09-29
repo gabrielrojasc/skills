@@ -112,9 +112,8 @@ instructions](references/documentation-review.md).
 The Spec agent judges whether the diff implements what the originating ticket
 asks:
 
-1. Find the Jira key or Linear ref in the PR title, branch, body, or commits.
-   Fetch it with `acli jira workitem view <key> --fields '*all'` or the Linear
-   MCP `get_issue`.
+1. Find the Linear issue ID in the PR title, branch, body, or commits, and
+   fetch the issue with the Linear MCP `get_issue`.
 2. Report only requirements that are missing, partial, or implemented wrong, and
    quote the ticket line for each. Extra changes are fine unless they are
    themselves wrong or risky.
