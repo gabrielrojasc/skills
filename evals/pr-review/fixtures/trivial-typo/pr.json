@@ -1,0 +1,20 @@
+{
+  "number": 8,
+  "title": "Fix typo in README",
+  "url": "https://github.com/riskive/webhook-relay/pull/8",
+  "body": "Fixes a spelling mistake.",
+  "state": "OPEN",
+  "isDraft": false,
+  "author": {"login": "bob-dev"},
+  "headRefName": "chore/readme-typo",
+  "baseRefName": "main",
+  "headRefOid": "8a1b2c3d4e5f60718293a4b5c6d7e8f901234567",
+  "updatedAt": "2026-09-27T16:10:00Z",
+  "reviews": [],
+  "reviewDecision": "",
+  "repository": {"nameWithOwner": "riskive/webhook-relay"},
+  "files": [{"path": "README.md", "additions": 1, "deletions": 1}],
+  "commits": [{"oid": "8a1b2c3d4e5f60718293a4b5c6d7e8f901234567", "messageHeadline": "Fix typo in README"}],
+  "labels": [],
+  "reviewRequests": [{"login": "eval-user"}]
+}

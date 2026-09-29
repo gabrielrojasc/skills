@@ -1,0 +1,22 @@
+diff --git a/relay/signature.py b/relay/signature.py
+index 2c4e6a8..7b9d1f3 100644
+--- a/relay/signature.py
++++ b/relay/signature.py
+@@ -1,12 +1,14 @@
+ import hashlib
+ import hmac
+
+
+ def verify_request(request, secret):
+-    """Reject requests whose signature doesn't match."""
+-    signature = request.headers["X-Relay-Signature"]
++    """Check the request signature."""
++    signature = request.headers.get("X-Relay-Signature")
++    if signature is None:
++        # Older senders don't sign requests yet.
++        return True
+     expected = hmac.new(secret.encode(), request.body, hashlib.sha256).hexdigest()
+-    if not hmac.compare_digest(signature, expected):
+-        raise PermissionError("bad signature")
+-    return True
++    return signature == expected

@@ -4,3 +4,6 @@ __pycache__/
 
 # pr-review eval run output
 evals/pr-review/evals/results/
+
+# pr-review rung eval output
+evals/pr-review/rung-results/

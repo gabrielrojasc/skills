@@ -1,0 +1,20 @@
+{
+  "number": 9,
+  "title": "Accept unsigned requests from older senders",
+  "url": "https://github.com/riskive/webhook-relay/pull/9",
+  "body": "Some partners haven't rolled out request signing yet, so this lets unsigned requests through until they do.",
+  "state": "OPEN",
+  "isDraft": false,
+  "author": {"login": "carol-dev"},
+  "headRefName": "feature/unsigned-senders",
+  "baseRefName": "main",
+  "headRefOid": "9c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d",
+  "updatedAt": "2026-09-27T17:20:00Z",
+  "reviews": [],
+  "reviewDecision": "",
+  "repository": {"nameWithOwner": "riskive/webhook-relay"},
+  "files": [{"path": "relay/signature.py", "additions": 6, "deletions": 4}],
+  "commits": [{"oid": "9c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d", "messageHeadline": "Accept unsigned requests from older senders"}],
+  "labels": [],
+  "reviewRequests": [{"login": "eval-user"}]
+}

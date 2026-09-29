@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Offline stand-in for the GitHub CLI, used by the pr-review evals.
 
-It answers the `gh` calls pr-review makes from fixture files in ./fixtures and
-never touches the network. Writes such as submitting a review are recorded in
+It answers the `gh` calls pr-review makes from fixture files and never touches
+the network. Each PR lives in ./fixtures/<number>/; repository file contents and
+the team roster may sit in any PR's folder and are shared across them. Writes such as submitting a review are recorded in
 ./posted/ instead of being sent, so graders can check what would have been
 posted. Every call is appended to ./gh-calls.log.
 """
@@ -31,11 +32,44 @@ def fail(message, code=1):
     sys.exit(code)
 
 
-def load(name):
-    path = FIXTURES / name
+def pr_dirs():
+    return sorted(p for p in FIXTURES.iterdir() if (p / "pr.json").is_file())
+
+
+def pr_dir(number=None):
+    """Return the fixture folder for a PR number, or the only one when unambiguous."""
+    dirs = pr_dirs()
+    if number is not None:
+        for d in dirs:
+            if d.name == str(number):
+                return d
+        fail(f"gh: Not Found (HTTP 404) [no fixture for PR {number}]")
+    if len(dirs) == 1:
+        return dirs[0]
+    fail("gh: a PR number is required; several fixture PRs exist")
+
+
+def pr_number(value):
+    """Extract a PR number from `7`, `#7`, `owner/repo#7`, or a PR URL."""
+    tail = str(value).rstrip("/").split("/")[-1].split("#")[-1]
+    return int(tail) if tail.isdigit() else None
+
+
+def load(name, number=None, optional=False):
+    path = pr_dir(number) / name
     if not path.exists():
+        if optional:
+            return None
         fail(f"gh: Not Found (HTTP 404) [fixture {name} missing]")
     return path.read_text(encoding="utf-8")
+
+
+def shared(relative):
+    """Find a shared fixture path (contents or roster) in any PR folder."""
+    for d in pr_dirs():
+        if (d / relative).exists():
+            return d / relative
+    return None
 
 
 def emit(text, jq_filter=None):
@@ -73,11 +107,13 @@ def pr_command(args):
     fields = take(args, "--json")
     take(args, "--repo")
     take(args, "-R")
-    pr = json.loads(load("pr.json"))
+    positional = [a for a in args if not a.startswith("-")]
+    number = pr_number(positional[0]) if positional else None
+    pr = json.loads(load("pr.json", number))
     if sub == "view":
         emit(json.dumps(select_fields(pr, fields)), jq_filter)
     elif sub == "diff":
-        print(load("diff.patch"), end="")
+        print(load("diff.patch", number), end="")
     elif sub in {"review", "comment", "merge", "close", "edit"}:
         record("pr-" + sub, args)
     else:
@@ -112,7 +148,8 @@ def api_command(args):
     endpoint = args[0].lstrip("/").split("?")[0]
 
     if endpoint == "graphql":
-        emit(load("graphql.json") if (FIXTURES / "graphql.json").exists() else json.dumps({"data": {}}), jq_filter)
+        emit(json.dumps({"data": {"repository": {"pullRequest": {"reviewThreads": {
+            "nodes": [], "pageInfo": {"hasNextPage": False, "endCursor": None}}}}}}), jq_filter)
         return
 
     parts = endpoint.split("/")
@@ -125,14 +162,14 @@ def api_command(args):
     if len(parts) == 6 and parts[0] == "repos" and parts[3] == "pulls":
         name = {"reviews": "reviews.json", "comments": "review-comments.json", "files": "files.json"}.get(parts[5])
         if name:
-            emit(load(name) if (FIXTURES / name).exists() else "[]", jq_filter)
+            emit(load(name, pr_number(parts[4]), optional=True) or "[]", jq_filter)
             return
     if len(parts) == 5 and parts[0] == "repos" and parts[3] == "pulls":
-        emit(load("pr-rest.json") if (FIXTURES / "pr-rest.json").exists() else load("pr.json"), jq_filter)
+        emit(load("pr.json", pr_number(parts[4])), jq_filter)
         return
     # repos/<owner>/<repo>/issues/<n>/comments
     if len(parts) == 6 and parts[0] == "repos" and parts[3] == "issues" and parts[5] == "comments":
-        emit(load("issue-comments.json") if (FIXTURES / "issue-comments.json").exists() else "[]", jq_filter)
+        emit(load("issue-comments.json", pr_number(parts[4]), optional=True) or "[]", jq_filter)
         return
     # orgs/<org>/teams/<team>/memberships/<user>
     if len(parts) == 6 and parts[0] == "orgs" and parts[2] == "teams" and parts[4] == "memberships":
@@ -140,7 +177,8 @@ def api_command(args):
         fail("gh: Not Found (HTTP 404)\nThis API operation needs the \"admin:org\" scope.")
     # orgs/<org>/teams/<team> and orgs/<org>/teams/<team>/members
     if parts[:1] == ["orgs"] and len(parts) in (4, 5) and parts[2] == "teams" and parts[4:] in ([], ["members"]):
-        teams = json.loads(load("teams.json")) if (FIXTURES / "teams.json").exists() else {}
+        roster = shared("teams.json")
+        teams = json.loads(roster.read_text(encoding="utf-8")) if roster else {}
         team = teams.get(parts[3])
         if team is None:
             fail("gh: Not Found (HTTP 404)")
@@ -157,7 +195,7 @@ def api_command(args):
     if len(parts) >= 4 and parts[0] == "repos" and parts[3] == "contents":
         repo = f"{parts[1]}/{parts[2]}"
         rel = "/".join(parts[4:])
-        target = FIXTURES / "contents" / repo / rel
+        target = shared(Path("contents") / repo / rel) or FIXTURES / "missing"
         if target.is_dir():
             listing = [{"name": p.name, "path": f"{rel}/{p.name}".lstrip("/"), "type": "dir" if p.is_dir() else "file"}
                        for p in sorted(target.iterdir())]
@@ -188,7 +226,7 @@ def main():
     elif command == "auth":
         print("github.com\n  ✓ Logged in to github.com account eval-user (fixture)")
     elif command == "repo" and args[:1] == ["view"]:
-        emit(json.dumps({"nameWithOwner": json.loads(load("pr.json"))["repository"]["nameWithOwner"]}),
+        emit(json.dumps({"nameWithOwner": json.loads(pr_dirs()[0].joinpath("pr.json").read_text())["repository"]["nameWithOwner"]}),
              take(args, "--jq"))
     else:
         fail(f"gh {command}: not supported by the eval fixture")
