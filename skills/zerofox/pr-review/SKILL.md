@@ -218,12 +218,17 @@ revised. After each round that leaves drafts unconfirmed, a fresh read-only
 progress agent reads the round files so far and decides whether another round
 can make progress. It doesn't judge the findings. It stops the loop when
 objections repeat without new evidence, revisions cycle between equivalent
-drafts, or resolution needs evidence or a decision outside the review. Anything
-still unconfirmed then is dropped and listed as "unverified, dropped" with its
-sticking point and the progress agent's reason. Then the orchestrator sets the
-axis verdict from the confirmed set. Nonblocking findings alone mean COMMENT,
-not REQUEST_CHANGES. Refuted and dropped drafts stay in `triage.md` with their
-reasons so the user can overrule.
+drafts, or resolution needs evidence or a decision outside the review.
+
+When the loop stops, keep every draft whose concern a verifier accepted, through
+a `confirmed` or `revise` verdict, unless a later verifier refuted it. If its
+wording or anchor is still unsettled, keep the latest draft, mark it
+`wording unsettled`, and record the sticking point; it counts as confirmed.
+Drop a draft as "unverified, dropped", with its sticking point and the progress
+agent's reason, only when no verifier accepted its concern or the latest verdict
+refuted it. Then the orchestrator sets the axis verdict from the confirmed set.
+Nonblocking findings alone mean COMMENT, not REQUEST_CHANGES. Refuted and
+dropped drafts stay in `triage.md` with their reasons so the user can overrule.
 
 ## Triage
 
@@ -259,21 +264,22 @@ questions.
 
    Keep the problem and the reason to a sentence or two each, but always show
    the full draft. Add the trimmed impact argument when the verifier removed
-   one. After the confirmed findings, show refuted and dropped drafts with
-   reasons, then the reviewer notes.
+   one. Show a `wording unsettled` finding with the confirmed ones, marked in
+   its heading, and add a **Wording:** line with the sticking point. After the
+   confirmed findings, show refuted and dropped drafts with reasons, then the
+   reviewer notes.
 3. Show the whole batch in one message, then ask one question at the end, not
-   one per finding. The user may keep all, give decisions by ID (for example,
-   "keep S1 S3, drop S2, reword P1 to ..."), go one by one, or decide some by ID
-   and go one by one through the rest. Record every decision in `triage.md`.
-4. One by one means one block at a time, with a short explanation of the
-   surrounding code, waiting for a decision before the next. Findings the user
-   already decided are skipped.
-5. A note the user wants raised becomes a new draft marked `user-promoted`. It
-   gets one verification round for claim and anchor only; the user's decision
-   replaces the consequence test.
-6. Link every file mention shown to the user to the PR's Files changed view
-   with this pattern, leaving no space between the hash and `R<line>`. Posted
-   comment bodies stay plain.
+   one per finding. The user may keep all, give decisions by ID
+   (for example, "keep S1 S3, drop S2, reword P1 to ..."), go one by one, or
+   decide some by ID and go one by one through the rest. Record every decision
+   in `triage.md`. 4. One by one means one block at a time, with a short
+   explanation of the surrounding code, waiting for a decision before the next.
+   Findings the user already decided are skipped. 5. A note the user wants
+   raised becomes a new draft marked `user-promoted`. It gets one verification
+   round for claim and anchor only; the user's decision replaces the consequence
+   test. 6. Link every file mention shown to the user to the PR's Files changed
+   view with this pattern, leaving no space between the hash and `R<line>`.
+   Posted comment bodies stay plain.
 
    ```text
    [<path>:<line>](https://github.com/<owner>/<repo>/pull/<n>/files#diff-<sha256-of-path>R<line>)
