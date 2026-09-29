@@ -43,8 +43,6 @@ installation, updates, and lock tracking.
 - [`developer-documentation-style`](skills/developer-documentation-style/SKILL.md)
   reads the live Google guide before writing, editing, or reviewing developer
   documentation.
-- [`file-pr`](skills/file-pr/SKILL.md) reviews the committed branch diff and
-  opens one concise pull request without changing code.
 - [`python-environments`](skills/python-environments/SKILL.md) creates and
   manages project-local Python environments with `uv venv` while preserving each
   repository's dependency workflow.
