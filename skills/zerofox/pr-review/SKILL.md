@@ -286,8 +286,9 @@ questions.
    [<path>:<line>](https://github.com/<owner>/<repo>/pull/<n>/files#diff-<sha256-of-path>R<line>)
    ```
 
-   Compute every hash by running `printf '%s' '<path>' | shasum -a 256`, all of a
-   PR's hashes in one command, even for a familiar path. GitHub anchors use
+   Compute every hash by running
+   `printf '%s' '<path>' | shasum -a 256 | cut -d' ' -f1`, all of a PR's hashes
+   in one command, even for a familiar path. GitHub anchors use
    SHA-256, and a hash written from memory is usually the old MD5 form, which
    GitHub no longer resolves.
 7. Write posted comments in lowercase, with no praise or follow-up-ticket
