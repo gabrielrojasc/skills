@@ -11,11 +11,16 @@ criteria for its PR's risk class:
   risky    reviewers and verifiers run on tier 4
            (Claude: effort xhigh or max; Codex: gpt-6-astra)
 
+--policy tier2-reviewers relaxes normal PRs: reviewers and Spec reviewers may
+run on tier 2 (Claude: effort medium or higher; Codex: any model but
+gpt-6-luna), and verifiers still need tier 3.
+
 Progress checks and other helpers are reported but not scored.
 
 Usage:
   score-rungs.py claude <trace.jsonl> --expect 7=normal 8=trivial 9=risky
   score-rungs.py codex  <trace.jsonl> --expect 7=normal [--sessions ~/.codex/sessions]
+  score-rungs.py claude <trace.jsonl> --expect 7=normal --policy tier2-reviewers
 """
 
 import argparse
@@ -117,9 +122,13 @@ def codex_spawns(trace, sessions, thread_id=None):
              "forked": bool(metas[sid].get("forked_from_id"))} for sid in sorted(family)]
 
 
-def passes(tool, risk, spawn):
+def passes(tool, risk, spawn, policy="current"):
     if risk == "trivial":
         return True
+    if policy == "tier2-reviewers" and risk == "normal" and spawn["role"] != "verifier":
+        if tool == "claude":
+            return spawn["effort"] in {"medium", "high", "xhigh", "max"}
+        return spawn["model"] not in {None, "gpt-6-luna"}
     if tool == "claude":
         allowed = {"normal": {"high", "xhigh", "max"}, "risky": {"xhigh", "max"}}[risk]
         return spawn["effort"] in allowed
@@ -136,6 +145,7 @@ def main():
     parser.add_argument("--expect", nargs="+", required=True, help="PR=risk pairs, e.g. 7=normal")
     parser.add_argument("--sessions", type=Path, default=Path.home() / ".codex" / "sessions")
     parser.add_argument("--json", type=Path, help="also write the scored rows as JSON")
+    parser.add_argument("--policy", choices=["current", "tier2-reviewers"], default="current")
     args = parser.parse_args()
     expect = dict(pair.split("=", 1) for pair in args.expect)
 
@@ -146,8 +156,9 @@ def main():
         pr = pr_of(spawn["label"], expect)
         risk = expect.get(pr, "?")
         scored = role in SCORED_ROLES and risk != "?"
-        rows.append({**spawn, "role": role, "pr": pr, "risk": risk,
-                     "result": ("PASS" if passes(args.tool, risk, spawn) else "FAIL") if scored else "-"})
+        row = {**spawn, "role": role, "pr": pr, "risk": risk}
+        row["result"] = ("PASS" if passes(args.tool, risk, row, args.policy) else "FAIL") if scored else "-"
+        rows.append(row)
 
     print(f"{'PR':4} {'risk':8} {'role':9} {'rung':15} {'model':18} {'effort':8} {'fork':5} result  label")
     for r in sorted(rows, key=lambda r: (r["pr"], r["role"])):

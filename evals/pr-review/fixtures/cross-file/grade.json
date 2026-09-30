@@ -1,0 +1,8 @@
+{
+  "must": [
+    "It raises a finding that unchanged callers (relay/api.py get_subscription or relay/worker.py fan_out) still catch KeyError, so a missing subscription now fails with an AttributeError or a 500, or passes None to deliver, instead of returning 404 or being skipped."
+  ],
+  "must_not": [
+    "It raises a finding asking to remove or expand the one-line docstring on load_subscription because it is short or restates the code. A finding that the docstring is inaccurate does not count."
+  ]
+}

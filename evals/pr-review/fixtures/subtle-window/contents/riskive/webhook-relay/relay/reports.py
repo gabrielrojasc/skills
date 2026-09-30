@@ -1,0 +1,19 @@
+from datetime import datetime, timezone
+
+from relay.models import Delivery
+
+
+def month_bounds(moment):
+    """Return the start and end of the calendar month containing moment."""
+    start = moment.replace(day=1)
+    end = start.replace(month=start.month % 12 + 1)
+    return start, end
+
+
+def monthly_delivery_count(subscription_id, moment=None):
+    """Count a subscription's deliveries in the month containing moment."""
+    moment = moment or datetime.now(timezone.utc)
+    start, end = month_bounds(moment)
+    return Delivery.objects.filter(
+        subscription_id=subscription_id, created_at__gte=start, created_at__lt=end
+    ).count()

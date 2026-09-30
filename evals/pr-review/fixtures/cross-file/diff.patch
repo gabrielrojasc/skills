@@ -1,0 +1,16 @@
+diff --git a/relay/store.py b/relay/store.py
+index 7a3b9e2..e41c0d8 100644
+--- a/relay/store.py
++++ b/relay/store.py
+@@ -1,9 +1,6 @@
+ from relay.models import Subscription
+
+
+ def load_subscription(subscription_id):
+-    """Load a subscription by ID. Raises KeyError when it does not exist."""
+-    try:
+-        return Subscription.objects.get(pk=subscription_id)
+-    except Subscription.DoesNotExist:
+-        raise KeyError(subscription_id)
++    """Load a subscription by ID, or None when it does not exist."""
++    return Subscription.objects.filter(pk=subscription_id).first()

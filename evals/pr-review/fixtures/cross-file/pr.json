@@ -1,0 +1,20 @@
+{
+  "number": 14,
+  "title": "Return None for unknown subscriptions",
+  "url": "https://github.com/riskive/webhook-relay/pull/14",
+  "body": "Simplifies load_subscription to one query that returns None for a missing subscription instead of raising.",
+  "state": "OPEN",
+  "isDraft": false,
+  "author": {"login": "grace-dev"},
+  "headRefName": "chore/load-subscription-none",
+  "baseRefName": "main",
+  "headRefOid": "d14e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e",
+  "updatedAt": "2026-09-29T11:15:00Z",
+  "reviews": [],
+  "reviewDecision": "",
+  "repository": {"nameWithOwner": "riskive/webhook-relay"},
+  "files": [{"path": "relay/store.py", "additions": 2, "deletions": 5}],
+  "commits": [{"oid": "d14e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e", "messageHeadline": "Return None for unknown subscriptions"}],
+  "labels": [],
+  "reviewRequests": [{"login": "eval-user"}]
+}

@@ -1,0 +1,20 @@
+{
+  "number": 13,
+  "title": "Count deliveries per calendar month",
+  "url": "https://github.com/riskive/webhook-relay/pull/13",
+  "body": "Adds a monthly delivery count for the billing page. Invoices bill each subscription for the deliveries this returns.",
+  "state": "OPEN",
+  "isDraft": false,
+  "author": {"login": "frank-dev"},
+  "headRefName": "feature/monthly-delivery-count",
+  "baseRefName": "main",
+  "headRefOid": "c13d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d",
+  "updatedAt": "2026-09-29T09:30:00Z",
+  "reviews": [],
+  "reviewDecision": "",
+  "repository": {"nameWithOwner": "riskive/webhook-relay"},
+  "files": [{"path": "relay/reports.py", "additions": 20, "deletions": 0}],
+  "commits": [{"oid": "c13d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d", "messageHeadline": "Count deliveries per calendar month"}],
+  "labels": [],
+  "reviewRequests": [{"login": "eval-user"}]
+}

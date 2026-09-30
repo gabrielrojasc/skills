@@ -4,6 +4,9 @@
 #
 #   run-rungs.sh <claude|codex> <out-dir> <fixture>...
 #
+# RUNG_POLICY=tier2-reviewers scores normal PRs' reviewers against tier 2
+# instead of tier 3 (see lib/score-rungs.py).
+#
 # Each fixture is a folder under fixtures/. Several fixtures make one batch
 # request. Nothing is posted: the fake gh records writes under posted/.
 set -euo pipefail
@@ -36,4 +39,4 @@ else
   ZDOTDIR="${out}/zdot" codex exec --skip-git-repo-check -s workspace-write --json -o final.md "$prompt" \
     < /dev/null > trace.jsonl 2> stderr.log
 fi
-python3 "${here}/lib/score-rungs.py" "$tool" trace.jsonl --expect "${expect[@]}" --json scores.json | tee scores.txt
+python3 "${here}/lib/score-rungs.py" "$tool" trace.jsonl --expect "${expect[@]}" --policy "${RUNG_POLICY:-current}" --json scores.json | tee scores.txt

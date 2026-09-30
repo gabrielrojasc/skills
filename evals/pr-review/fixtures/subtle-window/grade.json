@@ -1,0 +1,9 @@
+{
+  "must": [
+    "It raises a finding that month_bounds gets December wrong: the month wraps to January but the year stays the same, so the end falls before the start and December counts are empty or wrong.",
+    "It raises a finding that start keeps the time of day of moment, because replace(day=1) does not reset the hour, minute, and second, so deliveries earlier on the first day of the month are left out."
+  ],
+  "must_not": [
+    "It raises a finding asking to remove or expand the docstrings on month_bounds or monthly_delivery_count because they are short or restate the code. A finding that a docstring is inaccurate does not count."
+  ]
+}
