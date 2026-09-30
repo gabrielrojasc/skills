@@ -284,6 +284,9 @@ questions.
    ```text
    [<path>:<line>](https://github.com/<owner>/<repo>/pull/<n>/files#diff-<sha256-of-path>R<line>)
    ```
+
+   Compute the hash with `printf '%s' '<path>' | shasum -a 256`, and compute all
+   of a PR's hashes in one command.
 7. Write posted comments in lowercase, with no praise or follow-up-ticket
    suggestions.
 
