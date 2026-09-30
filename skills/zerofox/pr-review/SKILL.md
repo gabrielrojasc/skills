@@ -269,24 +269,27 @@ questions.
    confirmed findings, show refuted and dropped drafts with reasons, then the
    reviewer notes.
 3. Show the whole batch in one message, then ask one question at the end, not
-   one per finding. The user may keep all, give decisions by ID
-   (for example, "keep S1 S3, drop S2, reword P1 to ..."), go one by one, or
-   decide some by ID and go one by one through the rest. Record every decision
-   in `triage.md`. 4. One by one means one block at a time, with a short
-   explanation of the surrounding code, waiting for a decision before the next.
-   Findings the user already decided are skipped. 5. A note the user wants
-   raised becomes a new draft marked `user-promoted`. It gets one verification
-   round for claim and anchor only; the user's decision replaces the consequence
-   test. 6. Link every file mention shown to the user to the PR's Files changed
-   view with this pattern, leaving no space between the hash and `R<line>`.
-   Posted comment bodies stay plain.
+   one per finding. The user may keep all, give decisions by ID (for example,
+   "keep S1 S3, drop S2, reword P1 to ..."), go one by one, or decide some by ID
+   and go one by one through the rest. Record every decision in `triage.md`.
+4. One by one means one block at a time, with a short explanation of the
+   surrounding code, waiting for a decision before the next. Findings the user
+   already decided are skipped.
+5. A note the user wants raised becomes a new draft marked `user-promoted`. It
+   gets one verification round for claim and anchor only; the user's decision
+   replaces the consequence test.
+6. Link every file mention shown to the user to the PR's Files changed view
+   with this pattern, leaving no space between the hash and `R<line>`. Posted
+   comment bodies stay plain.
 
    ```text
    [<path>:<line>](https://github.com/<owner>/<repo>/pull/<n>/files#diff-<sha256-of-path>R<line>)
    ```
 
-   Compute the hash with `printf '%s' '<path>' | shasum -a 256`, and compute all
-   of a PR's hashes in one command.
+   Compute every hash by running `printf '%s' '<path>' | shasum -a 256`, all of a
+   PR's hashes in one command, even for a familiar path. GitHub anchors use
+   SHA-256, and a hash written from memory is usually the old MD5 form, which
+   GitHub no longer resolves.
 7. Write posted comments in lowercase, with no praise or follow-up-ticket
    suggestions.
 
