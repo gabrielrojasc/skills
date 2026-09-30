@@ -1,0 +1,24 @@
+diff --git a/pyproject.toml b/pyproject.toml
+index 4d5e6f7..8a9b0c1 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -5,6 +5,6 @@ version = "1.4.0"
+
+ [tool.poetry.dependencies]
+ python = "^3.10"
+-django = "^3.2"
++django = "^4.2"
+ requests = "^2.32"
+diff --git a/poetry.lock b/poetry.lock
+index 1b2c3d4..5e6f7a8 100644
+--- a/poetry.lock
++++ b/poetry.lock
+@@ -120,8 +120,8 @@
+ [[package]]
+ name = "django"
+-version = "3.2.25"
++version = "4.2.16"
+ description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
+ optional = false
+-python-versions = ">=3.6"
++python-versions = ">=3.8"

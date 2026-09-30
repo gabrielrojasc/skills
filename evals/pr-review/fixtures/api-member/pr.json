@@ -1,0 +1,39 @@
+{
+  "number": 5602,
+  "title": "Add alert counts per executive endpoint",
+  "url": "https://github.com/riskive/API/pull/5602",
+  "body": "Adds an endpoint that returns alert counts per executive for the dashboard. Part of AIC-2.",
+  "state": "OPEN",
+  "isDraft": false,
+  "author": {
+    "login": "reviewer-two"
+  },
+  "headRefName": "feature/exec-alert-counts-5602",
+  "baseRefName": "main",
+  "headRefOid": "5602abababababababababababababababababab",
+  "updatedAt": "2026-09-28T11:00:00Z",
+  "reviews": [],
+  "reviewDecision": "",
+  "repository": {
+    "nameWithOwner": "riskive/API"
+  },
+  "files": [
+    {
+      "path": "zfapi/alerts/views.py",
+      "additions": 20,
+      "deletions": 0
+    }
+  ],
+  "commits": [
+    {
+      "oid": "5602abababababababababababababababababab",
+      "messageHeadline": "Add alert counts per executive endpoint"
+    }
+  ],
+  "labels": [],
+  "reviewRequests": [
+    {
+      "login": "eval-user"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "number": 11,
+  "title": "Count webhook deliveries",
+  "url": "https://github.com/riskive/webhook-relay/pull/11",
+  "body": "Adds a helper that counts deliveries per event.",
+  "state": "OPEN",
+  "isDraft": false,
+  "author": {"login": "erin-dev"},
+  "headRefName": "feature/delivery-count",
+  "baseRefName": "main",
+  "headRefOid": "b11c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c",
+  "updatedAt": "2026-09-28T10:00:00Z",
+  "reviews": [],
+  "reviewDecision": "",
+  "repository": {"nameWithOwner": "riskive/webhook-relay"},
+  "files": [{"path": "relay/metrics.py", "additions": 20, "deletions": 0}],
+  "commits": [{"oid": "b11c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c", "messageHeadline": "Count webhook deliveries"}],
+  "labels": [],
+  "reviewRequests": [{"login": "eval-user"}]
+}

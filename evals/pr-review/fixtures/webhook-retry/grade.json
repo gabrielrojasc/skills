@@ -1,0 +1,8 @@
+{
+  "must": [
+    "It raises a finding that the retry loop retries permanent 4xx errors (such as 401, 404, or 410), or that the comment claiming it only retries temporary failures is wrong."
+  ],
+  "must_not": [
+    "It raises a finding asking to remove, expand, or rewrite the short docstring \"Send a webhook.\""
+  ]
+}

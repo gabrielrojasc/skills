@@ -1,0 +1,6 @@
+{
+  "must": [
+    "It raises a blocking finding that relay/urls.py uses django.conf.urls.url, which Django 4.0 removed, so the app breaks on 4.2.",
+    "It raises a finding that relay/urls.py uses django.utils.encoding.force_text, which Django 4.0 removed (force_str replaces it)."
+  ]
+}

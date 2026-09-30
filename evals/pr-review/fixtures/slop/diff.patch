@@ -1,0 +1,27 @@
+diff --git a/relay/metrics.py b/relay/metrics.py
+new file mode 100644
+index 0000000..8e7f6a5
+--- /dev/null
++++ b/relay/metrics.py
+@@ -0,0 +1,21 @@
++def record_delivery(event, success):
++    stats = {"delivered": 0, "failed": 0}
++    # Increment the right counter
++    if success:
++        stats["delivered"] += 1
++    else:
++        stats["failed"] += 1
++    return _get_delivery_count(stats)
++
++
++def _get_delivery_count(stats):
++    # Get the delivery count
++    return _count_deliveries(stats)
++
++
++def _count_deliveries(stats):
++    # Return zero when there are no stats
++    if stats is None:
++        return 0
++    # Add delivered and failed together
++    return stats["delivered"] + stats["failed"]

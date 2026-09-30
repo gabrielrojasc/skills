@@ -1,0 +1,8 @@
+{
+  "must": [
+    "It raises a finding about the N+1 query: counting alerts with a separate query per executive instead of annotating or aggregating.",
+    "It raises a finding that the view hand-rolls pagination or returns JsonResponse instead of using DRF pagination or serializers.",
+    "It says the Spec axis didn't run or doesn't apply (for example because the author isn't on the team roster), and it doesn't check the diff against a ticket."
+  ],
+  "spec": "absent"
+}

@@ -1,0 +1,8 @@
+{
+  "must": [
+    "It raises a finding that the remove() docstring claims it emails the subscription owner, which the code does not do."
+  ],
+  "must_not": [
+    "It raises a finding asking to remove or expand the short docstrings on the class, __init__, get, or add."
+  ]
+}

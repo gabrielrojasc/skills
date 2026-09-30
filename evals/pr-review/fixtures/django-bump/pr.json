@@ -1,0 +1,44 @@
+{
+  "number": 12,
+  "title": "Bump Django to 4.2",
+  "url": "https://github.com/riskive/webhook-relay/pull/12",
+  "body": "Keeps us on a supported Django release. CI is green.",
+  "state": "OPEN",
+  "isDraft": false,
+  "author": {
+    "login": "renovate-bot"
+  },
+  "headRefName": "chore/django-4.2",
+  "baseRefName": "main",
+  "headRefOid": "c12d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d",
+  "updatedAt": "2026-09-28T12:00:00Z",
+  "reviews": [],
+  "reviewDecision": "",
+  "repository": {
+    "nameWithOwner": "riskive/webhook-relay"
+  },
+  "files": [
+    {
+      "path": "pyproject.toml",
+      "additions": 1,
+      "deletions": 1
+    },
+    {
+      "path": "poetry.lock",
+      "additions": 2,
+      "deletions": 2
+    }
+  ],
+  "commits": [
+    {
+      "oid": "c12d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d",
+      "messageHeadline": "Bump Django to 4.2"
+    }
+  ],
+  "labels": [],
+  "reviewRequests": [
+    {
+      "login": "eval-user"
+    }
+  ]
+}

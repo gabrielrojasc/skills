@@ -1,0 +1,7 @@
+{
+  "must": [
+    "It raises a finding about the N+1 query: counting alerts with a separate query per executive instead of annotating or aggregating.",
+    "It runs a Spec assessment that reads the Linear issue AIC-2 and either checks the diff against that issue's requirements or states that AIC-2 doesn't describe this change."
+  ],
+  "spec": "present"
+}

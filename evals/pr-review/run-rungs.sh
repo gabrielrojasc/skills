@@ -21,13 +21,14 @@ refs=(); expect=()
 for fixture in "$@"; do
   n="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["number"])' "${here}/fixtures/${fixture}/pr.json")"
   risk="$(cat "${here}/fixtures/${fixture}/risk")"
-  refs+=("riskive/webhook-relay#${n}"); expect+=("${n}=${risk}")
+  repo="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["repository"]["nameWithOwner"])' "${here}/fixtures/${fixture}/pr.json")"
+  refs+=("${repo}#${n}"); expect+=("${n}=${risk}")
 done
 prompt="Use the pr-review skill to review ${refs[*]}."
 if [[ "$tool" == claude ]]; then
   PATH="${out}/bin:${PATH}" claude -p "$prompt" --output-format stream-json --verbose \
     --max-budget-usd "${MAX_BUDGET_USD:-5}" --permission-mode acceptEdits \
-    --allowedTools "Bash Read Write Edit Glob Grep Skill Agent" --no-session-persistence \
+    --allowedTools "Bash Read Write Edit Glob Grep Skill Agent mcp__claude_ai_Linear__get_issue mcp__claude_ai_Linear__list_comments mcp__claude_ai_Linear__search_documentation" --no-session-persistence \
     < /dev/null > trace.jsonl 2> stderr.log
 else
   # Codex runs commands in a login shell; a private ZDOTDIR keeps the fake gh first on PATH.

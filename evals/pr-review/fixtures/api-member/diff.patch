@@ -1,0 +1,25 @@
+diff --git a/zfapi/alerts/views.py b/zfapi/alerts/views.py
+new file mode 100644
+index 0000000..5a6b7c8
+--- /dev/null
++++ b/zfapi/alerts/views.py
+@@ -0,0 +1,20 @@
++from django.http import JsonResponse
++from rest_framework.views import APIView
++
++from zfapi.alerts.models import Alert
++from zfapi.executives.models import Executive
++
++
++class ExecutiveAlertCountsView(APIView):
++    """Return alert counts per executive for the caller's enterprise."""
++
++    def get(self, request):
++        page = int(request.GET.get("page", 1))
++        start, end = (page - 1) * 50, page * 50
++        executives = Executive.objects.filter(enterprise=request.user.enterprise)[start:end]
++        results = []
++        for executive in executives:
++            count = Alert.objects.filter(executive=executive).count()
++            results.append({"executive": executive.id, "alerts": count})
++        return JsonResponse({"page": page, "results": results})
