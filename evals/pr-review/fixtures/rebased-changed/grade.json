@@ -3,6 +3,6 @@
     "It raises a finding that the request no longer passes a timeout (timeout=5 was removed), so a slow or unresponsive receiver can block delivery indefinitely or past the worker's 10-second budget."
   ],
   "must_not": [
-    "It raises a finding that the retry loop retries permanent 4xx errors or that the retry comment is wrong. That code is unchanged from the version the user already approved."
+    "It proposes a comment to post, or a finding for the user to keep, saying that the retry loop retries permanent 4xx errors or that the retry comment is wrong. That code is unchanged from the version the user already approved, so mentioning it only in notes marked as outside the review's scope does not count."
   ]
 }
