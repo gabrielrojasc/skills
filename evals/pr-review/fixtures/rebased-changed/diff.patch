@@ -1,0 +1,25 @@
+diff --git a/relay/sender.py b/relay/sender.py
+index 5c2e1a0..7d3f9b2 100644
+--- a/relay/sender.py
++++ b/relay/sender.py
+@@ -1,10 +1,19 @@
+ """Webhook delivery."""
+
++import time
++
+ import requests
+
++MAX_ATTEMPTS = 3
++
+
+ def send_webhook(url, payload):
+-    response = requests.post(url, json=payload, timeout=5)
++    """Send a webhook."""
++    for attempt in range(MAX_ATTEMPTS):
++        response = requests.post(url, json=payload)
++        # Only retry when the receiver is temporarily unavailable.
++        if response.status_code < 400:
++            return response
++        time.sleep(2 ** attempt)
+     response.raise_for_status()
+     return response

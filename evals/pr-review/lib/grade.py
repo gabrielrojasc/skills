@@ -14,7 +14,8 @@ Fixture checks come from fixtures/<fixture>/grade.json:
   must       rubric sentences the review has to satisfy (model-graded, each separately)
   must_not   rubric sentences the review must not do (model-graded)
   spec       "absent" or "present": whether a Spec reviewer should run
-The judge is Claude Sonnet with a 2-of-3 vote per rubric line.
+  reviewers  "absent": no reviewer, Spec, or verifier subagent should run
+The judge is Claude Opus with a 2-of-3 vote per rubric line.
 """
 
 import json
@@ -107,6 +108,10 @@ def main():
         has_spec = any(r.get("role") == "spec" for r in scores)
         want = spec["spec"] == "present"
         rows.append((f"spec-{spec['spec']}", has_spec == want, f"spec reviewer {'ran' if has_spec else 'did not run'}"))
+
+    if spec.get("reviewers") == "absent":
+        ran = [r["label"] for r in scores if r.get("role") in ("reviewer", "spec", "verifier")]
+        rows.append(("reviewers-absent", not ran, "; ".join(ran)[:150] or "no review subagents ran"))
 
     for i, rubric in enumerate(spec.get("must", []), 1):
         rows.append((f"must-{i}", *judge(rubric, message)))

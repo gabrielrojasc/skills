@@ -46,6 +46,25 @@ produced against. `review.json` records the head in `commit_id`. Reject any file
 whose target head differs from its folder's head. If the head moves before
 submission, follow [When the head moves](#when-the-head-moves).
 
+## Check for an earlier review
+
+Before starting reviewers, run
+`<SKILL_DIR>/scripts/changes-since-review.py <owner>/<repo> <n>` for each PR. It
+compares the PR's own added and removed lines at the head with those at the
+commit of the user's latest submitted review, each against its merge base, so a
+rebase onto a newer base doesn't count as a change.
+
+- `none`: the user hasn't reviewed the PR. Review it in full.
+- `same`: nothing the PR changes differs from what the user reviewed. Start no
+  reviewers. Report it with the status of that review's threads, and ask
+  whether to re-submit its event through [Submit](#submit) or stop. GitHub
+  dismisses only approvals and change requests, so for a `DISMISSED` review,
+  ask which it was.
+- `changed`: review only the printed differences, reading the full diff for
+  context. Report only problems the differences introduce, including breakage
+  they cause elsewhere.
+- `unknown`: review the full diff and tell the user why.
+
 ## Choose the review
 
 | PR | Standards axis | Spec axis |
@@ -297,10 +316,12 @@ any triage decisions. Don't restart triage.
    (re-anchored to its new line), **fixed** (name the commit that resolved it),
    or **changed** (still real, but the claim, anchor, or draft needs a revision,
    which the verifier supplies).
-2. In parallel with step 1, a reviewer per axis reviews only the commits added
-   since the reviewed head (`compare/<old-head>...<new-head>`). If that
-   compare's `status` is not `ahead`, as after a rebase or force-push, it
-   reviews the full diff instead. Its drafts go through Verify as usual.
+2. In parallel with step 1, run
+   `<SKILL_DIR>/scripts/changes-since-review.py <owner>/<repo> <n> <old-head>`.
+   On `changed`, a reviewer per axis reviews only the printed differences, as
+   in [Check for an earlier review](#check-for-an-earlier-review), and its
+   drafts go through Verify as usual. On `same`, as after a plain rebase, there
+   is nothing new to review. On `unknown`, it reviews the full diff.
 3. Findings that still apply keep the user's earlier decision, and the user
    isn't asked about them again. Fixed findings are dropped. Show one message
    with what needs a decision (changed findings, new findings, and findings not

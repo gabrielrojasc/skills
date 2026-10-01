@@ -187,9 +187,16 @@ def api_command(args):
         else:
             emit(json.dumps([{"login": login} for login in team]), jq_filter)
         return
-    # repos/<owner>/<repo>/compare/<base>...<head>
+    # repos/<owner>/<repo>/compare/<base>...<head>: compare-<head>.json in any PR folder
     if len(parts) == 5 and parts[0] == "repos" and parts[3] == "compare":
-        emit(load("compare.json"), jq_filter)
+        head = parts[4].split("...")[-1]
+        path = next((d / name for d in pr_dirs() for name in (f"compare-{head}.json",) if (d / name).is_file()), None)
+        if path is None:
+            fail(f"gh: Not Found (HTTP 404) [no compare fixture for {head}]")
+        emit(path.read_text(encoding="utf-8"), jq_filter)
+        return
+    if endpoint == "user":
+        emit(json.dumps({"login": "eval-user"}), jq_filter)
         return
     # repos/<owner>/<repo>/contents/<path>
     if len(parts) >= 4 and parts[0] == "repos" and parts[3] == "contents":

@@ -1,0 +1,51 @@
+{
+  "number": 15,
+  "title": "Retry webhook delivery on failure",
+  "url": "https://github.com/riskive/webhook-relay/pull/15",
+  "body": "Receivers sometimes return errors when they're briefly down. This retries delivery up to three times with backoff before giving up.",
+  "state": "OPEN",
+  "isDraft": false,
+  "author": {
+    "login": "alice-dev"
+  },
+  "headRefName": "feature/retry-webhooks-15",
+  "baseRefName": "main",
+  "headRefOid": "f15b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a81",
+  "updatedAt": "2026-09-29T14:00:00Z",
+  "reviews": [
+    {
+      "author": {
+        "login": "eval-user"
+      },
+      "state": "DISMISSED",
+      "body": "",
+      "submittedAt": "2026-09-26T18:20:00Z",
+      "commit": {
+        "oid": "e15a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f70"
+      }
+    }
+  ],
+  "reviewDecision": "REVIEW_REQUIRED",
+  "repository": {
+    "nameWithOwner": "riskive/webhook-relay"
+  },
+  "files": [
+    {
+      "path": "relay/sender.py",
+      "additions": 10,
+      "deletions": 1
+    }
+  ],
+  "commits": [
+    {
+      "oid": "f15b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a81",
+      "messageHeadline": "Retry webhook delivery on failure"
+    }
+  ],
+  "labels": [],
+  "reviewRequests": [
+    {
+      "login": "eval-user"
+    }
+  ]
+}
