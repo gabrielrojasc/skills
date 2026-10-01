@@ -278,19 +278,12 @@ questions.
 5. A note the user wants raised becomes a new draft marked `user-promoted`. It
    gets one verification round for claim and anchor only; the user's decision
    replaces the consequence test.
-6. Link every file mention shown to the user to the PR's Files changed view
-   with this pattern, leaving no space between the hash and `R<line>`. Posted
-   comment bodies stay plain.
-
-   ```text
-   [<path>:<line>](https://github.com/<owner>/<repo>/pull/<n>/files#diff-<sha256-of-path>R<line>)
-   ```
-
-   Compute every hash by running
-   `printf '%s' '<path>' | shasum -a 256 | cut -d' ' -f1`, all of a PR's hashes
-   in one command, even for a familiar path. GitHub anchors use
-   SHA-256, and a hash written from memory is usually the old MD5 form, which
-   GitHub no longer resolves.
+6. Link every file mention shown to the user to the PR's Files changed view.
+   Print all of a PR's links with one run of
+   `<SKILL_DIR>/scripts/file-links.sh <owner>/<repo> <n> <path>:<line>...` and
+   paste each printed link unchanged, even for a familiar path. A link typed by
+   hand tends to carry the old MD5 hash or a space before `R<line>`, and GitHub
+   resolves neither. Posted comment bodies stay plain.
 7. Write posted comments in lowercase, with no praise or follow-up-ticket
    suggestions.
 
