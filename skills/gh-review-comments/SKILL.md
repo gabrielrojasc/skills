@@ -162,10 +162,12 @@ such as "after #127 merges".
 - Use Fix for any item that needs a code or test change, even when part of it is
   already handled. Already addressed means only a reply or thread resolution
   remains.
-- Link file mentions to the PR's Files changed view:
-  `[<path>:<line>](https://github.com/<owner>/<repo>/pull/<n>/files#diff-<sha256
-  of path>R<line>)`. Link the source as `[thread]`, `[comment]`, or `[review]`
-  instead of a bare URL.
+- Link file mentions to the PR's Files changed view. Print all of a PR's links
+  with one run of
+  `<SKILL_DIR>/scripts/file-links.sh <owner>/<repo> <n> <path>:<line>...` and
+  paste each printed link unchanged. A link typed by hand tends to carry the old
+  MD5 hash or a space before `R<line>`, and GitHub resolves neither. Link the
+  source as `[thread]`, `[comment]`, or `[review]` instead of a bare URL.
 - Add a `Disputed:` line when a reviewer disagreement remains, naming the
   deciding assumption.
 - List anything proposed beyond the comments, such as a follow-up issue or a
