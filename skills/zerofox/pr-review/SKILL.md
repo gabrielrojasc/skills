@@ -104,13 +104,16 @@ consistency (`pyproject.toml` and `poetry.lock` change together).
 ## Review
 
 For each PR, run one Standards subagent and, when the table calls for it, one
-Spec subagent. Start every PR's reviewers at once, in the background. Each axis
-moves to verification as soon as its own reviewer returns, without waiting for
-the other axis or other PRs. Wait only when no work can proceed. Sibling PRs
-with identical changes, such as matching renovate configs, may share one
-Standards agent with a folder per PR. Keep the axes in separate reports so one
-never masks the other: standards-clean code can implement the wrong thing, and
-spec-faithful code can break conventions.
+Spec subagent. Do each PR's setup yourself: the head check, the earlier-review
+check, and choosing the review take a few commands. Start that PR's reviewers in
+the background as soon as its own setup is done, without waiting for other PRs.
+Don't gather diffs, threads, or source for reviewers; they read the PR
+themselves. Each axis moves to verification as soon as its own reviewer returns,
+without waiting for the other axis or other PRs. Wait only when no work can
+proceed. Sibling PRs with identical changes, such as matching renovate configs,
+may share one Standards agent with a folder per PR. Keep the axes in separate
+reports so one never masks the other: standards-clean code can implement the
+wrong thing, and spec-faithful code can break conventions.
 
 ### Standards axis
 
@@ -253,6 +256,11 @@ through triage and submission before showing the next. Other PRs keep reviewing
 and verifying in the background, but the user sees only one open decision at a
 time; about other PRs, send only short progress notes, never findings or
 questions.
+
+Before ending a turn with a question, start every step that is ready. Some
+hosts, such as Codex, don't resume you when a background agent finishes, so
+nothing advances while the user reads. There, first wait for the agents
+already running to return and start their next steps, then ask.
 
 1. Re-check `updatedAt`, `headRefOid`, `reviews`, and `state`. A moved head
    follows [When the head moves](#when-the-head-moves); a merge or close ends
