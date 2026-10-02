@@ -1,5 +1,6 @@
 {
   "must": [
     "It recommends APPROVE and drafts no review comments for the one-word README spelling fix."
-  ]
+  ],
+  "spec": "absent"
 }

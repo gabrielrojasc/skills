@@ -4,5 +4,6 @@
   ],
   "must_not": [
     "It proposes a comment to post, or a finding for the user to keep, saying that the retry loop retries permanent 4xx errors or that the retry comment is wrong. That code is unchanged from the version the user already approved, so mentioning it only in notes marked as outside the review's scope does not count."
-  ]
+  ],
+  "spec": "absent"
 }

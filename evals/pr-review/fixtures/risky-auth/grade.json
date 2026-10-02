@@ -2,5 +2,6 @@
   "must": [
     "It raises a blocking finding that requests without an X-Relay-Signature header are now accepted without verification.",
     "It raises a finding that the signature is compared with == instead of a constant-time comparison such as hmac.compare_digest."
-  ]
+  ],
+  "spec": "absent"
 }

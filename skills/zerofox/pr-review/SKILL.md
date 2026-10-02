@@ -128,16 +128,19 @@ instructions](references/documentation-review.md).
 
 ### Spec axis
 
+Before starting a Spec agent, look for Linear issue IDs, such as `EPL-123`, in
+the PR title, branch, body, and commit messages. With none, record "no spec
+available" for the axis and start no Spec agent or verifier.
+
 The Spec agent judges whether the diff implements what the originating ticket
 asks:
 
-1. Find the Linear issue ID in the PR title, branch, body, or commits, and
-   fetch the issue with the Linear MCP `get_issue`.
+1. Fetch the issue with the Linear MCP `get_issue`.
 2. Report only requirements that are missing, partial, or implemented wrong, and
    quote the ticket line for each. Extra changes are fine unless they are
    themselves wrong or risky.
-3. If there is no ticket or no real spec on it, report "no spec available" and
-   stop. Don't infer requirements from the PR description.
+3. If the ticket has no real spec, or doesn't describe this change, report "no
+   spec available" and stop. Don't infer requirements from the PR description.
 
 ### Finding bar
 
@@ -257,10 +260,11 @@ and verifying in the background, but the user sees only one open decision at a
 time; about other PRs, send only short progress notes, never findings or
 questions.
 
-Before ending a turn with a question, start every step that is ready. Some
-hosts, such as Codex, don't resume you when a background agent finishes, so
-nothing advances while the user reads. There, first wait for the agents
-already running to return and start their next steps, then ask.
+Some hosts, such as Codex, don't resume you when a background agent finishes,
+so no review advances while a question waits for the user. There, carry every
+PR through verification before asking the first triage question; after that,
+each answer leads straight to the next ready PR. In hosts that resume you, show
+each PR as soon as it is verified.
 
 1. Re-check `updatedAt`, `headRefOid`, `reviews`, and `state`. A moved head
    follows [When the head moves](#when-the-head-moves); a merge or close ends

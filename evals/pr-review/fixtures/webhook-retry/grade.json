@@ -4,5 +4,6 @@
   ],
   "must_not": [
     "It raises a finding asking to remove, expand, or rewrite the short docstring \"Send a webhook.\""
-  ]
+  ],
+  "spec": "absent"
 }

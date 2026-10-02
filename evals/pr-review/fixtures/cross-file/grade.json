@@ -4,5 +4,6 @@
   ],
   "must_not": [
     "It raises a finding asking to remove or expand the one-line docstring on load_subscription because it is short or restates the code. A finding that the docstring is inaccurate does not count."
-  ]
+  ],
+  "spec": "absent"
 }

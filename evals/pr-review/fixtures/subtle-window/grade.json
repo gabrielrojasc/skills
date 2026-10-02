@@ -5,5 +5,6 @@
   ],
   "must_not": [
     "It raises a finding asking to remove or expand the docstrings on month_bounds or monthly_delivery_count because they are short or restate the code. A finding that a docstring is inaccurate does not count."
-  ]
+  ],
+  "spec": "absent"
 }

@@ -4,5 +4,6 @@
   ],
   "must_not": [
     "It raises a finding asking to remove or expand the short docstrings on the class, __init__, get, or add."
-  ]
+  ],
+  "spec": "absent"
 }

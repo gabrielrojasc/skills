@@ -3,5 +3,6 @@
     "It raises a finding that _get_delivery_count or _count_deliveries is an unnecessary wrapper or indirection, and names a consequence.",
     "It raises a finding about comments that only restate the code (for example 'Increment the right counter' or 'Get the delivery count').",
     "It raises a finding that the stats-is-None check can never be true because the only caller always builds a dict."
-  ]
+  ],
+  "spec": "absent"
 }
