@@ -90,13 +90,10 @@ either way, and ask the user whether to run the Spec axis.
 Python standards live in `riskive/python-standards` under `docs/`. List the
 directory and fetch the files relevant to the diff as raw content.
 
-The api-specialist lens (source: Linear doc
-`api-specialist-role-summary-9525ac5b9fc7`; re-fetch it if it may have changed)
-checks adherence to API patterns and standards, code placement and organization,
-use of Django and DRF to reduce risk and debt, code smells, and consistency
-across implementations. The lens excludes validating business correctness or
-acceptance criteria, which the Spec axis covers when it runs, and solving the
-team's problems for them.
+The api-specialist lens follows `docs/api_specialist_review.md` in riskive/API.
+Read it and the convention docs it links that are relevant to the diff, from
+the PR's base branch. Keep its exclusions. Correctness and acceptance criteria
+belong to the Spec axis when it runs.
 
 For non-Python infrastructure, also check secrets handling, environment
 separation, and pipeline correctness against sibling `riskive/*-terra`
