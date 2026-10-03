@@ -1,0 +1,12 @@
+diff --git a/alerts/views.py b/alerts/views.py
+index 2c4d1e9..8b7a0f3 100644
+--- a/alerts/views.py
++++ b/alerts/views.py
+@@ -10,4 +10,6 @@ class PhishingAlertListView(ListAPIView):
+     serializer_class = PhishingAlertSerializer
+
+     def get_queryset(self):
+-        return PhishingAlert.objects.filter(enterprise=self.request.user.enterprise)
++        return PhishingAlert.objects.filter(enterprise=self.request.user.enterprise).order_by(
++            "detected_at"
++        )

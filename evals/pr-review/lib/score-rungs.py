@@ -6,8 +6,8 @@ subagent the run spawned, and checks each review role against the acceptance
 criteria for its PR's risk class:
 
   trivial  any tier
-  normal   reviewers and verifiers run on tier 3 or higher
-           (Claude: effort high, xhigh, or max; Codex: effort xhigh or max, or gpt-6-astra)
+  normal   reviewers and verifiers run on tier 3, not lower or higher
+           (Claude: effort high; Codex: effort xhigh or max on a model other than gpt-6-astra)
   risky    reviewers and verifiers run on tier 4
            (Claude: effort xhigh or max; Codex: gpt-6-astra)
 
@@ -130,10 +130,10 @@ def passes(tool, risk, spawn, policy="current"):
             return spawn["effort"] in {"medium", "high", "xhigh", "max"}
         return spawn["model"] not in {None, "gpt-6-luna"}
     if tool == "claude":
-        allowed = {"normal": {"high", "xhigh", "max"}, "risky": {"xhigh", "max"}}[risk]
+        allowed = {"normal": {"high"}, "risky": {"xhigh", "max"}}[risk]
         return spawn["effort"] in allowed
     if risk == "normal":
-        return spawn["effort"] in {"xhigh", "max"} or spawn["model"] == "gpt-6-astra"
+        return spawn["effort"] in {"xhigh", "max"} and spawn["model"] != "gpt-6-astra"
     return spawn["model"] == "gpt-6-astra"
 
 

@@ -1,0 +1,6 @@
+{
+  "must": [
+    "It raises a finding that order_by(\"detected_at\") sorts oldest first, while the PR says newest first, so it needs \"-detected_at\"."
+  ],
+  "spec": "absent"
+}

@@ -4,9 +4,10 @@
 #
 #   run-suite.sh <out-dir> [fixture...]     (default: every fixture with a grade.json)
 #
-# Runs go four at a time. RUNS=<n> repeats every cell n times under
-# <out-dir>/r<i>/. Each cell's workspace holds its trace, rung scores, grades,
-# and elapsed seconds; summary.txt collects them.
+# Runs go JOBS at a time (default 4). TOOLS=codex limits the run to one tool.
+# RUNS=<n> repeats every cell n times under <out-dir>/r<i>/. Each cell's
+# workspace holds its trace, rung scores, grades, and elapsed seconds;
+# summary.txt collects them. Codex honors CODEX_HOME; see ../AGENTS.md.
 set -euo pipefail
 here="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)"
 out="${1:?out dir}"; shift
@@ -19,7 +20,7 @@ cells=()
 for ((r = 1; r <= runs; r++)); do
   dir="$out"; [[ "$runs" -gt 1 ]] && dir="$out/r$r"
   mkdir -p "$dir"
-  for f in "${fixtures[@]}"; do cells+=("claude $f $dir" "codex $f $dir"); done
+  for f in "${fixtures[@]}"; do for t in ${TOOLS:-claude codex}; do cells+=("$t $f $dir"); done; done
 done
 run_cell() {
   local tool="$1" fixture="$2" dir="$3" ws="$3/$1-$2" start=$SECONDS
@@ -28,7 +29,7 @@ run_cell() {
   python3 "$4/lib/grade.py" "$tool" "$ws" "$fixture" > "$dir/$1-$2.grades.log" 2>&1 || true
 }
 export -f run_cell
-printf '%s\n' "${cells[@]}" | xargs -P 4 -I{} bash -c 'set -- {}; run_cell "$1" "$2" "$3" "'"$here"'"'
+printf '%s\n' "${cells[@]}" | xargs -P "${JOBS:-4}" -I{} bash -c 'set -- {}; run_cell "$1" "$2" "$3" "'"$here"'"'
 : > "$out/summary.txt"
 for c in "${cells[@]}"; do
   set -- $c
