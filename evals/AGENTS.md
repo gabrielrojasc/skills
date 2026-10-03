@@ -28,10 +28,12 @@ and an interrupted run can leave a variant in place.
 
 - Write output under `~/tmp/<skill>-evals/`, outside git (the runners refuse a
   git workspace) and outside `$TMPDIR`, which macOS purges.
-- Start a suite detached with
-  `perl -e 'use POSIX qw(setsid); setsid(); exec @ARGV' <command> &`. Claude
-  Code stops its background tasks after about 30 minutes, so poll with waits
-  under 25.
+- Start a suite under launchd with
+  `launchctl submit -l <label> -o <log> -e <log> -- /bin/bash -lc '<command>'`,
+  and `launchctl remove <label>` once it finishes, because launchd restarts a
+  submitted job when it exits. Claude Code stops its background tasks after
+  about 30 minutes and kills even `setsid` children when its session restarts.
+  Poll with waits under 25 minutes.
 - `codex exec` can hang after a transient model or network failure: its trace
   stops growing for 20 minutes or more while sibling cells progress. Match the
   process to its cell by working directory (`lsof -p <pid> | rg cwd`) before
