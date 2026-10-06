@@ -2,4 +2,4 @@ interface:
   display_name: "GitHub Review Comments"
   short_description: "Triages PR feedback. Use when reviewing unresolved comments."
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

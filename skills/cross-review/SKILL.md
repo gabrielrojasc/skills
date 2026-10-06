@@ -25,7 +25,7 @@ never push.
    ```
 
 2. A fresh subagent, without your reasoning, triages the findings with the
-   `gh-review-comments` skill. It decides instead of asking the user, and there
+   /gh-review-comments skill. It decides instead of asking the user, and there
    are no PR threads to reply to or resolve.
 3. Make the fixes, run the checks, and commit.
 4. Ask the same reviewer session for a re-review, passing the fixes and the
