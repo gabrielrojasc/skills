@@ -10,8 +10,9 @@ Have the other agent review the change, fix what holds up, and ask it for a
 re-review until nothing is left to fix. Don't ask the user. Commit locally each
 round and push once nothing is left to fix.
 
-1. Ask the other agent for a review with the skill the user named, or
-   `code-review`, on `<base>...HEAD`. From Claude Code, run Codex as one
+1. Ask the other agent for a review on `<base>...HEAD` with the skill the user
+   named. Otherwise use `pr-review` when the change has a PR and that skill is
+   installed, and `code-review` when not. From Claude Code, run Codex as one
    unchained command, in the background:
 
    ```bash
