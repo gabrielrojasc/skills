@@ -51,6 +51,10 @@ installation, updates, and lock tracking.
 - [`review-revise`](skills/review-revise/SKILL.md) runs adversarial
   review-revise loops with independent reviewers until findings are resolved or
   an independent progress agent stops a stalled loop.
+- [`cross-review`](skills/cross-review/SKILL.md) has the other agent review a
+  code change (Codex from Claude Code, Claude from Codex), sends each finding to
+  an independent triage subagent, fixes and commits locally, and repeats until a
+  round leaves nothing to fix.
 - [`codex-computer-use`](skills/codex-computer-use/SKILL.md) hands browser and
   desktop-app tasks to Codex's `@Chrome` and Computer Use through `codex exec`,
   continues approved sessions, and checks the files Codex produces.

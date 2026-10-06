@@ -1,0 +1,5 @@
+interface:
+  display_name: "Cross-review"
+  short_description: "Cross-model review loop. Use when the other agent should review."
+policy:
+  allow_implicit_invocation: false
