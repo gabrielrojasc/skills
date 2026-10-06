@@ -7,8 +7,8 @@ disable-model-invocation: true
 # Cross-review
 
 Have the other agent review the change, fix what holds up, and ask it for a
-re-review until nothing is left to fix. Don't ask the user; commit locally and
-never push.
+re-review until nothing is left to fix. Don't ask the user. Commit locally each
+round and push once nothing is left to fix.
 
 1. Ask the other agent for a review with the skill the user named, or
    `code-review`, on `<base>...HEAD`. From Claude Code, run Codex as one
@@ -32,5 +32,6 @@ never push.
    dismissals with their reasons (`codex exec … resume <id>` or
    `claude -p --resume <id>`). Repeat from step 2.
 
-Stop when a round leaves nothing to fix or the loop goes in circles. Report the
-commits and every dismissal with its reason.
+When a round leaves nothing to fix, push. If the loop goes in circles, stop
+without pushing and report what's unresolved. Report the commits and every
+dismissal with its reason.
