@@ -55,9 +55,9 @@ installation, updates, and lock tracking.
   code change (Codex from Claude Code, Claude from Codex), sends each finding to
   an independent triage subagent, fixes and commits each round, repeats until a
   round leaves nothing to fix, and then pushes.
-- [`codex-computer-use`](skills/codex-computer-use/SKILL.md) hands browser and
-  desktop-app tasks to Codex's `@Chrome` and Computer Use through `codex exec`,
-  continues approved sessions, and checks the files Codex produces.
+- [`codex`](skills/codex/SKILL.md) hands tasks to Codex through `codex exec`
+  without waiting on the user, continues the same session for follow-ups,
+  covers `@Chrome` and Computer Use, and checks what Codex produces.
 
 Matt Pocock's skills cover general research, specification, implementation, TDD,
 architecture, and review. They are intentionally not copied here.

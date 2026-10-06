@@ -1,0 +1,5 @@
+interface:
+  display_name: "Codex"
+  short_description: "Hands work to Codex. Use when a task should run in Codex."
+policy:
+  allow_implicit_invocation: true

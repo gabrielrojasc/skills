@@ -1,5 +1,0 @@
-interface:
-  display_name: "Codex Computer Use"
-  short_description: "Runs GUI tasks via Codex. Use when work needs a browser or app."
-policy:
-  allow_implicit_invocation: true
