@@ -6,8 +6,7 @@ description: Reviews GitHub PRs. Use when reviewing a PR.
 # PR review
 
 Review one or more GitHub PRs with independent reviewer and verifier subagents,
-triage the verified findings with the user, and submit one review per PR. The
-skill is self-contained and does not depend on any other review skill.
+triage the verified findings with the user, and submit one review per PR.
 
 Keep every draft local until the user explicitly approves the complete review
 for that PR in this session. Subagents are read-only outside their assigned
@@ -20,39 +19,34 @@ decisions like "keep S1, reword S2 to ...".
 
 ## Setup
 
-Accept PR URLs or `<repo>#<number>` refs. Resolve a bare number against the
-current directory's repository when it is a git checkout; otherwise ask.
+When reviewing more than one PR, also follow [Multiple
+PRs](references/multiple-prs.md). When a tool to set the session title is
+available, set it as [Session title](references/session-title.md) describes.
 
-When a tool to set the session title is available, set it once the PRs are
-resolved. Use `RV <repo>#<n>: <short PR summary>` for one PR, or
-`RV <repo>#<n> +<count>` for several, so the number stays visible in a narrow
-title. Add the owner only when it isn't `riskive`. Shorten long repository names
-the way the team does, such as `ep-api` for `executive-protection-api`, `go-ep`
-for `go-executive-protection`, and `ds-sdk` for `datasource-sdk`. Without such a
-tool, skip this step.
-
-Create a private run directory with `mktemp -d` under `${TMPDIR:-/tmp}` and mode
-`0700`. Give each PR a folder named
-`<owner>__<repo>__<number>__<short-head-sha>`. It holds `standards.md`,
+Create a private run directory with `mktemp -d`. Give each PR a folder named
+`<owner>__<repo>__<number>__<short-head-sha>`. It holds `src/`, `standards.md`,
 `spec.md`, `verify-<axis>-<round>-input.md`, `verify-<axis>-<round>.md`,
 `triage.md`, `final-review.md`, and `review.json`. These files, not the
 conversation, are the source of truth for draft text, so a summarized
 conversation can't change what gets posted. Give subagents absolute paths to the
-files they write. Report the run directory path in updates and in the final
-tally.
+files they write and to `src/`. Report the run directory path in updates.
+
+Fetch each PR's head into its folder with
+`<SKILL_DIR>/scripts/fetch-source.sh <owner>/<repo> <head-sha> <pr-folder>/src`,
+so agents read source with local tools instead of one API call per file. Agents
+treat `src/` as read-only. An agent that needs another repository at a pinned
+commit fetches it the same way into the run directory.
 
 Every Markdown file starts with `## Target head` and the head SHA it was
 produced against. `review.json` records the head in `commit_id`. Reject any file
 whose target head differs from its folder's head. If the head moves before
-submission, follow [When the head moves](#when-the-head-moves).
+submission, follow [When the head moves](references/head-moves.md).
 
 ## Check for an earlier review
 
 Before starting reviewers, run
-`<SKILL_DIR>/scripts/changes-since-review.py <owner>/<repo> <n>` for each PR. It
-compares the PR's own added and removed lines at the head with those at the
-commit of the user's latest submitted review, each against its merge base, so a
-rebase onto a newer base doesn't count as a change.
+`<SKILL_DIR>/scripts/changes-since-review.py <owner>/<repo> <n>` for each PR and
+act on its output:
 
 - `none`: the user hasn't reviewed the PR. Review it in full.
 - `same`: nothing the PR changes differs from what the user reviewed. Start no
@@ -75,45 +69,31 @@ rebase onto a newer base doesn't count as a change.
 | Dependency bumps (for example, renovate) | Upgrade risk | No |
 
 Dependency bumps take the upgrade-risk row in every repository, riskive/API
-included.
+included. For riskive/API, non-Python infrastructure, and dependency bumps, read
+[Choosing the review](references/choose-review.md) before starting reviewers.
 
-Decide `t-executive-protection` membership from the team roster. The membership
-endpoint returns 404 when the token can't see memberships, so a 404 there proves
-nothing. Read `members_count` from
-`gh api orgs/riskive/teams/t-executive-protection` and the logins from
-`gh api orgs/riskive/teams/t-executive-protection/members --paginate`.
-The author is a member when listed, and not a member only when the roster is
-complete: its length equals `members_count`. If the roster can't be read
-completely, membership is unknown. Start the Standards axis, which is the same
-either way, and ask the user whether to run the Spec axis.
-
-Python standards live in `riskive/python-standards` under `docs/`. List the
-directory and fetch the files relevant to the diff as raw content.
-
-The api-specialist lens follows `docs/api_specialist_review.md` in riskive/API.
-Read it and the convention docs it links that are relevant to the diff, from
-the PR's base branch. Keep its exclusions. Correctness and acceptance criteria
-belong to the Spec axis when it runs.
-
-For non-Python infrastructure, also check secrets handling, environment
-separation, and pipeline correctness against sibling `riskive/*-terra`
-repositories and `riskive/zf-ci` workflows. For dependency bumps, review CI
-state, changelog breaking changes, uses of removed APIs, and lockfile
-consistency (`pyproject.toml` and `poetry.lock` change together).
+Python standards live in `riskive/python-standards` under `docs/`; use the files
+relevant to the diff.
 
 ## Review
 
 For each PR, run one Standards subagent and, when the table calls for it, one
-Spec subagent. Do each PR's setup yourself: the head check, the earlier-review
-check, and choosing the review take a few commands. Start that PR's reviewers in
-the background as soon as its own setup is done, without waiting for other PRs.
-Don't gather diffs, threads, or source for reviewers; they read the PR
-themselves. Each axis moves to verification as soon as its own reviewer returns,
-without waiting for the other axis or other PRs. Wait only when no work can
-proceed. Sibling PRs with identical changes, such as matching renovate configs,
-may share one Standards agent with a folder per PR. Keep the axes in separate
-reports so one never masks the other: standards-clean code can implement the
-wrong thing, and spec-faithful code can break conventions.
+Spec subagent. Do the setup yourself: the head check, fetching the source, the
+earlier-review check, and choosing the review take a few commands. Then start
+the reviewers in the background. Beyond `src/`, don't gather diffs, threads, or
+source for reviewers; they read the PR themselves. Each axis moves to
+verification as soon as its own reviewer returns, without waiting for the other
+axis. Keep the axes in separate reports so one never masks the other:
+standards-clean code can implement the wrong thing, and spec-faithful code can
+break conventions.
+
+Wait only when no work can proceed. When the host makes you poll agents, wait
+several minutes per call. Codex asks for a progress update at least every 60
+seconds. Write it from what you already know, such as which agents are running
+and which files exist; "still running" is a complete update. Don't message a
+running agent for status or to pass along CI results, threads, or other PR
+state. Each agent reads the PR itself, and triage step 1 re-checks it. Message
+an agent only to stop it, when its head moved or its PR closed.
 
 ### Standards axis
 
@@ -135,11 +115,10 @@ available" for the axis and start no Spec agent or verifier.
 The Spec agent judges whether the diff implements what the originating ticket
 asks:
 
-1. Fetch the issue with the Linear MCP `get_issue`.
-2. Report only requirements that are missing, partial, or implemented wrong, and
+1. Report only requirements that are missing, partial, or implemented wrong, and
    quote the ticket line for each. Extra changes are fine unless they are
    themselves wrong or risky.
-3. If the ticket has no real spec, or doesn't describe this change, report "no
+2. If the ticket has no real spec, or doesn't describe this change, report "no
    spec available" and stop. Don't infer requirements from the PR description.
 
 ### Finding bar
@@ -181,18 +160,17 @@ When a broken standards rule is the only consequence, the draft cites the doc
 and line, then names the change, and says nothing else. The team settled the
 impact when it wrote the rule.
 
-Inspect callers, framework behavior, and configuration before proposing a
-correction. The correction must preserve required behavior, useful information,
-contracts, and conventions, and should be local and proportionate. Missing
-evidence is a verification gap, not proof of redundancy. Cleanup findings are
-nonblocking unless they independently meet the blocker or major-debt bar.
+The correction must preserve required behavior, useful information, contracts,
+and conventions, and should be local and proportionate. Missing evidence is a
+verification gap, not proof of redundancy. Cleanup findings are nonblocking
+unless they independently meet the blocker or major-debt bar.
 
 ### Rules for every reviewer
 
-1. Read the PR metadata, diff, and existing review threads. Don't repeat a point
-   already raised or resolved. If the user reviewed the PR before, report the
-   status of each of their earlier threads: addressed, unaddressed, or author
-   replied.
+1. Read the PR metadata, diff, and existing review threads, and read source from
+   `src/` in the PR folder. Don't repeat a point already raised or resolved. If
+   the user reviewed the PR before, report the status of each of their earlier
+   threads: addressed, unaddressed, or author replied.
 2. Anchor a finding inline when a specific changed line owns the problem;
    otherwise draft it for the review body. Never invent an anchor.
 3. Each draft states the problem concisely. For defects and spec gaps, give a
@@ -216,8 +194,8 @@ orchestrator assigns stable axis-prefixed IDs (`S1`, `P1`) and writes only the
 IDs, draft text, and any `user-promoted` marker to the round's input file. A
 fresh, read-only verifier per axis per round checks every draft against the diff
 and source at the target head, existing threads, the applicable standards, and,
-for Spec, the ticket. It reads only its input file and primary sources, never
-other files in the run directory.
+for Spec, the ticket. It reads only its input file and primary sources,
+including the fetched source in the run directory, never other files there.
 
 The verifier returns one verdict per ID with one line of evidence:
 
@@ -234,41 +212,19 @@ The verifier returns one verdict per ID with one line of evidence:
 
 For a `user-promoted` draft, check only the claim and anchor.
 
-The verifier may add new findings. They get fresh IDs and go through the next
-round with the revised drafts. An agent never verifies a draft it wrote or
-revised. After each round that leaves drafts unconfirmed, a fresh read-only
-progress agent reads the round files so far and decides whether another round
-can make progress. It doesn't judge the findings. It stops the loop when
-objections repeat without new evidence, revisions cycle between equivalent
-drafts, or resolution needs evidence or a decision outside the review.
+The verifier may add new findings, which get fresh IDs. When a round leaves a
+draft at `revise` or adds a finding, follow [Further verification
+rounds](references/verify-rounds.md) before triage.
 
-When the loop stops, keep every draft whose concern a verifier accepted, through
-a `confirmed` or `revise` verdict, unless a later verifier refuted it. If its
-wording or anchor is still unsettled, keep the latest draft, mark it
-`wording unsettled`, and record the sticking point; it counts as confirmed.
-Drop a draft as "unverified, dropped", with its sticking point and the progress
-agent's reason, only when no verifier accepted its concern or the latest verdict
-refuted it. Then the orchestrator sets the axis verdict from the confirmed set.
-Nonblocking findings alone mean COMMENT, not REQUEST_CHANGES. Refuted and
-dropped drafts stay in `triage.md` with their reasons so the user can overrule.
+The orchestrator then sets the axis verdict from the confirmed set. Nonblocking
+findings alone mean COMMENT, not REQUEST_CHANGES. Refuted and dropped drafts
+stay in `triage.md` with their reasons so the user can overrule.
 
 ## Triage
 
-Take one PR at a time, in the order they finish verification, and carry it
-through triage and submission before showing the next. Other PRs keep reviewing
-and verifying in the background, but the user sees only one open decision at a
-time; about other PRs, send only short progress notes, never findings or
-questions.
-
-Some hosts, such as Codex, don't resume you when a background agent finishes,
-so no review advances while a question waits for the user. There, carry every
-PR through verification before asking the first triage question; after that,
-each answer leads straight to the next ready PR. In hosts that resume you, show
-each PR as soon as it is verified.
-
-1. Re-check `updatedAt`, `headRefOid`, `reviews`, and `state`. A moved head
-   follows [When the head moves](#when-the-head-moves); a merge or close ends
-   the review.
+1. Re-check the PR's head, state, last update time, and reviews. A moved head
+   follows [When the head moves](references/head-moves.md); a merge or close
+   ends the review.
 2. Show the Standards verdict and findings, then the Spec verdict and findings.
    Give each confirmed finding its own heading and each field its own paragraph,
    so the user can scan the batch and decide without opening any file:
@@ -315,33 +271,6 @@ each PR as soon as it is verified.
 7. Write posted comments in lowercase, with no praise or follow-up-ticket
    suggestions.
 
-## When the head moves
-
-Start a folder for the new head and carry forward the finding IDs, drafts, and
-any triage decisions. Don't restart triage.
-
-1. A fresh verifier checks every carried finding against the new head, with the
-   same inputs and limits as in Verify. Each gets one verdict: **still applies**
-   (re-anchored to its new line), **fixed** (name the commit that resolved it),
-   or **changed** (still real, but the claim, anchor, or draft needs a revision,
-   which the verifier supplies).
-2. In parallel with step 1, run
-   `<SKILL_DIR>/scripts/changes-since-review.py <owner>/<repo> <n> <old-head>`.
-   On `changed`, a reviewer per axis reviews only the printed differences, as
-   in [Check for an earlier review](#check-for-an-earlier-review), and its
-   drafts go through Verify as usual. On `same`, as after a plain rebase, there
-   is nothing new to review. On `unknown`, it reviews the full diff.
-3. Findings that still apply keep the user's earlier decision, and the user
-   isn't asked about them again. Fixed findings are dropped. Show one message
-   with what needs a decision (changed findings, new findings, and findings not
-   yet triaged, in the triage format) and a one-line list of what carried over
-   or was fixed, then ask one question. If nothing needs a decision, say so and
-   go straight to the package.
-4. Rebuild the package and ask for approval, marking which comments carried over
-   unchanged.
-
-If the head moves again, repeat against the latest head.
-
 ## Submit
 
 Assemble `final-review.md` with the review event, every kept inline comment in
@@ -353,8 +282,8 @@ Immediately before submitting, re-check the head, confirm every target line is
 still in the diff, and confirm `final-review.md` matches what the user approved.
 Build `review.json` in the PR folder from that file and confirm its head, event,
 body, and comments match it. A moved head follows [When the head
-moves](#when-the-head-moves). Any other change means rebuilding the package and
-asking again. Submit it once, as one review with all inline comments, and
+moves](references/head-moves.md). Any other change means rebuilding the package
+and asking again. Submit it once, as one review with all inline comments, and
 publish no standalone PR comments:
 
 ```bash
@@ -364,5 +293,5 @@ gh api repos/<owner>/<repo>/pulls/<n>/reviews -X POST --input <pr-folder>/review
 The JSON has `commit_id` (the verified head), `event`, `body` (omit when empty),
 and `comments`, each with `path`, `line`, `side: "RIGHT"`, and `body`.
 
-Then move to the next ready PR. End with the run directory path and, per PR,
-whether the review was posted, skipped, or deferred.
+End with the run directory path and, per PR, whether the review was posted,
+skipped, or deferred.

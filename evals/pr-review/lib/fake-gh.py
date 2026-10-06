@@ -9,11 +9,13 @@ posted. Every call is appended to ./gh-calls.log.
 """
 
 import base64
+import io
 import json
 import os
 import shutil
 import subprocess
 import sys
+import tarfile
 import time
 from pathlib import Path
 
@@ -197,6 +199,22 @@ def api_command(args):
         return
     if endpoint == "user":
         emit(json.dumps({"login": "eval-user"}), jq_filter)
+        return
+    # repos/<owner>/<repo>/tarball/<ref>. A PR's head SHA selects that PR's
+    # folder; any other ref, such as a pinned python-standards commit, falls
+    # back to every folder.
+    if len(parts) == 5 and parts[0] == "repos" and parts[3] == "tarball":
+        heads = [d for d in pr_dirs()
+                 if json.loads((d / "pr.json").read_text(encoding="utf-8"))["headRefOid"].startswith(parts[4])]
+        roots = [d / "contents" / parts[1] / parts[2] for d in heads or pr_dirs()]
+        roots = [root for root in roots if root.is_dir()]
+        if not roots:
+            fail("gh: Not Found (HTTP 404)")
+        buffer = io.BytesIO()
+        with tarfile.open(fileobj=buffer, mode="w:gz") as tar:
+            for root in roots:
+                tar.add(root, arcname=f"{parts[1]}-{parts[2]}-{parts[4][:7]}")
+        sys.stdout.buffer.write(buffer.getvalue())
         return
     # repos/<owner>/<repo>/contents/<path>
     if len(parts) >= 4 and parts[0] == "repos" and parts[3] == "contents":
