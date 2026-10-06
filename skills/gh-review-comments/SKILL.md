@@ -15,8 +15,8 @@ current branch's. It returns unresolved inline threads, conversation comments,
 and review bodies; add `--all-threads` or `--threads-only` only when asked. When
 a thread's `comments.pageInfo.hasNextPage` is true, fetch the rest with
 `gh api graphql`; if you can't, leave that item open and say so. Split comments
-and review bodies into concrete concerns, merge duplicates, and treat praise and
-status summaries as context.
+and review bodies into concrete concerns, merge duplicates while keeping every
+source link, and treat praise and status summaries as context.
 
 ## 2. Classify
 
@@ -85,7 +85,8 @@ by ID, or revise.
 Change nothing before approval, and do only what was approved.
 
 - Per PR, apply the fixes on one branch and run the covering checks once; work
-  on separate PRs in parallel. Pushing keeps its own approval.
+  on separate PRs in parallel, each in its own worktree. Pushing keeps its own
+  approval.
 - Resolve a Fix or Already addressed thread once the fix is on the PR and checks
   pass, without waiting for CI. Leave partial or disputed threads open. Resolve
   a Dismiss thread only when the approval said so.

@@ -20,9 +20,9 @@ codex exec --approve-for-me --skip-git-repo-check -C <dir> -o <out>/final.md - <
 
 - `--approve-for-me` sends Codex's approval requests to its automatic reviewer,
   so nothing waits on the user.
-- `-C <dir>` is Codex's working directory and sandbox root: it writes only
-  there and under `/tmp`. Point it at the repository for code work, or at a new
-  folder outside git otherwise.
+- `-C <dir>` is Codex's working directory and sandbox root: it writes there and
+  in temp directories without escalating. Point it at the repository for code
+  work, or at a new folder outside git otherwise.
 - Pass the prompt on stdin from a file, or inline in quotes with
   `< /dev/null`. Name skills in it ("Use the code-review skill on ...").
   End it with "Don't ask questions; if something blocks you, say what and
