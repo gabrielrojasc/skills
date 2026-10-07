@@ -11,9 +11,8 @@ re-review until nothing is left to fix. Don't ask the user. Commit locally each
 round and push once nothing is left to fix.
 
 1. Ask the other agent for a review on `<base>...HEAD` with the skill the user
-   named. Otherwise use `pr-review` when the change has a PR and that skill is
-   installed, and `code-review` when not. From Claude Code, run Codex as one
-   unchained command, in the background:
+   named. Otherwise use `pr-review` when it's installed, and `code-review` when
+   not. From Claude Code, run Codex as one unchained command, in the background:
 
    ```bash
    codex exec --approve-for-me --skip-git-repo-check -C <repo> -o <out>.md "<prompt>" < /dev/null > <out>.log 2>&1
