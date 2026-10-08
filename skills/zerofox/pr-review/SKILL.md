@@ -98,9 +98,11 @@ an agent only to stop it, when its head moved or its PR closed.
 ### Standards axis
 
 The Standards agent judges code, documentation, and agent instructions against
-the chosen standards. It does not check the ticket or acceptance criteria. Use
-Fowler's code smells (*Refactoring*, chapter 3) as shared vocabulary; repository
-conventions override them.
+the chosen standards. It does not check the ticket or acceptance criteria. The
+repository's standards are its `AGENTS.md`, the docs it points to, and any file
+under `docs/` about how code is written. Alongside them, always apply Fowler's
+code smells (*Refactoring*, chapter 3); where the two conflict, the repository
+wins.
 
 When the diff changes documentation, agent instructions, or documentation
 automation, reviewers and verifiers read [Documentation and agent
