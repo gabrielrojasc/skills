@@ -59,6 +59,11 @@ act on its output:
   they cause elsewhere.
 - `unknown`: review the full diff and tell the user why.
 
+## Re-review
+
+A re-review covers every PR in this session's run directories unless the user
+names some. Repeat Setup and the earlier-review check for each.
+
 ## Choose the review
 
 | PR | Standards axis | Spec axis |
