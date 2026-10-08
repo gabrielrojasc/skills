@@ -24,9 +24,9 @@ round and push once nothing is left to fix.
    claude -p "<prompt>" --permission-mode auto --output-format json < /dev/null > <out>.json
    ```
 
-2. A fresh subagent, without your reasoning, triages the findings with the
-   /gh-review-comments skill. It decides instead of asking the user, and there
-   are no PR threads to reply to or resolve.
+2. A fresh subagent, without your reasoning, loads the `gh-review-comments`
+   skill and triages the findings with it. It decides instead of asking the
+   user, and there are no PR threads to reply to or resolve.
 3. Make the fixes, run the checks, and commit.
 4. Ask the same reviewer session for a re-review, passing the fixes and the
    dismissals with their reasons (`codex exec … resume <id>` or
