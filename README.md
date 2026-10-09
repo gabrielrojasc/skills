@@ -47,8 +47,6 @@ installation, updates, and lock tracking.
 - [`python-environments`](skills/python-environments/SKILL.md) creates and
   manages project-local Python environments with `uv venv` while preserving each
   repository's dependency workflow.
-- [`mermaid-validation`](skills/mermaid-validation/SKILL.md) renders and
-  inspects changed Mermaid diagrams with Mermaid CLI.
 - [`review-revise`](skills/review-revise/SKILL.md) runs adversarial
   review-revise loops with independent reviewers until findings are resolved or
   an independent progress agent stops a stalled loop.

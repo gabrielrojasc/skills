@@ -1,3 +1,0 @@
-interface:
-  display_name: "Mermaid Validation"
-  short_description: "Validates Mermaid diagrams. Use when creating or editing them."
