@@ -33,6 +33,9 @@
 
 - Wrap Markdown prose at 80 columns. Leave headings, tables, code blocks, and
   links that can't break as they are.
+- Match the concision of the surrounding skill text. Write only what changes
+  agent behavior; leave out what agents already know or would recover from on
+  their own.
 - Keep `README.md` and the skill inventory in sync.
 - When a changed skill has a same-named skill in `riskive/ai-tooling`, propose
   the matching team PR. The team copy may differ from this one.
