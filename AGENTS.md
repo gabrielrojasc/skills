@@ -26,6 +26,9 @@
 - Put repeatable mechanics in `scripts/`. Keep cross-task policy in the
   user-level `AGENTS.md` and domain-specific workflow in the skill that triggers
   it.
+- Copy a script into each skill that uses it, so every skill installs on its
+  own. When you change a script, find same-named copies under `skills/` and
+  keep them identical.
 - Choose model invocation only when the agent must discover the skill itself.
   Otherwise set `disable-model-invocation: true`.
 
