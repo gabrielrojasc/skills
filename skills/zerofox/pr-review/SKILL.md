@@ -176,9 +176,10 @@ unless they independently meet the blocker or major-debt bar.
 ### Rules for every reviewer
 
 1. Read the PR metadata, diff, and existing review threads, and read source from
-   `src/` in the PR folder. Don't repeat a point already raised or resolved. If
-   the user reviewed the PR before, report the status of each of their earlier
-   threads: addressed, unaddressed, or author replied.
+   `src/` in the PR folder. Don't repeat a point already raised or resolved;
+   when an unresolved bot comment meets the finding bar, draft a +1 on it
+   instead. If the user reviewed the PR before, report the status of each of
+   their earlier threads: addressed, unaddressed, or author replied.
 2. Anchor a finding inline when a specific changed line owns the problem;
    otherwise draft it for the review body. Never invent an anchor.
 3. Each draft states the problem concisely. For defects and spec gaps, give a
@@ -188,9 +189,9 @@ unless they independently meet the blocker or major-debt bar.
    obvious.
 4. Write the result with headings `## Target head`, `## Verdict` (APPROVE,
    COMMENT, or REQUEST_CHANGES with one line of reasoning), `## Comment drafts`
-   (`- **file:line** — text` using new-file line numbers, or
-   `- **review body** — text`), and
-   `## Notes for the reviewer (not for posting)`. Spec agents use
+   (`- **file:line** — text` using new-file line numbers,
+   `- **review body** — text`, or `- **+1 <comment URL>** — why it holds`),
+   and `## Notes for the reviewer (not for posting)`. Spec agents use
    `## Spec verdict` and `## Spec findings`. Return only the file path and the
    verdict line.
 5. If nothing qualifies, return APPROVE with no drafts. No praise.
@@ -222,7 +223,8 @@ The verifier returns one verdict per ID with one line of evidence:
 - **refuted:** the claim doesn't hold or the finding misses the bar. Never
   refute a finding for being small.
 
-For a `user-promoted` draft, check only the claim and anchor.
+For a `user-promoted` draft, check only the claim and anchor. For a +1, the
+bot's comment is the claim.
 
 The verifier may add new findings, which get fresh IDs. When a round leaves a
 draft at `revise` or adds a finding, follow [Further verification
@@ -260,8 +262,9 @@ stay in `triage.md` with their reasons so the user can overrule.
 
    Keep the problem and the reason to a sentence or two each, but always show
    the full draft. Add the trimmed impact argument when the verifier removed
-   one. Show a `wording unsettled` finding with the confirmed ones, marked in
-   its heading, and add a **Wording:** line with the sticking point. After the
+   one. A +1 quotes and links the bot's comment in place of the draft. Show a
+   `wording unsettled` finding with the confirmed ones, marked in its heading,
+   and add a **Wording:** line with the sticking point. After the
    confirmed findings, show refuted and dropped drafts with reasons, then the
    reviewer notes.
 3. Show the whole batch in one message, then ask one question at the end, not
@@ -286,9 +289,9 @@ stay in `triage.md` with their reasons so the user can overrule.
 ## Submit
 
 Assemble `final-review.md` with the review event, every kept inline comment in
-order, and a review body only for kept findings without an inline anchor. Show
-the exact package and ask for explicit approval. Deciding to keep a finding is
-not approval to submit.
+order, a review body only for kept findings without an inline anchor, and every
+kept +1. Show the exact package and ask for explicit approval. Deciding to keep
+a finding is not approval to submit.
 
 Immediately before submitting, re-check the head, confirm every target line is
 still in the diff, and confirm `final-review.md` matches what the user approved.
@@ -304,6 +307,8 @@ gh api repos/<owner>/<repo>/pulls/<n>/reviews -X POST --input <pr-folder>/review
 
 The JSON has `commit_id` (the verified head), `event`, `body` (omit when empty),
 and `comments`, each with `path`, `line`, `side: "RIGHT"`, and `body`.
+
+Then add a `+1` reaction to each kept +1's comment.
 
 After posting or skipping a PR, start the next PR's triage in the same message,
 waiting for its verification if needed. After the last PR, end with the run
