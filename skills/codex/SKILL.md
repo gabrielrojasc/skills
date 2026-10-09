@@ -32,7 +32,7 @@ codex exec --approve-for-me --skip-git-repo-check -C <dir> -o <out>/final-2.md r
 - Use `@Chrome` for websites, even when the user says computer use. It drives
   the user's signed-in Chromium browser, such as Helium, in new tabs, never a
   new window. Name the browser in the prompt; the plugin's diagnostic scripts
-  only know Chrome. Downloads need "Ask where to save each file" off.
+  only know Chrome.
 - Computer Use drives native apps and takes over the cursor.
 - Keep live accounts read-only unless the user approves a write.
 - Each app, and each site's hover, resize, or device emulation, needs the
