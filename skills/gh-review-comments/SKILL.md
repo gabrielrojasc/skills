@@ -1,12 +1,12 @@
 ---
 name: gh-review-comments
-description: Triages PR feedback. Use when reviewing unresolved comments.
+description: Triages PR review comments. Use when addressing PR feedback.
 ---
 
 # GitHub review comment triage
 
-Decide how to handle the feedback on one or more PRs, get the user's approval,
-then act on it. `<SKILL_DIR>` is this file's directory.
+Classify feedback on one or more PRs, raise only what needs the user's
+judgment, and handle the rest without asking. `<SKILL_DIR>` is this file's directory.
 
 ## 1. Fetch
 
@@ -20,9 +20,10 @@ source link, and treat praise and status summaries as context.
 
 ## 2. Classify
 
-Read the cited code, diff, and tests first, using `gh pr diff` and `gh api`
-when the checkout isn't the PR branch. With several PRs, give each its own
-read-only subagent, all at once. Each item is:
+Read each PR's code in a local worktree on its branch, or fetch its head with
+`<SKILL_DIR>/scripts/fetch-source.sh <owner>/<repo> <head-sha> <dir>` into a
+`mktemp -d` directory. With several PRs, give each its own read-only subagent,
+all at once. Each item is:
 
 - **Fix:** a real defect, missing behavior, contract mismatch, test gap, or
   maintainability problem worth changing. Nits count when the change genuinely
@@ -32,8 +33,9 @@ read-only subagent, all at once. Each item is:
 - **Already addressed:** the code already handles it.
 
 When the code can't settle a call, as with product behavior, preference,
-ownership, or the author's intent, pick the best-supported one and state the
-assumption.
+ownership, or the author's intent, check the PR body, its linked issue, and the
+conversation, and cite what settles it. Otherwise pick the best-supported call
+and state the assumption.
 
 ## 3. Challenge each call
 
@@ -49,7 +51,7 @@ circles. Your own review doesn't replace it. Mark any disagreement left as
 Raise an item for the user's judgment when any of these holds; every other item
 is routine:
 
-- It rests on an assumption: it is `Disputed:` or the code can't settle it.
+- It rests on an assumption: it is `Disputed:` or nothing cited settles it.
 - It changes a contract or scope: user-visible behavior, a public API, config,
   stored data, a dependency, or work beyond the PR's purpose.
 - It dismisses or only partly accepts a human's comment.
@@ -92,24 +94,24 @@ link, then list routine items one line each. Number items across PRs:
   was right and 👎 when it wasn't.
 - Keep replies short and about the code.
 
-End with one plain-text question, never a question tool: approve all, approve
-the routine items and decide raised ones by ID, or revise.
+Ask about raised items in one plain-text question, never a question tool, and
+start on routine items without waiting for the answer.
 
-## 5. Act on approval
+## 5. Act
 
-Change nothing before approval, and do only what was approved.
+Routine items carry the user's standing approval; raised items need their
+answer. Do nothing beyond the two.
 
 - Per PR, apply the fixes on one branch and run the covering checks once; work
-  on separate PRs in parallel, each in its own worktree. Pushing keeps its own
-  approval.
-- Resolve a Fix or Already addressed thread once the fix is on the PR and checks
-  pass, without waiting for CI. Leave partial or disputed threads open. Resolve
-  a Dismiss thread only when the approval said so.
-- Add approved reactions once each item is decided.
+  on separate PRs in parallel, each in its own worktree.
+- Push each PR once, after all its items are settled, so bots re-review once.
+- Then reply, react, and resolve Fix, Already addressed, and routine Dismiss
+  threads, without waiting for CI. Leave partial or disputed threads open, and
+  resolve a raised Dismiss only when the user said so.
 - Mutations: `addPullRequestReviewThreadReply` to reply in a thread,
   `resolveReviewThread` with the thread's `id`, `gh pr comment --body-file` for
   a top-level answer (a new comment that links its source), and `addReaction`.
   Pass bodies through a file.
 
 Before ending, confirm each resolved thread's `isResolved`, and list any
-approved thread left open with its reason.
+thread left open with its reason.
