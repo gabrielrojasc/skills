@@ -17,8 +17,8 @@ codex exec --approve-for-me --skip-git-repo-check -C <dir> -o <out>/final.md - <
   folder outside git.
 - Pass the prompt on stdin, or inline with `< /dev/null`. End it with "Don't
   ask questions; if something blocks you, say what and stop."
-- Run tasks longer than 10 minutes in the background. A background run dies
-  with the Claude Code session and after about 30 minutes.
+- Run it in the background. It dies with the Claude Code session and after
+  about 30 minutes.
 
 Follow up in the same session, from the log's `session id:` line. Options go
 before `resume`, and `-C` is required again:
