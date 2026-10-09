@@ -41,6 +41,10 @@ installation, updates, and lock tracking.
   GitHub review threads, top-level comments, and review bodies by default,
   handles routine fixes, replies, and resolutions on its own, and raises only
   the decisions that need the user's judgment.
+- [`babysit-pr`](skills/babysit-pr/SKILL.md) fixes review feedback and CI
+  failures in rounds through `gh-review-comments`, pushes once per round, and
+  hands the PR back when it's ready to merge, stuck, or has a decision for the
+  user.
 - [`developer-documentation-style`](skills/developer-documentation-style/SKILL.md)
   reads the live Google guide before writing, editing, or reviewing developer
   documentation.

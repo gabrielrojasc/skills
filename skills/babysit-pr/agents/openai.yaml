@@ -1,0 +1,5 @@
+interface:
+  display_name: "Babysit PR"
+  short_description: "Drives PRs to merge-ready. Use when babysitting a PR."
+policy:
+  allow_implicit_invocation: false
