@@ -305,5 +305,6 @@ gh api repos/<owner>/<repo>/pulls/<n>/reviews -X POST --input <pr-folder>/review
 The JSON has `commit_id` (the verified head), `event`, `body` (omit when empty),
 and `comments`, each with `path`, `line`, `side: "RIGHT"`, and `body`.
 
-End with the run directory path and, per PR, whether the review was posted,
-skipped, or deferred.
+After posting or skipping a PR, start the next PR's triage in the same message,
+waiting for its verification if needed. After the last PR, end with the run
+directory path and, per PR, whether the review was posted, skipped, or deferred.

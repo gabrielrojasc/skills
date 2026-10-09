@@ -16,5 +16,3 @@ so no review advances while a question waits for the user. There, carry every
 PR through verification before asking the first triage question; after that,
 each answer leads straight to the next ready PR. In hosts that resume you, show
 each PR as soon as it is verified.
-
-After submitting or skipping a PR, move to the next ready PR.
