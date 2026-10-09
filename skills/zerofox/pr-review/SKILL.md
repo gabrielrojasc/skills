@@ -5,8 +5,9 @@ description: Reviews GitHub PRs. Use when reviewing a PR.
 
 # PR review
 
-Review one or more GitHub PRs with independent reviewer and verifier subagents,
-triage the verified findings with the user, and submit one review per PR.
+Review one or more GitHub PRs with independent reviewer subagents, verify any
+draft findings with fresh subagents, triage them with the user, and submit one
+review per PR.
 
 Keep every draft local until the user explicitly approves the complete review
 for that PR in this session. Subagents are read-only outside their assigned
@@ -196,13 +197,17 @@ unless they independently meet the blocker or major-debt bar.
 
 ## Verify
 
-No draft reaches the user unverified. After an axis's reviewer returns, the
-orchestrator assigns stable axis-prefixed IDs (`S1`, `P1`) and writes only the
-IDs, draft text, and any `user-promoted` marker to the round's input file. A
-fresh, read-only verifier per axis per round checks every draft against the diff
-and source at the target head, existing threads, the applicable standards, and,
-for Spec, the ticket. It reads only its input file and primary sources,
-including the fetched source in the run directory, never other files there.
+No draft reaches the user unverified. An axis with no drafts skips verification;
+report it as "no review issues found". When no axis has drafts, re-check the
+head and PR state yourself and go to [Submit](#submit).
+
+After an axis's reviewer returns drafts, the orchestrator assigns stable
+axis-prefixed IDs (`S1`, `P1`) and writes only the IDs, draft text, and any
+`user-promoted` marker to the round's input file. A fresh, read-only verifier
+per axis per round checks every draft against the diff and source at the target
+head, existing threads, the applicable standards, and, for Spec, the ticket. It
+reads only its input file and primary sources, including the fetched source in
+the run directory, never other files there.
 
 The verifier returns one verdict per ID with one line of evidence:
 

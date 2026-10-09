@@ -3,11 +3,11 @@
 Start a folder for the new head, with its own `src/`, and carry forward the
 finding IDs, drafts, and any triage decisions. Don't restart triage.
 
-1. A fresh verifier checks every carried finding against the new head, with the
-   same inputs and limits as in Verify. Each gets one verdict: **still applies**
-   (re-anchored to its new line), **fixed** (name the commit that resolved it),
-   or **changed** (still real, but the claim, anchor, or draft needs a revision,
-   which the verifier supplies).
+1. If findings carried over, a fresh verifier checks each against the new head,
+   with the same inputs and limits as in Verify. Each gets one verdict: **still
+   applies** (re-anchored to its new line), **fixed** (name the commit that
+   resolved it), or **changed** (still real, but the claim, anchor, or draft
+   needs a revision, which the verifier supplies).
 2. In parallel with step 1, run
    `<SKILL_DIR>/scripts/changes-since-review.py <owner>/<repo> <n> <old-head>`.
    On `changed`, a reviewer per axis reviews only the printed differences, as
