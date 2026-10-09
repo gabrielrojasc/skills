@@ -39,7 +39,8 @@ installation, updates, and lock tracking.
   tracker mutation.
 - [`gh-review-comments`](skills/gh-review-comments/SKILL.md) fetches unresolved
   GitHub review threads, top-level comments, and review bodies by default and
-  proposes fix, dismissal, or already-addressed decisions before any mutation.
+  proposes fix, dismissal, or already-addressed decisions before any mutation,
+  raising only the ones that need the user's judgment.
 - [`developer-documentation-style`](skills/developer-documentation-style/SKILL.md)
   reads the live Google guide before writing, editing, or reviewing developer
   documentation.

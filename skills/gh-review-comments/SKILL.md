@@ -31,8 +31,9 @@ read-only subagent, all at once. Each item is:
   constraint.
 - **Already addressed:** the code already handles it.
 
-When a call hinges on product or preference, pick the best-supported one and
-state the assumption.
+When the code can't settle a call, as with product behavior, preference,
+ownership, or the author's intent, pick the best-supported one and state the
+assumption.
 
 ## 3. Challenge each call
 
@@ -45,21 +46,29 @@ circles. Your own review doesn't replace it. Mark any disagreement left as
 
 ## 4. Decision pack
 
-One block per item, numbered across PRs, so the user can decide without opening
-a link:
+Raise an item for the user's judgment when any of these holds; every other item
+is routine:
+
+- It rests on an assumption: it is `Disputed:` or the code can't settle it.
+- It changes a contract or scope: user-visible behavior, a public API, config,
+  stored data, a dependency, or work beyond the PR's purpose.
+- It dismisses or only partly accepts a human's comment.
+
+Give each raised item a full block so the user can decide without opening a
+link, then list routine items one line each. Number items across PRs:
 
 ```markdown
 ## PR <number>: <title>
 
-Fix <n> · dismiss <n> · already addressed <n>
-
-### 1 · Fix · P2
+### 1 · Fix
 
 [path:line](link) · [thread](url)
 
 **Concern:** what the reviewer says is wrong, in plain words.
 
 **Assessment:** whether it holds and why.
+
+**Decide:** what the user must settle, and your pick.
 
 **Plan:** the change and its scope.
 
@@ -68,6 +77,12 @@ Fix <n> · dismiss <n> · already addressed <n>
 > the exact text, only when one is proposed
 
 **Reaction:** 👍 or 👎, only for a bot comment
+
+### Routine
+
+| # | Call | Item | Action |
+| - | ---- | ---- | ------ |
+| 2 | Fix | [path:line](link) · [thread](url) | the change, reply, and reaction |
 ```
 
 - Print file links with
@@ -78,7 +93,7 @@ Fix <n> · dismiss <n> · already addressed <n>
 - Keep replies short and about the code.
 
 End with one plain-text question, never a question tool: approve all, approve
-by ID, or revise.
+the routine items and decide raised ones by ID, or revise.
 
 ## 5. Act on approval
 
