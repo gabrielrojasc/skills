@@ -117,7 +117,7 @@ They need the `claude` and `codex` CLIs:
 evals/triggers/run-evals.sh
 ```
 
-The header of `run-evals.sh` documents its options. Add `--case '<skill>*'` to
+The header of `run-evals.sh` documents its options. Add `--case '*<skill>*'` to
 run one skill's cases, and `--installed` to make the repo skills compete with
 every skill installed in `~/.agents/skills`. Cases named `hard-*` hide the
 trigger inside a larger task, in the working directory, or in a terse request.

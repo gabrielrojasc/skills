@@ -134,6 +134,9 @@ def run(case, run_dir, env, model_args):
                         break
                     if actions >= case["max_actions"] or event.get("type") == "turn.completed":
                         break
+                else:
+                    # Codex can exit without turn.failed, e.g. on a startup error.
+                    error = "codex exited before turn.completed; see stderr.log"
             finally:
                 if not timer.is_alive():
                     error = f"timeout after {TIMEOUT_SECONDS}s"
