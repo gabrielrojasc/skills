@@ -43,6 +43,10 @@
 - When a changed skill has a same-named skill in `riskive/ai-tooling`, propose
   the matching team PR. The team copy may differ from this one.
 - Run `scripts/validate-skills.sh` after changing skills, metadata, or scripts.
+- When you add, rename, or change the description or invocation policy of a
+  model-invoked skill, keep its link in `evals/triggers/skills/` and its cases
+  in `evals/triggers/evals/` current, then run
+  `evals/triggers/run-evals.sh --case '<name>*'`.
 - Preserve approval gates for external writes, worktree removal, and branch
   deletion.
 - Do not change global installations, global agent guidance, or external

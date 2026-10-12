@@ -79,6 +79,7 @@ architecture, and review. They are intentionally not copied here.
 skills/          General personal skills
 skills/zerofox/  ZeroFox-specific skills
 scripts/         Repository validation
+evals/           Claude Code and Codex eval harnesses
 ```
 
 ## Development
@@ -107,6 +108,17 @@ use only the Python standard library. Run the shell regression suite separately:
 ```bash
 bash skills/git-workspace/tests/test-upstream.sh
 ```
+
+Trigger evals check that each model-invoked skill fires on the prompts it
+should, and stays silent on near misses, in real Claude Code runs. They need
+the `claude` CLI and cost about $5 per full run:
+
+```bash
+evals/triggers/run-evals.sh -j 4
+```
+
+Arguments pass through to `claude plugin eval`. Add `--case '<skill>*'` to
+run one skill's cases.
 
 ## License
 

@@ -65,7 +65,8 @@ workflow to uv.
 - Do not change the repository's declared Python range, dependency manager, or
   lockfile format unless the user asks.
 - If repository files give conflicting Python requirements, or satisfying them
-  requires changing the declared range, stop and ask.
+  requires changing the declared range, stop and propose a version or range,
+  citing what each source requires.
 
 ## Completion criteria
 

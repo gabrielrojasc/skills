@@ -7,3 +7,6 @@ evals/pr-review/evals/results/
 
 # pr-review rung eval output
 evals/pr-review/rung-results/
+
+# trigger eval run output
+evals/triggers/evals/results/

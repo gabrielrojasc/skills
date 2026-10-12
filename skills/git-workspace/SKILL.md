@@ -81,7 +81,8 @@ attaching an existing branch preserves its upstream configuration.
 
 ## Remove task worktrees
 
-Cleanup is destructive. Present the exact worktrees and branches first, then get
+Cleanup is destructive. Present the exact worktrees and branches with each
+one's merge, push, and PR state and your pick of which to remove, then get
 explicit human approval. Several tasks may be approved together from one list;
 run the helper once per task. After approval, pass `--yes`, because the helper's
 own prompt can't be answered from an agent shell and exits with an error:

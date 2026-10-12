@@ -9,8 +9,8 @@ disable-model-invocation: true
 Fix review feedback and CI failures in rounds, without asking the user, until
 each PR is ready for them to take over. Watch every PR's checks yourself, and
 give each round a fresh subagent that runs steps 2 to 5 and returns raised items
-instead of asking; ask the user and pass the answers to that PR's next round. A
-stack runs as one loop, bottom up.
+as `gh-review-comments` decision-pack blocks instead of asking; ask the user and
+pass the answers to that PR's next round. A stack runs as one loop, bottom up.
 
 1. Wait in the background for the head's checks to settle with
    `gh pr checks <pr> --watch`, once the new head's checks have appeared.

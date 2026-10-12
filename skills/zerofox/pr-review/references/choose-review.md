@@ -5,8 +5,8 @@
 Run
 `<SKILL_DIR>/scripts/team-member.sh riskive/t-executive-protection <author>`.
 On `member`, run the Spec axis; on `not-member`, skip it. On `unknown`, start
-the Standards axis, which is the same either way, and ask the user whether to
-run the Spec axis.
+the Standards axis, which is the same either way, and recommend running or
+skipping the Spec axis based on what you know about the author.
 
 The api-specialist lens follows `docs/api_specialist_review.md` in riskive/API.
 Read it and the convention docs it links that are relevant to the diff, from

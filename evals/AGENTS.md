@@ -1,7 +1,13 @@
 # Evals
 
-Each eval drives real Claude Code and Codex runs against fixture PRs. The
+`pr-review/` drives real Claude Code and Codex runs against fixture PRs. The
 headers of `run-suite.sh` and `run-rungs.sh` document their options.
+
+`triggers/` checks which skill Claude Code picks for a prompt. Each case is a
+`prompt.md` with one `tool_used: Skill` grader per skill that must fire
+(`min: 1`) or stay silent (`max: 0`). Write prompts the way the user would ask,
+without naming the skill. Give each skill at least one positive case, and add a
+near miss wherever a sibling skill or a plain answer competes for the prompt.
 
 ## Test variants in isolation
 
