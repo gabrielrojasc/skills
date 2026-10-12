@@ -1,0 +1,5 @@
+#!/bin/sh
+# Claude runs see this first on PATH. Trigger evals only count which skill
+# loads; a real `codex exec` would start a Codex run that outlives the eval.
+echo "codex is disabled in trigger evals" >&2
+exit 1

@@ -3,11 +3,22 @@
 `pr-review/` drives real Claude Code and Codex runs against fixture PRs. The
 headers of `run-suite.sh` and `run-rungs.sh` document their options.
 
-`triggers/` checks which skill Claude Code picks for a prompt. Each case is a
+Run every eval in both Claude Code and Codex.
+
+`triggers/` checks which skill each tool picks for a prompt. Each case is a
 `prompt.md` with one `tool_used: Skill` grader per skill that must fire
-(`min: 1`) or stay silent (`max: 0`). Write prompts the way the user would ask,
-without naming the skill. Give each skill at least one positive case, and add a
-near miss wherever a sibling skill or a plain answer competes for the prompt.
+(`min: 1`) or stay silent (`max: 0`). `lib/codex.py` counts a Codex read of a
+skill's `SKILL.md` as a Skill call, so both tools use the same graders. Write
+prompts the way the user would ask, without naming the skill. Give each skill
+at least one positive case, and add a near miss wherever a sibling skill or a
+plain answer competes for the prompt.
+
+Name a case `hard-*` when a realistic request makes the trigger hard to see:
+the skill is one step of a larger task, the clue is only in the working
+directory, or the request is terse. A case puts files in the working directory
+through a `case.yaml` `scaffold_script` that calls `lib/scaffold.sh` with a
+folder under `fixtures/`. Run hard cases with `--installed` too, and compare
+against a run without it to tell a weak description from a competing skill.
 
 ## Test variants in isolation
 
@@ -35,11 +46,13 @@ and an interrupted run can leave a variant in place.
 - Write output under `~/tmp/<skill>-evals/`, outside git (the runners refuse a
   git workspace) and outside `$TMPDIR`, which macOS purges.
 - Start a suite under launchd with
-  `launchctl submit -l <label> -o <log> -e <log> -- /bin/bash -lc '<command>'`,
+  `launchctl submit -l <label> -o <log> -e <log> -- /usr/bin/env PATH="$PATH" /bin/bash -c '<command>'`,
   and `launchctl remove <label>` once it finishes, because launchd restarts a
-  submitted job when it exits. Claude Code stops its background tasks after
-  about 30 minutes and kills even `setsid` children when its session restarts.
-  Poll with waits under 25 minutes.
+  submitted job when it exits. Pass `PATH` through `env`: a launchd login
+  shell doesn't get the user's, and finds neither `claude` nor `codex`. Claude
+  Code stops its background tasks after about 30 minutes and kills even
+  `setsid` children when its session restarts. Poll with waits under 25
+  minutes.
 - `codex exec` can hang after a transient model or network failure: its trace
   stops growing for 20 minutes or more while sibling cells progress. Match the
   process to its cell by working directory (`lsof -p <pid> | rg cwd`) before

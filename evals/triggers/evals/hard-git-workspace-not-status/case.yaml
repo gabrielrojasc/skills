@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: hard-git-workspace-not-status
+context:
+  scaffold_script: scaffold.sh

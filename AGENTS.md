@@ -47,6 +47,8 @@
   model-invoked skill, keep its link in `evals/triggers/skills/` and its cases
   in `evals/triggers/evals/` current, then run
   `evals/triggers/run-evals.sh --case '<name>*'`.
+- Run every eval in both Claude Code and Codex, and report both tools' results.
+  A result from one tool doesn't stand in for the other.
 - Preserve approval gates for external writes, worktree removal, and branch
   deletion.
 - Do not change global installations, global agent guidance, or external

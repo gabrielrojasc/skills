@@ -1,0 +1,11 @@
+[project]
+name = "widgets"
+version = "0.3.0"
+requires-python = ">=3.11"
+dependencies = ["click>=8.1"]
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[project.scripts]
+widgets = "widgets.cli:main"

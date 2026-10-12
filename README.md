@@ -55,8 +55,8 @@ installation, updates, and lock tracking.
   review-revise loops with independent reviewers until findings are resolved or
   an independent progress agent stops a stalled loop.
 - [`cross-review`](skills/cross-review/SKILL.md) has the other agent review a
-  code change (Codex from Claude Code, Claude from Codex), sends each finding to
-  an independent triage subagent, fixes and commits each round, repeats until a
+  code change (Codex from Claude Code, Claude from Codex), has an independent
+  subagent triage the findings, fixes and commits each round, repeats until a
   round leaves nothing to fix, and then pushes.
 - [`codex`](skills/codex/SKILL.md) hands tasks to Codex through `codex exec`
   without waiting on the user, continues the same session for follow-ups,
@@ -110,15 +110,18 @@ bash skills/git-workspace/tests/test-upstream.sh
 ```
 
 Trigger evals check that each model-invoked skill fires on the prompts it
-should, and stays silent on near misses, in real Claude Code runs. They need
-the `claude` CLI and cost about $5 per full run:
+should, and stays silent on near misses, in real Claude Code and Codex runs.
+They need the `claude` and `codex` CLIs:
 
 ```bash
-evals/triggers/run-evals.sh -j 4
+evals/triggers/run-evals.sh
 ```
 
-Arguments pass through to `claude plugin eval`. Add `--case '<skill>*'` to
-run one skill's cases.
+The header of `run-evals.sh` documents its options. Add `--case '<skill>*'` to
+run one skill's cases, and `--installed` to make the repo skills compete with
+every skill installed in `~/.agents/skills`. Cases named `hard-*` hide the
+trigger inside a larger task, in the working directory, or in a terse request.
+The summary reports them separately, and they don't affect the exit status.
 
 ## License
 
