@@ -14,16 +14,8 @@ Keep each repository in a bare-container layout:
   <ticket-or-task>/
 ```
 
-The default-branch worktree is for browsing and synchronization. Implementation
-normally happens in a task worktree. An explicit user choice to use the current
-checkout overrides that default.
-
 Resolve `<SKILL_DIR>` as the directory containing this `SKILL.md` before running
 a bundled helper.
-
-The helpers require Python 3.10+, Git, and Bash. All Python code ships inside
-this skill; no packages or installation step are needed. Keep the bundled
-`scripts/` directory intact when copying the skill.
 
 ## Add or repair a repository
 
@@ -99,14 +91,3 @@ own prompt can't be answered from an agent shell and exits with an error:
 The helper blocks dirty worktrees and branches with unpushed commits. It uses
 `git worktree remove` and safe branch deletion with `git branch -d`. Never
 replace those operations with force deletion.
-
-## Tests
-
-```bash
-bash <SKILL_DIR>/tests/test-upstream.sh
-uv run --no-project --with pytest pytest <SKILL_DIR>/tests/test_workspace.py
-```
-
-Both suites use temporary local repositories without network access. uv may
-download pytest on first use. The Python suite runs a standalone copy of the
-skill from an unrelated working directory.

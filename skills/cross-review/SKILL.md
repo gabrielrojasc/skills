@@ -29,8 +29,9 @@ round and push once nothing is left to fix.
    user, and there are no PR threads to reply to or resolve.
 3. Make the fixes, run the checks, and commit.
 4. Ask the same reviewer session for a re-review, passing the fixes and the
-   dismissals with their reasons (`codex exec … resume <id>` or
-   `claude -p --resume <id>`). Repeat from step 2.
+   dismissals with their reasons. For Codex, repeat the options, `-C`
+   included, before `resume <id> "<prompt>"`; for Claude, add `--resume <id>`.
+   Repeat from step 2.
 
 When a round leaves nothing to fix, push. If the loop goes in circles, stop
 without pushing and report what's unresolved. Report the commits and every

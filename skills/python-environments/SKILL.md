@@ -5,23 +5,9 @@ description: Manages Python venvs. Use when setting up or repairing one.
 
 # Python environments
 
-Use `uv venv` when creating Python virtual environments. Keep Python
-interpreters, tools, and project dependencies out of global language
-installations.
-
-## Precedence
-
-Use guidance in this order:
-
-1. The user's explicit Python version or environment requirement.
-2. The repository's documented setup and dependency workflow.
-3. Repository configuration such as `.python-version`, `requires-python`, CI,
-   runtime files, and tool configuration.
-4. The defaults in this skill.
-
-Keep the repository's dependency manager. Creating the environment with `uv`
-does not authorize migrating Poetry, pip, pip-tools, or another dependency
-workflow to uv.
+Create environments with `uv venv`. Keep the repository's dependency manager;
+uv creates the environment and doesn't replace Poetry or pip. Keep Python
+packages and tools out of global installations.
 
 ## Workflow
 
@@ -58,21 +44,6 @@ workflow to uv.
    python --version
    ```
 
-## Guardrails
-
-- Do not install Python packages or Python-based tools globally.
-- Do not recreate a working environment without a reason tied to the task.
-- Do not change the repository's declared Python range, dependency manager, or
-  lockfile format unless the user asks.
-- If repository files give conflicting Python requirements, or satisfying them
-  requires changing the declared range, stop and propose a version or range,
-  citing what each source requires.
-
-## Completion criteria
-
-- The environment was created by `uv venv` or an existing compatible, healthy
-  environment was reused.
-- `python` resolves inside the project environment and reports a compatible
-  version.
-- Dependencies and commands use the repository's existing workflow.
-- No Python package or tool was installed into a global Python environment.
+When repository files conflict on the Python version, or satisfying them means
+changing the declared range, stop and propose a version or range, citing what
+each source requires.

@@ -6,7 +6,8 @@ description: Triages PR review comments. Use when addressing PR feedback.
 # GitHub review comment triage
 
 Classify feedback on one or more PRs, raise only what needs the user's
-judgment, and handle the rest without asking. `<SKILL_DIR>` is this file's directory.
+judgment, and handle the rest without asking. `<SKILL_DIR>` is this file's
+directory.
 
 ## 1. Fetch
 
@@ -59,43 +60,40 @@ is routine:
 Give each raised item a full block so the user can decide without opening a
 link, then list routine items one line each. Number items across PRs:
 
-```markdown
+~~~markdown
 ## PR <number>: <title>
 
-### 1 · Fix
+### 1 · Fix: <the call to settle, and your pick>
 
 [path:line](link) · [thread](url)
 
-**Concern:** what the reviewer says is wrong, in plain words.
+The concern, whether it holds, and why you pick this call, in one or two
+sentences.
 
-**Assessment:** whether it holds and why.
-
-**Decide:** what the user must settle, and your pick.
-
-**Plan:** the change and its scope.
+```diff
+the proposed change, when it's an edit
+```
 
 **Reply:**
 
 > the exact text, only when one is proposed
-
-**Reaction:** 👍 or 👎, only for a bot comment
 
 ### Routine
 
 | # | Call | Item | Action |
 | - | ---- | ---- | ------ |
 | 2 | Fix | [path:line](link) · [thread](url) | the change, reply, and reaction |
-```
+~~~
 
 - Print file links with
   `<SKILL_DIR>/scripts/file-links.sh <owner>/<repo> <n> <path>:<line>...` and
   paste them unchanged.
-- For each concern from a bot (`author.__typename` is `Bot`), propose 👍 when it
-  was right and 👎 when it wasn't.
+- For a bot concern (`author.__typename` is `Bot`), add `THUMBS_UP` or
+  `THUMBS_DOWN` to the Reply line for whether it was right.
 - Keep replies short and about the code.
 
-Ask about raised items in one plain-text question, never a question tool, and
-start on routine items without waiting for the answer.
+Ask about raised items in one question, and start on routine items without
+waiting for the answer.
 
 ## 5. Act
 

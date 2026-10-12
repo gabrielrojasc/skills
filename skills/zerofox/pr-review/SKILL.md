@@ -13,11 +13,6 @@ Keep every draft local until the user explicitly approves the complete review
 for that PR in this session. Subagents are read-only outside their assigned
 files.
 
-Ask every question, including triage and approval, as plain text at the end of a
-chat message. Never use a question or multiple-choice tool such as
-`AskUserQuestion` or `request_user_input`: its fixed options can't express
-decisions like "keep S1, reword S2 to ...".
-
 ## Setup
 
 When reviewing more than one PR, also follow [Multiple

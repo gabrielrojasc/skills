@@ -7,20 +7,8 @@ description: Structures Linear work. Use when planning levels or tickets.
 
 Place work in the right Linear layer, from initiative to sub-issue, and create
 it the way the team expects. An organization's documented Linear conventions
-override these defaults.
-
-## When to use
-
-- Choosing the layer for new work: initiative, sub-initiative, project,
-  milestone, issue, or sub-issue.
-- Turning an accepted proposal into Linear structure.
-- Deciding where a bug or sustaining item goes.
-- Reviewing an existing structure.
-
-## When not to use
-
-- Linking branches and pull requests to issues. Use `linear-gh-linking`.
-- Work tracked outside Linear.
+override these defaults. For linking branches and pull requests to issues, use
+`linear-gh-linking`.
 
 ## Propose the full structure
 

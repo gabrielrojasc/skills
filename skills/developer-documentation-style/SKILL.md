@@ -19,21 +19,11 @@ Use this skill for READMEs, tutorials, procedures, conceptual documentation, CLI
 reference, API reference prose, and documentation reviews. Apply it to code
 comments only when the user explicitly asks.
 
-A review is read-only. Return findings and suggested changes without modifying
-files or external content unless the user asks for edits.
-
 ## Authority
 
-Apply guidance in this order:
-
-1. The user's explicit requirements.
-2. The repository or product's documented conventions.
-3. The live Google Developer Documentation Style Guide.
-4. General editorial judgment.
-
-Depart from the guide when a higher authority requires it or when the guide
-allows a clearer, more consistent choice for the intended readers. Do not
-present personal judgment as a Google rule.
+The user's requirements and repository conventions override the guide. Depart
+from the guide when it allows a clearer, more consistent choice for the intended
+readers, and present that judgment as your own rather than as a Google rule.
 
 ## Use upstream selectively
 
@@ -50,18 +40,7 @@ work that does not depend on it. Ask whether to use editorial judgment for the
 blocked portion; leave it unresolved until the user approves a fallback or the
 source becomes available.
 
-## Workflow
-
-1. Identify the audience, goal, document type, requested operation, and files in
-   scope.
-2. For repository work, read the applicable repository instructions and style
-   conventions.
-3. Read only the upstream pages required by the material editorial questions.
-4. Draft, edit, or review within the user's authorization.
-5. Preserve technical meaning, exact identifiers, required terminology, code,
-   commands, paths, and citations.
-6. Check the result against every upstream page consulted and the repository's
-   conventions.
+Check the result against every upstream page you consulted.
 
 ## Reviews and edits
 
@@ -79,8 +58,6 @@ so.
 For a rewrite, return revised copy and list unresolved technical ambiguities
 separately. Do not invent behavior, requirements, or claims to improve the
 prose.
-
-For file edits, change only the authorized files and preserve unrelated content.
 
 ## API documentation boundary
 

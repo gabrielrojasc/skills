@@ -14,19 +14,18 @@ it.
 
 1. Establish the target, requirements, evidence, and authorized edits from the
    current task. A review-only request permits revising the assessment or
-   proposed patch, not changing the underlying artifact. Preserve the task's
-   approval gates. Default to one reviewer with no fixed round limit. Honor
-   explicit reviewer counts and user-specified budgets. State the reviewer count
-   and any explicit budget briefly before dispatch.
+   proposed patch, not changing the underlying artifact. Default to one
+   reviewer with no fixed round limit. Honor explicit reviewer counts and
+   user-specified budgets. State the reviewer count and any explicit budget
+   briefly before dispatch.
 
 2. Dispatch independent, read-only subagents. Give each the target or exact
    revision, requirements, constraints, relevant source locations, and one
    bounded review assignment. With multiple reviewers, assign distinct concerns
    that together cover the target. Let them inspect source evidence
-   independently of the author's rationale. Choose each model and reasoning
-   effort explicitly using the active agent-selection policy. Reviewers must not
-   edit, publish, or delegate further. If delegation is unavailable, report the
-   limitation; self-review does not satisfy this workflow.
+   independently of the author's rationale. Reviewers must not edit, publish,
+   or delegate further. If delegation is unavailable, report the limitation;
+   self-review does not satisfy this workflow.
 
    Use this brief, adapted to the assignment:
 
@@ -73,4 +72,3 @@ it.
 Summarize the changes, checks, reviewer count, rounds used, and remaining
 objections or unverified changes. If the loop stalled, state "Stopped after
 <N> rounds because <specific reason>" and what would allow progress to resume.
-Keep the report proportional to the work.
