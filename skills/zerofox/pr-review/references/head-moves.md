@@ -14,13 +14,11 @@ finding IDs, drafts, and any triage decisions. Don't restart triage.
    in Check for an earlier review, and its drafts go through Verify as usual.
    On `same`, as after a plain rebase, there is nothing new to review. On
    `unknown`, it reviews the full diff.
-3. Findings that still apply keep the user's earlier decision, and the user
-   isn't asked about them again. Fixed findings are dropped. Show one message
-   with what needs a decision (changed findings, new findings, and findings not
-   yet triaged, in the triage format) and a one-line list of what carried over
-   or was fixed, then ask one question. If nothing needs a decision, say so and
-   go straight to the package.
-4. Rebuild the package and ask for approval, marking which comments carried over
+3. For findings that still apply, keep the user's earlier decision without
+   asking again. Drop fixed findings. Sort changed, new, and untriaged findings
+   as in Triage, and show them with a one-line list of what carried over or was
+   fixed, following Triage step 4.
+4. Rebuild the package and follow Submit, marking which comments carried over
    unchanged.
 
 If the head moves again, repeat against the latest head.
