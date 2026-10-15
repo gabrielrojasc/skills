@@ -85,9 +85,13 @@ own prompt can't be answered from an agent shell and exits with an error:
   --repo <repo> \
   --ticket <LINEAR-123> \
   --task <short-name> \
+  --branch-prefix <prefix> \
   --yes
 ```
 
-The helper blocks dirty worktrees and branches with unpushed commits. It uses
-`git worktree remove` and safe branch deletion with `git branch -d`. Never
-replace those operations with force deletion.
+Pass the `--branch-prefix` the task was created with. The helper also deletes a
+task branch whose worktree is already gone. It blocks dirty worktrees and
+branches with commits whose patch isn't on the remote branch or default branch,
+so rebase-merged branches count as merged. It uses `git worktree remove` and
+`git branch -d`, and falls back to `git branch -D` only after that patch check
+passes. Never force-delete a worktree or branch yourself.

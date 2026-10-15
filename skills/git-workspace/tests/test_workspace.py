@@ -325,6 +325,60 @@ def test_remove_after_tracked_remote_branch_is_deleted(workspace, merged):
     assert (repo / "main").is_dir()
 
 
+def rebase_merge_and_delete_remote_branch(workspace, repo, remote, rebased):
+    task = repo / "sample"
+    (task / "change.txt").write_text("change\n", encoding="utf-8")
+    workspace.git(task, "add", "change.txt")
+    workspace.git(task, "-c", "commit.gpgsign=false", "commit", "-m", "Change")
+    task_head = workspace.git(task, "rev-parse", "HEAD")
+    workspace.git(task, "push", "-u", "origin", "HEAD")
+    workspace.commit(remote)
+    if rebased:
+        workspace.git(remote, "-c", "commit.gpgsign=false", "cherry-pick", "feature/sample")
+        assert workspace.git(remote, "rev-parse", "HEAD") != task_head, \
+            "a rebase merge must give the merged commit a new hash"
+    workspace.git(task, "push", "origin", "--delete", "feature/sample")
+    workspace.cli("sync-workspace")
+    return task, task_head
+
+
+@pytest.mark.parametrize("rebased", [True, False], ids=["rebase-merged", "unmerged"])
+def test_remove_rebase_merged_task_after_remote_branch_is_deleted(workspace, rebased):
+    repo, remote = workspace.add("sample")
+    workspace.create("sample")
+    task, task_head = rebase_merge_and_delete_remote_branch(workspace, repo, remote, rebased)
+
+    output = workspace.remove("sample", "sample", "--yes", ok=rebased)
+
+    if rebased:
+        assert not task.exists(), "a rebase-merged task worktree should be removed"
+        workspace.assert_no_branch(repo, "feature/sample")
+    else:
+        assert "unpushed commit" in output, "an unmerged commit must block removal"
+        assert workspace.git(task, "rev-parse", "HEAD") == task_head
+    assert (repo / "main").is_dir()
+
+
+@pytest.mark.parametrize("rebased", [True, False], ids=["rebase-merged", "unmerged"])
+def test_remove_branch_whose_worktree_is_already_gone(workspace, rebased):
+    repo, remote = workspace.add("sample")
+    workspace.create("sample")
+    task, task_head = rebase_merge_and_delete_remote_branch(workspace, repo, remote, rebased)
+    workspace.git(repo, "worktree", "remove", task)
+
+    unconfirmed = workspace.remove("sample", "sample", input="", ok=False)
+    branch = workspace.git(repo, "rev-parse", "refs/heads/feature/sample")
+    assert branch == task_head, f"an unconfirmed run must keep the branch: {unconfirmed}"
+
+    output = workspace.remove("sample", "sample", "--yes", ok=rebased)
+
+    if rebased:
+        workspace.assert_no_branch(repo, "feature/sample")
+    else:
+        assert "unpushed commit" in output, "an unmerged commit must block branch deletion"
+        assert workspace.git(repo, "rev-parse", "refs/heads/feature/sample") == task_head
+
+
 def test_sync_rejects_zero_jobs_even_when_workspace_is_empty(workspace):
     workspace.repos.mkdir()
     workspace.cli("sync-workspace", "--jobs", "0", ok=False)

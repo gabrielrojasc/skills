@@ -140,20 +140,32 @@ def create_tasks(args: Namespace) -> int:
     return 0
 
 
-def unpushed_count(path: Path, branch: str) -> int:
-    upstream = git(
-        path, "for-each-ref", "--format=%(upstream)", f"refs/heads/{branch}"
-    ).stdout.strip()
-    if upstream and ref_exists(path, upstream):
+def unmerged_count(repository: Path, branch: str) -> int:
+    ref = f"refs/heads/{branch}"
+    upstream = git(repository, "for-each-ref", "--format=%(upstream)", ref).stdout.strip()
+    if upstream and ref_exists(repository, upstream):
         reference = upstream
-    elif ref_exists(path, f"refs/remotes/origin/{branch}"):
+    elif ref_exists(repository, f"refs/remotes/origin/{branch}"):
         reference = f"refs/remotes/origin/{branch}"
     else:
-        reference = f"refs/remotes/origin/{default_branch(path)}"
-    count = git(path, "rev-list", "--count", f"{reference}..HEAD", "--").stdout.strip()
-    if not count.isascii() or not count.isdigit():
+        reference = f"refs/remotes/origin/{default_branch(repository)}"
+    # Rebase and cherry-pick merges give merged commits new hashes, so compare patches.
+    lines = git(repository, "cherry", reference, ref).stdout.splitlines()
+    if any(not line.startswith(("+ ", "- ")) for line in lines):
         raise WorkspaceError(f"Cannot determine whether {branch} has unpushed commits.")
-    return int(count)
+    return sum(line.startswith("+ ") for line in lines)
+
+
+def delete_branch(plan: TaskPlan) -> bool:
+    if not git(plan.repository, "branch", "-d", "--", plan.branch, check=False).returncode:
+        log("success", f"Deleted {plan.branch}")
+        return True
+    if unmerged_count(plan.repository, plan.branch):
+        log("warning", f"Safe branch deletion refused {plan.branch}; it has unmerged commits.")
+        return False
+    git(plan.repository, "branch", "-D", "--", plan.branch)
+    log("success", f"Deleted {plan.branch}; every commit's patch is on the base branch")
+    return True
 
 
 def remove_tasks(args: Namespace) -> int:
@@ -168,27 +180,34 @@ def remove_tasks(args: Namespace) -> int:
         if matching is None:
             if path.exists() or path.is_symlink():
                 raise WorkspaceError(f"Path exists but is not a registered task worktree: {path}")
-            log("info", f"No matching worktree in {name}; skipping.")
-            continue
-        actual = current_branch(path)
-        if actual != branch:
-            raise WorkspaceError(f"Worktree uses {actual or 'HEAD'}, expected {branch}: {path}")
-        if matching.locked:
-            raise WorkspaceError(f"Worktree is locked: {path}")
-        if is_dirty(path):
-            raise WorkspaceError(f"Worktree has uncommitted changes: {path}")
+            if not ref_exists(repository, f"refs/heads/{branch}"):
+                log("info", f"No matching worktree or branch in {name}; skipping.")
+                continue
+            action = "branch"
+        else:
+            actual = current_branch(path)
+            if actual != branch:
+                raise WorkspaceError(f"Worktree uses {actual or 'HEAD'}, expected {branch}: {path}")
+            if matching.locked:
+                raise WorkspaceError(f"Worktree is locked: {path}")
+            if is_dirty(path):
+                raise WorkspaceError(f"Worktree has uncommitted changes: {path}")
+            action = "remove"
         git(repository, "fetch", "--quiet", "--prune", "origin")
-        ahead = unpushed_count(path, branch)
+        ahead = unmerged_count(repository, branch)
         if ahead:
             raise WorkspaceError(f"Branch has {ahead} unpushed commit(s): {name} {branch}")
-        plans.append(TaskPlan(repository, path, branch, "remove"))
+        plans.append(TaskPlan(repository, path, branch, action))
 
     if not plans:
-        log("info", "No matching task worktrees found.")
+        log("info", "No matching task worktrees or branches found.")
         return 0
     print("Cleanup plan:")
     for plan in plans:
-        print(f"  - {plan.path}, branch {plan.branch}")
+        if plan.action == "remove":
+            print(f"  - {plan.path}, branch {plan.branch}")
+        else:
+            print(f"  - branch {plan.branch} (its worktree is already gone)")
     if not args.yes:
         try:
             answer = input("Proceed? [y/N] ")
@@ -201,17 +220,18 @@ def remove_tasks(args: Namespace) -> int:
 
     failed = 0
     for plan in plans:
+        if plan.action == "remove":
+            try:
+                git(plan.repository, "worktree", "remove", str(plan.path))
+            except WorkspaceError as error:
+                log("error", f"Could not remove {plan.path}: {error}")
+                failed = 1
+                continue
+            log("success", f"Removed {plan.path}")
         try:
-            git(plan.repository, "worktree", "remove", str(plan.path))
+            if not delete_branch(plan):
+                failed = 1
         except WorkspaceError as error:
-            log("error", f"Could not remove {plan.path}: {error}")
-            failed = 1
-            continue
-        log("success", f"Removed {plan.path}")
-        try:
-            git(plan.repository, "branch", "-d", "--", plan.branch)
-            log("success", f"Deleted {plan.branch}")
-        except WorkspaceError as error:
-            log("warning", f"Worktree removed, but safe branch deletion refused {plan.branch}: {error}")
+            log("warning", f"Could not delete {plan.branch}: {error}")
             failed = 1
     return failed
