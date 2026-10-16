@@ -1,0 +1,5 @@
+interface:
+  display_name: "Computer use"
+  short_description: "Drives signed-in sites and Mac apps. Use when a task needs one."
+policy:
+  allow_implicit_invocation: true
