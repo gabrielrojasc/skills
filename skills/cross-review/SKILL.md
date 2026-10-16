@@ -10,28 +10,18 @@ Have the other agent review the change, fix what holds up, and ask it for a
 re-review until nothing is left to fix. Don't ask the user. Commit locally each
 round and push once nothing is left to fix.
 
-1. Ask the other agent for a review on `<base>...HEAD` with the skill the user
-   named. Otherwise use `pr-review` when it's installed, and `code-review` when
-   not. From Claude Code, run Codex as one unchained command, in the background:
-
-   ```bash
-   codex exec --approve-for-me --skip-git-repo-check -C <repo> -o <out>.md "<prompt>" < /dev/null > <out>.log 2>&1
-   ```
-
-   From Codex, run Claude outside the sandbox:
-
-   ```bash
-   claude -p "<prompt>" --permission-mode auto --output-format json < /dev/null > <out>.json
-   ```
-
+1. Call `delegate_task` with the other provider at the chosen rung and a new
+   `clientRequestId`. Ask for a review of `<base>...HEAD` with `pr-review` when
+   it's installed and `code-review` when not, and tell the reviewer not to edit
+   files. End the turn until the result wakes you. Answer the reviewer's
+   questions yourself with `t3_pending_request_respond`.
 2. A fresh subagent, without your reasoning, loads the `gh-review-comments`
    skill and triages the findings with it. It decides instead of asking the
    user, and there are no PR threads to reply to or resolve.
 3. Make the fixes, run the checks, and commit.
-4. Ask the same reviewer session for a re-review, passing the fixes and the
-   dismissals with their reasons. For Codex, repeat the options, `-C`
-   included, before `resume <id> "<prompt>"`; for Claude, add `--resume <id>`.
-   Repeat from step 2.
+4. Ask for a re-review with a new `delegate_task` call. Pass the original
+   brief, every round's findings, the fixes, and the dismissals with their
+   reasons. Repeat from step 2.
 
 When a round leaves nothing to fix, push. If the loop goes in circles, stop
 without pushing and report what's unresolved. Report the commits and every
