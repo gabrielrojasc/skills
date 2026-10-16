@@ -9,7 +9,7 @@ Review one or more GitHub PRs with independent reviewer subagents, verify their
 drafts with fresh subagents, raise only the findings that need the user's
 judgment, and submit one review per PR.
 
-Submit a `COMMENT` review with nothing raised without asking. Keep every other
+Submit a `COMMENT` review of routine findings without asking. Keep every other
 draft local until the user explicitly approves the review for that PR in this
 session; one approval covers its routine findings too. Subagents are read-only
 outside their assigned files.
@@ -274,7 +274,8 @@ order, a review body only for kept findings without an inline anchor, and every
 kept +1. When the user hasn't been asked to decide on this review's findings or
 package and Triage step 4 came straight here, or the user approved the batch as
 shown, submit. Otherwise, including an `APPROVE` with no drafts, show the exact
-package and ask.
+package and ask. An instruction not to approve forbids posting the approval, not
+asking.
 
 Immediately before submitting, re-check the head, confirm every target line is
 still in the diff, and build `review.json` in the PR folder from

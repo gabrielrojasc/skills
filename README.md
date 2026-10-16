@@ -71,8 +71,8 @@ architecture, and review. They are intentionally not copied here.
   repository and ZeroFox Python standards, applies the api-specialist lens to
   every riskive/API PR and adds a spec review for its own team's authors,
   verifies every finding independently, +1s bot comments it agrees with, raises
-  only the findings that need the user's judgment, posts a `COMMENT` review with
-  nothing raised on its own, and asks before any other.
+  only the findings that need the user's judgment, posts a `COMMENT` review of
+  routine findings on its own, and asks before any other.
 
 ## Repository layout
 
