@@ -10,11 +10,10 @@ Have the other agent review the change, fix what holds up, and ask it for a
 re-review until nothing is left to fix. Don't ask the user. Commit locally each
 round and push once nothing is left to fix.
 
-1. Call `delegate_task` with the other provider at the chosen rung and a new
-   `clientRequestId`. Ask for a review of `<base>...HEAD` with `pr-review` when
-   it's installed and `code-review` when not, and tell the reviewer not to edit
-   files. End the turn until the result wakes you. Answer the reviewer's
-   questions yourself with `t3_pending_request_respond`.
+1. Call `delegate_task` with the other provider at the chosen rung. Ask for a
+   review of `<base>...HEAD` in the worktree's absolute path with `pr-review`
+   when it's installed and `code-review` when not, and tell the reviewer not to
+   edit files. Answer the reviewer's questions yourself.
 2. A fresh subagent, without your reasoning, loads the `gh-review-comments`
    skill and triages the findings with it. It decides instead of asking the
    user, and there are no PR threads to reply to or resolve.
