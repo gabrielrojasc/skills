@@ -14,8 +14,8 @@ Keep each repository in a bare-container layout:
   <ticket-or-task>/
 ```
 
-Resolve `<SKILL_DIR>` as the directory containing this `SKILL.md` before running
-a bundled helper.
+`<SKILL_DIR>` is the directory containing this `SKILL.md`. Each helper lists its
+options under `--help`.
 
 ## Add or repair a repository
 
@@ -23,12 +23,7 @@ a bundled helper.
 <SKILL_DIR>/scripts/add-repo.sh --repos-root ~/git <repo-url>
 ```
 
-Use `--repo-name <name>` to override the directory derived from the URL. Use
-`--from-manifest <file>` for lines formatted as `<repo-url> [repo-name]`.
-
-The helper creates or repairs the bare repository, detects the remote default
-branch, and creates its persistent default-branch worktree. It stops if an
-existing destination is not a matching bare-container repository.
+Rerun it to repair a repository whose default-branch worktree is missing.
 
 ## Inspect or synchronize the workspace
 
@@ -37,15 +32,12 @@ existing destination is not a matching bare-container repository.
 <SKILL_DIR>/scripts/sync-workspace.sh --repos-root ~/git
 ```
 
-Synchronization fetches every managed repository. When a clean persistent
-worktree has the wrong named branch checked out, it restores the default branch
-before fast-forwarding. Dirty and detached worktrees are reported but not
-modified. Task worktrees are never modified.
+Sync fast-forwards clean default-branch worktrees and leaves task, dirty, and
+detached worktrees as they are.
 
 ## Create task worktrees
 
-Create the worktree before implementation when the current checkout is a
-persistent default-branch worktree:
+Before implementing from a default-branch worktree, create a task worktree:
 
 ```bash
 <SKILL_DIR>/scripts/create-task-worktree.sh \
@@ -56,28 +48,20 @@ persistent default-branch worktree:
   --branch-prefix feature
 ```
 
-Repeat `--repo` when one task changes multiple repositories. The helper creates
-the same branch and worktree name in each selected repository. Omit `--ticket`
-for work without a tracker issue.
+Repeat `--repo` for a task that spans repositories; each gets the same branch
+and worktree name. For Linear-tracked work, choose the `--ticket` ID with
+`linear-gh-linking`; otherwise omit `--ticket`. Rerunning the command reuses the
+worktree.
 
-For Linear-tracked work, apply `linear-gh-linking` before selecting `--ticket`.
-Pass the exact executable issue or sub-issue ID. The helper keeps the lowercased
-ID in the branch name.
-
-Rerunning the same command reuses an exact registered worktree. A conflicting
-path, branch, or registration stops the run.
-
-Fresh task branches have no upstream. On the first authorized push, use `git
-push -u origin HEAD` to track the matching remote task branch. Reusing or
-attaching an existing branch preserves its upstream configuration.
+Fresh task branches have no upstream. On the first authorized push, run `git
+push -u origin HEAD`.
 
 ## Remove task worktrees
 
-Cleanup is destructive. Present the exact worktrees and branches with each
-one's merge, push, and PR state and your pick of which to remove, then get
-explicit human approval. Several tasks may be approved together from one list;
-run the helper once per task. After approval, pass `--yes`, because the helper's
-own prompt can't be answered from an agent shell and exits with an error:
+Cleanup is destructive. List the exact worktrees and branches with each one's
+merge, push, and PR state and your pick of which to remove, then get explicit
+approval. One list can cover several tasks. Run the helper once per task with
+`--yes`, because an agent shell can't answer its prompt:
 
 ```bash
 <SKILL_DIR>/scripts/remove-task-worktree.sh \
@@ -90,8 +74,7 @@ own prompt can't be answered from an agent shell and exits with an error:
 ```
 
 Pass the `--branch-prefix` the task was created with. The helper also deletes a
-task branch whose worktree is already gone. It blocks dirty worktrees and
-branches with commits whose patch isn't on the remote branch or default branch,
-so rebase-merged branches count as merged. It uses `git worktree remove` and
-`git branch -d`, and falls back to `git branch -D` only after that patch check
-passes. Never force-delete a worktree or branch yourself.
+task branch whose worktree is already gone. It refuses dirty worktrees and
+unmerged commits. A commit counts as merged when its patch is on the remote or
+default branch, or when `gh` shows a merged PR whose head is the branch tip.
+When it refuses, report why and leave the worktree and branch in place.

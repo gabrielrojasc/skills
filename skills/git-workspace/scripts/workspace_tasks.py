@@ -3,8 +3,10 @@
 
 from argparse import Namespace
 from dataclasses import dataclass
+import json
 from pathlib import Path
 import re
+import subprocess
 
 from workspace_core import (
     WorkspaceError,
@@ -29,6 +31,7 @@ class TaskPlan:
     branch: str
     action: str
     base: str = ""
+    merged: str = ""
 
 
 def task_identity(args: Namespace) -> tuple[str, str]:
@@ -160,12 +163,41 @@ def delete_branch(plan: TaskPlan) -> bool:
     if not git(plan.repository, "branch", "-d", "--", plan.branch, check=False).returncode:
         log("success", f"Deleted {plan.branch}")
         return True
+    if plan.merged:
+        git(plan.repository, "branch", "-D", "--", plan.branch)
+        log("success", f"Deleted {plan.branch}; {plan.merged} merged its tip")
+        return True
     if unmerged_count(plan.repository, plan.branch):
         log("warning", f"Safe branch deletion refused {plan.branch}; it has unmerged commits.")
         return False
     git(plan.repository, "branch", "-D", "--", plan.branch)
     log("success", f"Deleted {plan.branch}; every commit's patch is on the base branch")
     return True
+
+
+def merged_pull_request(repository: Path, branch: str) -> str:
+    """Return the URL of a merged GitHub PR whose head is this branch's tip.
+
+    A squash merge of several commits matches none of their patches, and
+    GitHub usually deletes the remote branch, so Git alone counts them as
+    unmerged. Any failure returns "" and leaves the branch protected.
+    """
+    merge = git(repository, "config", "--get", f"branch.{branch}.merge", check=False).stdout.strip()
+    remote_branch = merge.removeprefix("refs/heads/") or branch
+    head = git(repository, "rev-parse", f"refs/heads/{branch}").stdout.strip()
+    try:
+        result = subprocess.run(
+            ["gh", "pr", "list", "--head", remote_branch, "--state", "merged",
+             "--json", "url,headRefOid"],
+            cwd=repository, capture_output=True, text=True,
+        )
+        if result.returncode:
+            raise WorkspaceError(result.stderr.strip())
+        pulls = json.loads(result.stdout)
+    except (OSError, ValueError, WorkspaceError) as error:
+        log("warning", f"Could not check GitHub for a merged PR: {error}")
+        return ""
+    return next((pr["url"] for pr in pulls if pr.get("headRefOid") == head), "")
 
 
 def remove_tasks(args: Namespace) -> int:
@@ -195,19 +227,21 @@ def remove_tasks(args: Namespace) -> int:
             action = "remove"
         git(repository, "fetch", "--quiet", "--prune", "origin")
         ahead = unmerged_count(repository, branch)
-        if ahead:
+        merged = merged_pull_request(repository, branch) if ahead else ""
+        if ahead and not merged:
             raise WorkspaceError(f"Branch has {ahead} unpushed commit(s): {name} {branch}")
-        plans.append(TaskPlan(repository, path, branch, action))
+        plans.append(TaskPlan(repository, path, branch, action, merged=merged))
 
     if not plans:
         log("info", "No matching task worktrees or branches found.")
         return 0
     print("Cleanup plan:")
     for plan in plans:
+        merged = f", merged as {plan.merged}" if plan.merged else ""
         if plan.action == "remove":
-            print(f"  - {plan.path}, branch {plan.branch}")
+            print(f"  - {plan.path}, branch {plan.branch}{merged}")
         else:
-            print(f"  - branch {plan.branch} (its worktree is already gone)")
+            print(f"  - branch {plan.branch}{merged} (its worktree is already gone)")
     if not args.yes:
         try:
             answer = input("Proceed? [y/N] ")

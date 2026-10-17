@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Shared Git inspection and errors for the workspace commands."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from pathlib import Path
 import re

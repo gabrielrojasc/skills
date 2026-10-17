@@ -27,6 +27,21 @@ class Workspace:
             "GIT_COMMITTER_NAME": "Fixture", "GIT_COMMITTER_EMAIL": "fixture@example.invalid",
             "PYTHONDONTWRITEBYTECODE": "1", "TERM": "dumb", "LC_ALL": "C",
         })
+        # Stand in for GitHub: print FIXTURE_GH_PRS when set, else fail like an
+        # unauthenticated or non-GitHub gh, so no test reaches the network.
+        shim_dir = self.root / "gh shim"
+        shim_dir.mkdir()
+        gh = shim_dir / "gh"
+        gh.write_text("#!/usr/bin/env python3\nimport os, sys\n"
+                      "with open(os.environ['FIXTURE_GH_LOG'], 'a') as log:\n"
+                      "    log.write(' '.join(sys.argv[1:]) + '\\n')\n"
+                      "if 'FIXTURE_GH_PRS' not in os.environ:\n"
+                      "    sys.exit('gh: no GitHub host in this fixture')\n"
+                      "print(os.environ['FIXTURE_GH_PRS'])\n", encoding="utf-8")
+        gh.chmod(0o755)
+        self.gh_log = self.root / "gh.log"
+        self.env["FIXTURE_GH_LOG"] = str(self.gh_log)
+        self.env["PATH"] = str(shim_dir) + os.pathsep + self.env["PATH"]
 
     def run_command(self, *args, ok=True, input="", env=None):
         result = subprocess.run([str(arg) for arg in args], cwd=self.cwd,
@@ -377,6 +392,47 @@ def test_remove_branch_whose_worktree_is_already_gone(workspace, rebased):
     else:
         assert "unpushed commit" in output, "an unmerged commit must block branch deletion"
         assert workspace.git(repo, "rev-parse", "refs/heads/feature/sample") == task_head
+
+
+@pytest.mark.parametrize("pull_request", ["tip", "stale", "none", "gh-fails"])
+def test_remove_after_squash_merge_requires_merged_pr_at_tip(workspace, pull_request):
+    # GitHub squash merges leave the branch commits out of main and delete the
+    # remote branch, so only a merged PR whose head is the local tip proves
+    # nothing is lost.
+    repo, remote = workspace.add("sample")
+    workspace.create("sample")
+    task = repo / "sample"
+    (task / "change.txt").write_text("merged\n", encoding="utf-8")
+    workspace.git(task, "add", "change.txt")
+    stale = workspace.commit(task)
+    (task / "change.txt").write_text("merged twice\n", encoding="utf-8")
+    workspace.git(task, "add", "change.txt")
+    task_head = workspace.commit(task)
+    # Push under another remote name to check the lookup uses the upstream.
+    workspace.git(task, "push", "-u", "origin", "HEAD:fix/remote-name")
+    workspace.git(remote, "merge", "--squash", "fix/remote-name")
+    workspace.git(remote, "-c", "commit.gpgsign=false", "commit", "-m", "Squash")
+    workspace.git(remote, "branch", "-D", "fix/remote-name")
+    workspace.cli("sync-workspace")
+    env = dict(workspace.env)
+    head = {"tip": task_head, "stale": stale}.get(pull_request)
+    if head:
+        env["FIXTURE_GH_PRS"] = f'[{{"url": "https://example.invalid/pull/7", "headRefOid": "{head}"}}]'
+    elif pull_request == "none":
+        env["FIXTURE_GH_PRS"] = "[]"
+
+    output = workspace.remove("sample", "sample", "--yes", env=env, ok=pull_request == "tip")
+
+    assert "--head fix/remote-name" in workspace.gh_log.read_text()
+    if pull_request == "tip":
+        assert "https://example.invalid/pull/7" in output
+        assert not task.exists()
+        workspace.assert_no_branch(repo, "feature/sample")
+    else:
+        assert "unpushed commit" in output
+        assert workspace.git(task, "rev-parse", "HEAD") == task_head
+        assert workspace.git(task, "symbolic-ref", "--short", "HEAD") == "feature/sample"
+    assert (repo / "main").is_dir()
 
 
 def test_sync_rejects_zero_jobs_even_when_workspace_is_empty(workspace):

@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """Workspace commands, callable through the existing shell entry points."""
 
+from __future__ import annotations
+
 import sys
 
-if sys.version_info < (3, 10):
-    sys.exit("error: Git workspace requires Python 3.10 or newer.")
+# macOS still ships Python 3.9 as /usr/bin/python3.
+if sys.version_info < (3, 9):
+    sys.exit("error: Git workspace requires Python 3.9 or newer.")
 sys.dont_write_bytecode = True
 
 import argparse
