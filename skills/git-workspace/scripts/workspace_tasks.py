@@ -32,6 +32,7 @@ class TaskPlan:
     action: str
     base: str = ""
     merged: str = ""
+    head: str = ""
 
 
 def task_identity(args: Namespace) -> tuple[str, str]:
@@ -164,6 +165,10 @@ def delete_branch(plan: TaskPlan) -> bool:
         log("success", f"Deleted {plan.branch}")
         return True
     if plan.merged:
+        tip = git(plan.repository, "rev-parse", f"refs/heads/{plan.branch}").stdout.strip()
+        if tip != plan.head:
+            log("warning", f"Kept {plan.branch}; it moved to {tip} after {plan.merged} matched {plan.head}.")
+            return False
         git(plan.repository, "branch", "-D", "--", plan.branch)
         log("success", f"Deleted {plan.branch}; {plan.merged} merged its tip")
         return True
@@ -175,7 +180,7 @@ def delete_branch(plan: TaskPlan) -> bool:
     return True
 
 
-def merged_pull_request(repository: Path, branch: str) -> str:
+def merged_pull_request(repository: Path, branch: str, head: str) -> str:
     """Return the URL of a merged GitHub PR whose head is this branch's tip.
 
     A squash merge of several commits matches none of their patches, and
@@ -184,7 +189,6 @@ def merged_pull_request(repository: Path, branch: str) -> str:
     """
     merge = git(repository, "config", "--get", f"branch.{branch}.merge", check=False).stdout.strip()
     remote_branch = merge.removeprefix("refs/heads/") or branch
-    head = git(repository, "rev-parse", f"refs/heads/{branch}").stdout.strip()
     try:
         result = subprocess.run(
             ["gh", "pr", "list", "--head", remote_branch, "--state", "merged",
@@ -227,10 +231,11 @@ def remove_tasks(args: Namespace) -> int:
             action = "remove"
         git(repository, "fetch", "--quiet", "--prune", "origin")
         ahead = unmerged_count(repository, branch)
-        merged = merged_pull_request(repository, branch) if ahead else ""
+        head = git(repository, "rev-parse", f"refs/heads/{branch}").stdout.strip()
+        merged = merged_pull_request(repository, branch, head) if ahead else ""
         if ahead and not merged:
             raise WorkspaceError(f"Branch has {ahead} unpushed commit(s): {name} {branch}")
-        plans.append(TaskPlan(repository, path, branch, action, merged=merged))
+        plans.append(TaskPlan(repository, path, branch, action, merged=merged, head=head))
 
     if not plans:
         log("info", "No matching task worktrees or branches found.")

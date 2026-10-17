@@ -454,3 +454,39 @@ def test_remove_yes_still_checks_dirty_unpushed_and_mismatched_tasks(workspace, 
     assert (repo / "dirty" / "local.txt").read_text() == "keep\n"
     assert workspace.git(repo / "unpushed", "rev-parse", "HEAD") == unpushed
     assert workspace.git(repo / "mismatch", "symbolic-ref", "--short", "HEAD") == "feature/different"
+
+
+def test_remove_keeps_squash_merged_branch_that_moves_at_the_prompt(workspace):
+    repo, remote = workspace.add("sample")
+    workspace.create("sample")
+    task = repo / "sample"
+    (task / "change.txt").write_text("merged\n", encoding="utf-8")
+    workspace.git(task, "add", "change.txt")
+    workspace.commit(task)
+    (task / "change.txt").write_text("merged twice\n", encoding="utf-8")
+    workspace.git(task, "add", "change.txt")
+    merged_head = workspace.commit(task)
+    workspace.git(task, "push", "-u", "origin", "HEAD")
+    workspace.git(remote, "merge", "--squash", "feature/sample")
+    workspace.git(remote, "-c", "commit.gpgsign=false", "commit", "-m", "Squash")
+    workspace.git(remote, "branch", "-D", "feature/sample")
+    workspace.cli("sync-workspace")
+    env = dict(workspace.env)
+    env["FIXTURE_GH_PRS"] = f'[{{"url": "https://example.invalid/pull/7", "headRefOid": "{merged_head}"}}]'
+    cleanup = subprocess.Popen(
+        ["bash", str(workspace.skill / "scripts" / "remove-task-worktree.sh"),
+         "--repos-root", str(workspace.repos), "--repo", "sample", "--task", "sample"],
+        cwd=workspace.cwd, env=env, text=True,
+        stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    transcript = ""
+    while not transcript.endswith("Proceed? [y/N] "):
+        char = cleanup.stdout.read(1)
+        assert char, f"cleanup exited before the prompt: {transcript}"
+        transcript += char
+    new_head = workspace.commit(task)
+
+    output, _ = cleanup.communicate("y\n", timeout=30)
+
+    assert cleanup.returncode != 0, transcript + output
+    assert workspace.git(repo, "rev-parse", "refs/heads/feature/sample") == new_head, \
+        "cleanup deleted a branch that gained a commit after its merged PR was checked"
