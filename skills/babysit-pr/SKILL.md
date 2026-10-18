@@ -11,8 +11,11 @@ each PR is ready for them to take over. A stack runs as one loop, bottom up.
 
 1. Call `watch_pull_request` on each PR. Run the first round right away, then
    end your turn after each round until a wake starts the next. On a wake,
-   wait in the background with `gh pr checks <pr> --watch` until no check is
-   pending.
+   wait in the background until every check that isn't gated finishes. A
+   gated check belongs to a workflow run that waits on maintainer approval,
+   which `gh run list --commit <head-sha> --status action_required` or
+   `--status waiting` lists. Leave gated checks to the user; they are neither
+   pending nor failed.
 2. Give each round a fresh subagent that runs steps 3 to 6 and returns raised
    items as `gh-review-comments` decision-pack blocks instead of asking. To ask
    the user, unwatch every PR, watch again once they answer, and pass the
@@ -27,9 +30,10 @@ each PR is ready for them to take over. A stack runs as one loop, bottom up.
    resolution needs judgment.
 6. Push once, with the CI and feedback fixes together.
 
-Stop when required checks pass, no unresolved thread is left except ones the
-user kept open, and nothing conflicts. Unwatch every PR before you hand it
-over or stop. Hand the PR over with its link, what changed across rounds, fixes
-beyond its purpose, and what's left for the user, such as approvals, reviewers,
-draft state, and merging. If a fresh progress agent finds the rounds going in
-circles, stop and report what's unresolved and what each round tried.
+Stop when required checks pass or are gated, no unresolved thread is left except
+ones the user kept open, and nothing conflicts. Unwatch every PR before you hand
+it over or stop. Hand the PR over with its link, what changed across rounds,
+fixes beyond its purpose, and what's left for the user, such as approvals, gated
+runs, reviewers, draft state, and merging. If a fresh progress agent finds the
+rounds going in circles, stop and report what's unresolved and what each round
+tried.
