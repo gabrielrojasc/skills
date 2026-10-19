@@ -58,10 +58,12 @@ push -u origin HEAD`.
 
 ## Remove task worktrees
 
-Cleanup is destructive. List the exact worktrees and branches with each one's
-merge, push, and PR state and your pick of which to remove, then get explicit
-approval. One list can cover several tasks. Run the helper once per task with
-`--yes`, because an agent shell can't answer its prompt:
+Once a task's work has merged, remove its worktrees and branches without asking,
+then report what you removed. Any other cleanup is destructive. List the exact
+worktrees and branches with each one's merge, push, and PR state and your pick
+of which to remove, then get explicit approval. One list can cover several
+tasks. Run the helper once per task with `--yes`, because an agent shell can't
+answer its prompt:
 
 ```bash
 <SKILL_DIR>/scripts/remove-task-worktree.sh \

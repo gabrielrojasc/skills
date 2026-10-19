@@ -264,7 +264,7 @@ def parser() -> argparse.ArgumentParser:
             command.add_argument("--ticket", default="")
             command.add_argument("--branch-prefix", default="feature")
             if name == "remove-task-worktree":
-                command.add_argument("--yes", action="store_true", help="Skip the confirmation prompt after external approval.")
+                command.add_argument("--yes", action="store_true", help="Skip the confirmation prompt.")
     return cli
 
 
