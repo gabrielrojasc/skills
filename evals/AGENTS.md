@@ -53,6 +53,9 @@ and an interrupted run can leave a variant in place.
   Code stops its background tasks after about 30 minutes and kills even
   `setsid` children when its session restarts. Poll with waits under 25
   minutes.
+- Claude Code cells and the Opus judge share the user's 5-hour session limit:
+  18 Claude cells at once exhausted it in one full suite. Run Claude with a
+  lower `JOBS` than Codex.
 - `codex exec` can hang after a transient model or network failure: its trace
   stops growing for 20 minutes or more while sibling cells progress. Match the
   process to its cell by working directory (`lsof -p <pid> | rg cwd`) before

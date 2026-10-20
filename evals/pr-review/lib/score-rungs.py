@@ -7,9 +7,11 @@ criteria for its PR's risk class:
 
   trivial  any tier
   normal   reviewers and verifiers run on tier 3, not lower or higher
-           (Claude: effort high; Codex: effort xhigh or max on a model other than gpt-6-astra)
+           (Claude: effort high; Codex: the model and effort of the unruly agent)
   risky    reviewers and verifiers run on tier 4
-           (Claude: effort xhigh or max; Codex: gpt-6-astra)
+           (Claude: effort xhigh or max; Codex: the model and effort of the consequential agent)
+
+Codex tiers come from $CODEX_HOME/agents/<rung>.toml (default ~/.codex).
 
 --policy tier2-reviewers relaxes normal PRs: reviewers and Spec reviewers may
 run on tier 2 (Claude: effort medium or higher; Codex: any model but
@@ -25,11 +27,15 @@ Usage:
 
 import argparse
 import json
+import os
 import re
 import sys
+import tomllib
 from pathlib import Path
 
 CLAUDE_AGENTS = Path.home() / ".claude" / "agents"
+CODEX_AGENTS = Path(os.environ.get("CODEX_HOME") or Path.home() / ".codex") / "agents"
+TIER_AGENT = {"normal": "unruly", "risky": "consequential"}
 SCORED_ROLES = {"reviewer", "spec", "verifier"}
 
 
@@ -41,7 +47,7 @@ def role_of(label):
         return "verifier"
     if "spec" in text:
         return "spec"
-    if "review" in text or "standards" in text:
+    if any(word in text for word in ("review", "standards", "risk", "approach")):
         return "reviewer"
     return "other"
 
@@ -66,6 +72,12 @@ def claude_rung(name):
         key, _, value = line.partition(":")
         fields[key.strip()] = value.strip()
     return (fields.get("model", "inherit"), fields.get("effort", "inherit"))
+
+
+def codex_rung(name):
+    """Return (model, effort) from a Codex agent definition."""
+    fields = tomllib.loads((CODEX_AGENTS / f"{name}.toml").read_text(encoding="utf-8"))
+    return (fields.get("model"), fields.get("model_reasoning_effort"))
 
 
 def claude_spawns(trace):
@@ -132,9 +144,7 @@ def passes(tool, risk, spawn, policy="current"):
     if tool == "claude":
         allowed = {"normal": {"high"}, "risky": {"xhigh", "max"}}[risk]
         return spawn["effort"] in allowed
-    if risk == "normal":
-        return spawn["effort"] in {"xhigh", "max"} and spawn["model"] != "gpt-6-astra"
-    return spawn["model"] == "gpt-6-astra"
+    return (spawn["model"], spawn["effort"]) == codex_rung(TIER_AGENT[risk])
 
 
 def main():

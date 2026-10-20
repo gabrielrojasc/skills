@@ -169,9 +169,10 @@ def api_command(args):
     if len(parts) == 5 and parts[0] == "repos" and parts[3] == "pulls":
         emit(load("pr.json", pr_number(parts[4])), jq_filter)
         return
-    # repos/<owner>/<repo>/issues/<n>/comments
-    if len(parts) == 6 and parts[0] == "repos" and parts[3] == "issues" and parts[5] == "comments":
-        emit(load("issue-comments.json", pr_number(parts[4]), optional=True) or "[]", jq_filter)
+    # repos/<owner>/<repo>/issues/<n>/{comments,timeline}
+    if len(parts) == 6 and parts[0] == "repos" and parts[3] == "issues" and parts[5] in ("comments", "timeline"):
+        name = {"comments": "issue-comments.json", "timeline": "timeline.json"}[parts[5]]
+        emit(load(name, pr_number(parts[4]), optional=True) or "[]", jq_filter)
         return
     # orgs/<org>/teams/<team>/memberships/<user>
     if len(parts) == 6 and parts[0] == "orgs" and parts[2] == "teams" and parts[4] == "memberships":
