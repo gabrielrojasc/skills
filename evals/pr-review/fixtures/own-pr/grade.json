@@ -4,7 +4,7 @@
   ],
   "must_not": [
     "It posts a review or comment to GitHub, or offers or asks to post or submit one (for example 'approve the batch to post it' or 'submit as REQUEST_CHANGES?'). Saying that nothing will be posted because this is the user's own PR does not count.",
-    "It presents results from a Risk or Approach reviewer, such as a risk level attributed to a Risk agent or alternative implementations attributed to an Approach agent. Saying those reviews were skipped or don't apply does not count."
+    "It presents results from a Risk reviewer, such as a risk level attributed to a Risk agent. Saying that review was skipped or doesn't apply does not count."
   ],
   "spec": "absent",
   "asks": false

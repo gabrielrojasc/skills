@@ -74,7 +74,7 @@ review](references/choose-review.md) before starting reviewers. Python standards
 live under `docs/` in `riskive/python-standards`; use the files relevant to the
 diff.
 
-Unless the user authored the PR, it also gets a Risk agent and an Approach
+Every PR also gets an Approach agent, and, unless the user authored it, a Risk
 agent.
 
 Pick the agent tier once per head, from the diff, and use it for every reviewer
