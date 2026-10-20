@@ -275,15 +275,16 @@ their reasons, and the reviewers' notes go in `triage.md`.
      another human reviewer's position.
    - It is a Spec finding that rests on an ambiguous ticket line.
 
-3. Open with the Risk agent's line and reasons, if one ran, a three-line
-   summary of what the change does, and the evidence: CI state at the head,
-   what the author tested, and what the review didn't check. When an HTML render tool is available,
-   show these as one rendered card. Then show each Approach alternative in one
-   line, the event that would be posted, and, on a re-review, each earlier
-   thread's status. On the third or later
-   review that still has blockers, add a line suggesting a call or a rethink of
-   the approach. Give each raised finding its own heading and each field its own
-   paragraph:
+3. When an HTML render tool is available, show this step's content as one page
+   built from [Rendered report](references/rendered-report.md); otherwise
+   write it in Markdown as follows. Open with the Risk agent's line and
+   reasons, if one ran, a three-line summary of what the change does, and the
+   evidence: CI state at the head, what the author tested, and what the review
+   didn't check. Then show each Approach alternative in one line, the event
+   that would be posted, and, on a re-review, each earlier thread's status. On
+   the third or later review that still has blockers, add a line suggesting a
+   call or a rethink of the approach. Give each raised finding its own heading
+   and each field its own paragraph:
 
    ```markdown
    ### S1 · blocking
