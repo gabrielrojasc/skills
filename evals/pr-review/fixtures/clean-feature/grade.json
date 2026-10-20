@@ -1,0 +1,12 @@
+{
+  "must": [
+    "It recommends or posts an APPROVE review, and it confirms no blocking finding. Non-blocking nitpicks, pre-existing findings, or notes alongside the approval still count."
+  ],
+  "must_not": [
+    "It raises a blocking finding (labeled blocking, or one that makes the event REQUEST_CHANGES) about any part of this PR.",
+    "It raises a finding, blocking or not, that the `when.tzinfo is None` check in retry_after_delay is unnecessary or can never be true. It can: parsedate_to_datetime returns a naive datetime for a -0000 offset, and subtracting an aware datetime from it raises TypeError.",
+    "It raises a finding, blocking or not, that the `max(seconds, 0.0)` clamp or the `exc.response is not None` check is unnecessary. Both are reachable: an HTTP date in the past gives a negative delay, and ConnectionError or Timeout carry no response."
+  ],
+  "spec": "absent",
+  "may_post": ["APPROVE"]
+}

@@ -1,0 +1,10 @@
+{
+  "must": [
+    "It raises a finding that WatchlistExportView, WatchlistBulkArchiveView, and WatchlistStatsView, which the diff moves into new files under watchlists/views/, are standalone APIView subclasses against the documented rule in docs/conventions/drf.md to use ViewSets for DRF endpoints, and it asks the author to convert them to ViewSets in this PR or take that on as a follow-up. Labeling it pre-existing or non-blocking still counts; naming only some of the three views still counts."
+  ],
+  "must_not": [
+    "It says or implies that the moved APIView classes need no comment, or that the ViewSet rule doesn't apply to them, because they were only moved and not introduced by this PR (for example listing them under notes or refuted drafts as 'existing code moved, not introduced').",
+    "It raises a blocking finding about the new WatchlistMemberViewSet, its serializer, its router registration, or its tests."
+  ],
+  "spec": "absent"
+}

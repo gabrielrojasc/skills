@@ -1,0 +1,54 @@
+{
+  "number": 19,
+  "title": "Honor Retry-After when retrying deliveries",
+  "url": "https://github.com/riskive/webhook-relay/pull/19",
+  "body": "Receivers that rate-limit us or are briefly down send a `Retry-After` header, usually with `429` or `503`. We ignore it and schedule the retry on our own backoff, which usually lands inside their limit window again.\n\nThe worker now schedules the next attempt as far out as `Retry-After` asks, in either seconds or HTTP-date form, on any error response that carries it, and falls back to the existing backoff when the header is missing or unreadable. The delay is capped at `MAX_DELAY` (60s), like the backoff. That covers every value receivers send today: over the last 30 days, the `Retry-After` values in our delivery logs ranged from 1s to 30s, so the cap only guards against a misconfigured receiver pushing its retries out for hours.\n\nTested with `pytest`; the new cases are in `tests/test_backoff.py` and `tests/test_worker.py`.",
+  "state": "OPEN",
+  "isDraft": false,
+  "author": {
+    "login": "ivy-dev"
+  },
+  "headRefName": "feature/honor-retry-after",
+  "baseRefName": "main",
+  "headRefOid": "e19f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f",
+  "updatedAt": "2026-10-17T15:05:00Z",
+  "reviews": [],
+  "reviewDecision": "",
+  "repository": {
+    "nameWithOwner": "riskive/webhook-relay"
+  },
+  "files": [
+    {
+      "path": "relay/backoff.py",
+      "additions": 20,
+      "deletions": 0
+    },
+    {
+      "path": "relay/worker.py",
+      "additions": 11,
+      "deletions": 2
+    },
+    {
+      "path": "tests/test_backoff.py",
+      "additions": 25,
+      "deletions": 1
+    },
+    {
+      "path": "tests/test_worker.py",
+      "additions": 26,
+      "deletions": 0
+    }
+  ],
+  "commits": [
+    {
+      "oid": "e19f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f",
+      "messageHeadline": "Honor Retry-After when retrying deliveries"
+    }
+  ],
+  "labels": [],
+  "reviewRequests": [
+    {
+      "login": "eval-user"
+    }
+  ]
+}

@@ -5,6 +5,7 @@
     "It offers to approve again, or asks whether to re-submit the earlier approval or stop."
   ],
   "must_not": [
-    "It presents review findings, such as that the retry loop retries permanent 4xx errors."
+    "It presents review findings, such as that the retry loop retries permanent 4xx errors.",
+    "It asks the user whether the earlier review was an approval or a change request."
   ]
 }

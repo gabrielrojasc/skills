@@ -1,0 +1,143 @@
+diff --git a/relay/backoff.py b/relay/backoff.py
+index bff8537..f19e9f5 100644
+--- a/relay/backoff.py
++++ b/relay/backoff.py
+@@ -1,6 +1,8 @@
+ """Retry delays for failed deliveries."""
+
+ import random
++from datetime import timezone
++from email.utils import parsedate_to_datetime
+
+ BASE_DELAY = 1.0
+ MAX_DELAY = 60.0
+@@ -9,3 +11,21 @@ MAX_DELAY = 60.0
+ def delay_for_attempt(attempt):
+     """Exponential backoff with full jitter, capped at MAX_DELAY."""
+     return random.uniform(0, min(MAX_DELAY, BASE_DELAY * 2 ** (attempt - 1)))
++
++
++def retry_after_delay(header, now):
++    """Seconds a Retry-After header asks to wait, capped at MAX_DELAY, or None if it is missing or unreadable."""
++    if header is None:
++        return None
++    value = header.strip()
++    if value.isdecimal():
++        seconds = float(value)
++    else:
++        try:
++            when = parsedate_to_datetime(value)
++        except ValueError:
++            return None
++        if when.tzinfo is None:
++            when = when.replace(tzinfo=timezone.utc)
++        seconds = (when - now).total_seconds()
++    return min(max(seconds, 0.0), MAX_DELAY)
+diff --git a/relay/worker.py b/relay/worker.py
+index 810153e..12b56ab 100644
+--- a/relay/worker.py
++++ b/relay/worker.py
+@@ -1,11 +1,12 @@
+ """Delivery worker."""
+
+ import logging
++from datetime import datetime, timezone
+
+ import requests
+
+ from relay import queue, sender
+-from relay.backoff import delay_for_attempt
++from relay.backoff import delay_for_attempt, retry_after_delay
+
+ log = logging.getLogger(__name__)
+
+@@ -20,6 +21,14 @@ def process(job):
+         if job.attempt >= MAX_ATTEMPTS:
+             log.error("giving up on delivery %s after %s attempts: %s", job.id, job.attempt, exc)
+             return
+-        delay = delay_for_attempt(job.attempt)
++        delay = _retry_delay(exc, job.attempt)
+         log.warning("delivery %s attempt %s failed: %s; retrying in %.1fs", job.id, job.attempt, exc, delay)
+         queue.schedule(job.retry(), delay)
++
++
++def _retry_delay(exc, attempt):
++    if exc.response is not None:
++        requested = retry_after_delay(exc.response.headers.get("Retry-After"), datetime.now(timezone.utc))
++        if requested is not None:
++            return requested
++    return delay_for_attempt(attempt)
+diff --git a/tests/test_backoff.py b/tests/test_backoff.py
+index d1efd99..bfa6178 100644
+--- a/tests/test_backoff.py
++++ b/tests/test_backoff.py
+@@ -1,6 +1,9 @@
++from datetime import datetime, timezone
+ from unittest import mock
+
+-from relay.backoff import MAX_DELAY, delay_for_attempt
++import pytest
++
++from relay.backoff import MAX_DELAY, delay_for_attempt, retry_after_delay
+
+
+ def test_delay_grows_with_each_attempt():
+@@ -11,3 +14,24 @@ def test_delay_grows_with_each_attempt():
+ def test_delay_is_capped():
+     with mock.patch("relay.backoff.random.uniform", side_effect=lambda low, high: high):
+         assert delay_for_attempt(20) == MAX_DELAY
++
++
++NOW = datetime(2026, 10, 21, 7, 28, tzinfo=timezone.utc)
++
++
++@pytest.mark.parametrize(
++    ("header", "expected"),
++    [
++        pytest.param(None, None, id="missing"),
++        pytest.param("soon", None, id="unreadable"),
++        pytest.param("12", 12.0, id="seconds"),
++        pytest.param(" 12 ", 12.0, id="seconds with spaces"),
++        pytest.param("0", 0.0, id="zero seconds"),
++        pytest.param("600", MAX_DELAY, id="seconds over the cap"),
++        pytest.param("Wed, 21 Oct 2026 07:28:30 GMT", 30.0, id="http date"),
++        pytest.param("Wed, 21 Oct 2026 07:28:30 -0000", 30.0, id="http date parsed as naive"),
++        pytest.param("Wed, 21 Oct 2026 07:27:00 GMT", 0.0, id="http date in the past"),
++    ],
++)
++def test_retry_after_delay(header, expected):
++    assert retry_after_delay(header, NOW) == expected
+diff --git a/tests/test_worker.py b/tests/test_worker.py
+index 92c8f37..3095201 100644
+--- a/tests/test_worker.py
++++ b/tests/test_worker.py
+@@ -26,3 +26,29 @@ def test_gives_up_after_the_last_attempt():
+     ):
+         worker.process(last)
+     schedule.assert_not_called()
++
++
++def http_error(headers):
++    response = requests.Response()
++    response.status_code = 429
++    response.headers.update(headers)
++    return requests.HTTPError(response=response)
++
++
++def test_waits_as_long_as_retry_after_asks():
++    with (
++        mock.patch.object(worker.sender, "send_webhook", side_effect=http_error({"Retry-After": "7"})),
++        mock.patch.object(worker.queue, "schedule") as schedule,
++    ):
++        worker.process(JOB)
++    assert schedule.call_args.args[1] == 7.0
++
++
++def test_backs_off_when_retry_after_is_missing():
++    with (
++        mock.patch.object(worker.sender, "send_webhook", side_effect=http_error({})),
++        mock.patch.object(worker, "delay_for_attempt", return_value=0.5),
++        mock.patch.object(worker.queue, "schedule") as schedule,
++    ):
++        worker.process(JOB)
++    assert schedule.call_args.args[1] == 0.5

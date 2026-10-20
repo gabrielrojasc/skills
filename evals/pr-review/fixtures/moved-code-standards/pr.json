@@ -1,0 +1,34 @@
+{
+  "number": 412,
+  "title": "Add a watchlist members endpoint",
+  "url": "https://github.com/riskive/watchlist-api/pull/412",
+  "body": "Adds a read-only `/watchlist-members/` endpoint so the dashboard can list everyone on the organization's watchlists.\n\n`views.py` was getting long, so I split it into a `views/` package with one module per view. The existing views moved as they were; only the members ViewSet is new.",
+  "state": "OPEN",
+  "isDraft": false,
+  "author": {"login": "henry-dev"},
+  "headRefName": "feature/watchlist-members-endpoint",
+  "baseRefName": "main",
+  "headRefOid": "c412d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2",
+  "updatedAt": "2026-10-16T09:20:00Z",
+  "reviews": [],
+  "reviewDecision": "",
+  "repository": {"nameWithOwner": "riskive/watchlist-api"},
+  "files": [
+    {"path": "tests/test_watchlist_members.py", "additions": 30, "deletions": 0},
+    {"path": "watchlists/serializers.py", "additions": 7, "deletions": 1},
+    {"path": "watchlists/urls.py", "additions": 2, "deletions": 0},
+    {"path": "watchlists/views.py", "additions": 0, "deletions": 49},
+    {"path": "watchlists/views/__init__.py", "additions": 13, "deletions": 0},
+    {"path": "watchlists/views/bulk_archive.py", "additions": 16, "deletions": 0},
+    {"path": "watchlists/views/export.py", "additions": 17, "deletions": 0},
+    {"path": "watchlists/views/members.py", "additions": 11, "deletions": 0},
+    {"path": "watchlists/views/stats.py", "additions": 13, "deletions": 0},
+    {"path": "watchlists/views/watchlists.py", "additions": 14, "deletions": 0}
+  ],
+  "commits": [
+    {"oid": "b412c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1", "messageHeadline": "Split watchlist views into a package"},
+    {"oid": "c412d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2", "messageHeadline": "Add a watchlist members endpoint"}
+  ],
+  "labels": [],
+  "reviewRequests": [{"login": "eval-user"}]
+}

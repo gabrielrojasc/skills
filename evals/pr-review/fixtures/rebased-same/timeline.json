@@ -1,0 +1,15 @@
+[
+  {
+    "event": "review_dismissed",
+    "actor": {
+      "login": "repo-admin"
+    },
+    "created_at": "2026-09-27T10:05:00Z",
+    "dismissed_review": {
+      "state": "approved",
+      "review_id": 101,
+      "dismissal_message": "stale after rebase",
+      "dismissal_commit_id": "f15b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a81"
+    }
+  }
+]

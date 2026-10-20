@@ -1,0 +1,21 @@
+{
+  "status": "ahead",
+  "files": [
+    {
+      "filename": "relay/sender.py",
+      "status": "modified",
+      "additions": 3,
+      "deletions": 1,
+      "changes": 4,
+      "patch": "@@ -1,9 +1,11 @@\n \"\"\"Webhook delivery.\"\"\"\n \n import requests\n \n+HEADERS = {\"User-Agent\": \"webhook-relay\"}\n+\n \n def send_webhook(url, payload):\n-    response = requests.post(url, json=payload, timeout=5)\n+    response = requests.post(url, json=payload, headers=HEADERS)\n     response.raise_for_status()\n     return response"
+    },
+    {
+      "filename": "tests/test_sender.py",
+      "status": "added",
+      "additions": 9,
+      "deletions": 0,
+      "changes": 9,
+      "patch": "@@ -0,0 +1,9 @@\n+from unittest import mock\n+\n+from relay import sender\n+\n+\n+def test_send_webhook_sends_the_user_agent():\n+    with mock.patch.object(sender.requests, \"post\") as post:\n+        sender.send_webhook(\"https://receiver.test/hook\", {\"id\": 1})\n+    assert post.call_args.kwargs[\"headers\"] == {\"User-Agent\": \"webhook-relay\"}"
+    }
+  ]
+}

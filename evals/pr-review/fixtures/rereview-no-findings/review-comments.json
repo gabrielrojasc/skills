@@ -1,0 +1,35 @@
+[
+  {
+    "id": 1801,
+    "pull_request_review_id": 181,
+    "path": "relay/sender.py",
+    "side": "RIGHT",
+    "commit_id": "b18d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c81",
+    "original_commit_id": "a18c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b70",
+    "line": 9,
+    "original_line": 9,
+    "html_url": "https://github.com/riskive/webhook-relay/pull/18#discussion_r1801",
+    "created_at": "2026-10-14T16:05:00Z",
+    "user": {
+      "login": "eval-user"
+    },
+    "body": "this drops `timeout=5`, so a receiver that accepts the connection and never answers holds the worker past its 10-second delivery budget. can we keep the timeout?"
+  },
+  {
+    "id": 1802,
+    "pull_request_review_id": 182,
+    "path": "relay/sender.py",
+    "side": "RIGHT",
+    "commit_id": "b18d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c81",
+    "original_commit_id": "a18c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b70",
+    "line": 9,
+    "original_line": 9,
+    "html_url": "https://github.com/riskive/webhook-relay/pull/18#discussion_r1802",
+    "created_at": "2026-10-15T13:38:00Z",
+    "in_reply_to_id": 1801,
+    "user": {
+      "login": "alice-dev"
+    },
+    "body": "Good catch, restored in the latest commit."
+  }
+]

@@ -1,0 +1,25 @@
+{
+  "number": 20,
+  "title": "Refuse to activate a subscription whose receiver is down",
+  "url": "https://github.com/riskive/webhook-relay/pull/20",
+  "body": "Activating a subscription now sends a HEAD request to the receiver first and refuses with 422 when it can't connect or answers with a server error, so we stop queueing deliveries to receivers that were never up.",
+  "state": "OPEN",
+  "isDraft": false,
+  "author": {"login": "eval-user"},
+  "headRefName": "feature/check-receiver-on-activate",
+  "baseRefName": "main",
+  "headRefOid": "f20a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a",
+  "updatedAt": "2026-10-18T10:30:00Z",
+  "reviews": [],
+  "reviewDecision": "",
+  "repository": {"nameWithOwner": "riskive/webhook-relay"},
+  "files": [
+    {"path": "relay/api.py", "additions": 3, "deletions": 0},
+    {"path": "relay/health.py", "additions": 10, "deletions": 0},
+    {"path": "tests/test_api.py", "additions": 15, "deletions": 1},
+    {"path": "tests/test_health.py", "additions": 20, "deletions": 0}
+  ],
+  "commits": [{"oid": "f20a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a", "messageHeadline": "Refuse to activate a subscription whose receiver is down"}],
+  "labels": [],
+  "reviewRequests": []
+}

@@ -1,0 +1,252 @@
+diff --git a/tests/test_watchlist_members.py b/tests/test_watchlist_members.py
+new file mode 100644
+index 0000000..bd2dc58
+--- /dev/null
++++ b/tests/test_watchlist_members.py
+@@ -0,0 +1,30 @@
++from rest_framework.test import APIClient
++
++from watchlists.models import Watchlist, WatchlistMember
++
++
++def test_lists_only_members_of_the_users_organization(api_client, organization, other_organization):
++    own = Watchlist.objects.create(organization=organization, name="Board")
++    other = Watchlist.objects.create(organization=other_organization, name="Other")
++    WatchlistMember.objects.create(watchlist=own, name="Ada Lovelace")
++    WatchlistMember.objects.create(watchlist=other, name="Grace Hopper")
++
++    response = api_client.get("/watchlist-members/")
++
++    assert response.status_code == 200
++    assert [m["name"] for m in response.data["results"]] == ["Ada Lovelace"]
++
++
++def test_hides_another_organizations_member(api_client, other_organization):
++    other = Watchlist.objects.create(organization=other_organization, name="Other")
++    member = WatchlistMember.objects.create(watchlist=other, name="Grace Hopper")
++
++    response = api_client.get(f"/watchlist-members/{member.id}/")
++
++    assert response.status_code == 404
++
++
++def test_requires_authentication(db):
++    response = APIClient().get("/watchlist-members/")
++
++    assert response.status_code == 403
+diff --git a/watchlists/serializers.py b/watchlists/serializers.py
+index 1fc2e47..47415d5 100644
+--- a/watchlists/serializers.py
++++ b/watchlists/serializers.py
+@@ -1,6 +1,6 @@
+ from rest_framework import serializers
+
+-from watchlists.models import Watchlist
++from watchlists.models import Watchlist, WatchlistMember
+
+
+ class WatchlistSerializer(serializers.ModelSerializer):
+@@ -12,3 +12,9 @@ class WatchlistSerializer(serializers.ModelSerializer):
+
+ class BulkArchiveSerializer(serializers.Serializer):
+     ids = serializers.ListField(child=serializers.IntegerField(), allow_empty=False)
++
++
++class WatchlistMemberSerializer(serializers.ModelSerializer):
++    class Meta:
++        model = WatchlistMember
++        fields = ["id", "watchlist", "name", "added_at"]
+diff --git a/watchlists/urls.py b/watchlists/urls.py
+index 7b896cc..d6ef536 100644
+--- a/watchlists/urls.py
++++ b/watchlists/urls.py
+@@ -4,12 +4,14 @@ from rest_framework.routers import DefaultRouter
+ from watchlists.views import (
+     WatchlistBulkArchiveView,
+     WatchlistExportView,
++    WatchlistMemberViewSet,
+     WatchlistStatsView,
+     WatchlistViewSet,
+ )
+
+ router = DefaultRouter()
+ router.register("watchlists", WatchlistViewSet, basename="watchlist")
++router.register("watchlist-members", WatchlistMemberViewSet, basename="watchlist-member")
+
+ urlpatterns = [
+     path("watchlists/export/", WatchlistExportView.as_view(), name="watchlist-export"),
+diff --git a/watchlists/views.py b/watchlists/views.py
+deleted file mode 100644
+index 58a7c5c..0000000
+--- a/watchlists/views.py
++++ /dev/null
+@@ -1,49 +0,0 @@
+-import csv
+-
+-from django.db.models import Count, Q
+-from django.http import HttpResponse
+-from rest_framework import status, viewsets
+-from rest_framework.response import Response
+-from rest_framework.views import APIView
+-
+-from watchlists.models import Watchlist
+-from watchlists.serializers import BulkArchiveSerializer, WatchlistSerializer
+-
+-
+-class WatchlistViewSet(viewsets.ModelViewSet):
+-    serializer_class = WatchlistSerializer
+-
+-    def get_queryset(self):
+-        return Watchlist.objects.filter(organization=self.request.user.organization)
+-
+-    def perform_create(self, serializer):
+-        serializer.save(organization=self.request.user.organization)
+-
+-
+-class WatchlistExportView(APIView):
+-    def get(self, request):
+-        response = HttpResponse(content_type="text/csv")
+-        response["Content-Disposition"] = 'attachment; filename="watchlists.csv"'
+-        writer = csv.writer(response)
+-        writer.writerow(["id", "name", "archived"])
+-        for watchlist in Watchlist.objects.filter(organization=request.user.organization):
+-            writer.writerow([watchlist.id, watchlist.name, watchlist.archived])
+-        return response
+-
+-
+-class WatchlistBulkArchiveView(APIView):
+-    def post(self, request):
+-        serializer = BulkArchiveSerializer(data=request.data)
+-        serializer.is_valid(raise_exception=True)
+-        archived = Watchlist.objects.filter(
+-            organization=request.user.organization, id__in=serializer.validated_data["ids"]
+-        ).update(archived=True)
+-        return Response({"archived": archived}, status=status.HTTP_200_OK)
+-
+-
+-class WatchlistStatsView(APIView):
+-    def get(self, request):
+-        counts = Watchlist.objects.filter(organization=request.user.organization).aggregate(
+-            total=Count("id"), archived=Count("id", filter=Q(archived=True))
+-        )
+-        return Response(counts)
+diff --git a/watchlists/views/__init__.py b/watchlists/views/__init__.py
+new file mode 100644
+index 0000000..0d53666
+--- /dev/null
++++ b/watchlists/views/__init__.py
+@@ -0,0 +1,13 @@
++from watchlists.views.bulk_archive import WatchlistBulkArchiveView
++from watchlists.views.export import WatchlistExportView
++from watchlists.views.members import WatchlistMemberViewSet
++from watchlists.views.stats import WatchlistStatsView
++from watchlists.views.watchlists import WatchlistViewSet
++
++__all__ = [
++    "WatchlistBulkArchiveView",
++    "WatchlistExportView",
++    "WatchlistMemberViewSet",
++    "WatchlistStatsView",
++    "WatchlistViewSet",
++]
+diff --git a/watchlists/views/bulk_archive.py b/watchlists/views/bulk_archive.py
+new file mode 100644
+index 0000000..1536d49
+--- /dev/null
++++ b/watchlists/views/bulk_archive.py
+@@ -0,0 +1,16 @@
++from rest_framework import status
++from rest_framework.response import Response
++from rest_framework.views import APIView
++
++from watchlists.models import Watchlist
++from watchlists.serializers import BulkArchiveSerializer
++
++
++class WatchlistBulkArchiveView(APIView):
++    def post(self, request):
++        serializer = BulkArchiveSerializer(data=request.data)
++        serializer.is_valid(raise_exception=True)
++        archived = Watchlist.objects.filter(
++            organization=request.user.organization, id__in=serializer.validated_data["ids"]
++        ).update(archived=True)
++        return Response({"archived": archived}, status=status.HTTP_200_OK)
+diff --git a/watchlists/views/export.py b/watchlists/views/export.py
+new file mode 100644
+index 0000000..f2ee819
+--- /dev/null
++++ b/watchlists/views/export.py
+@@ -0,0 +1,17 @@
++import csv
++
++from django.http import HttpResponse
++from rest_framework.views import APIView
++
++from watchlists.models import Watchlist
++
++
++class WatchlistExportView(APIView):
++    def get(self, request):
++        response = HttpResponse(content_type="text/csv")
++        response["Content-Disposition"] = 'attachment; filename="watchlists.csv"'
++        writer = csv.writer(response)
++        writer.writerow(["id", "name", "archived"])
++        for watchlist in Watchlist.objects.filter(organization=request.user.organization):
++            writer.writerow([watchlist.id, watchlist.name, watchlist.archived])
++        return response
+diff --git a/watchlists/views/members.py b/watchlists/views/members.py
+new file mode 100644
+index 0000000..623c818
+--- /dev/null
++++ b/watchlists/views/members.py
+@@ -0,0 +1,11 @@
++from rest_framework import viewsets
++
++from watchlists.models import WatchlistMember
++from watchlists.serializers import WatchlistMemberSerializer
++
++
++class WatchlistMemberViewSet(viewsets.ReadOnlyModelViewSet):
++    serializer_class = WatchlistMemberSerializer
++
++    def get_queryset(self):
++        return WatchlistMember.objects.filter(watchlist__organization=self.request.user.organization)
+diff --git a/watchlists/views/stats.py b/watchlists/views/stats.py
+new file mode 100644
+index 0000000..83edbb6
+--- /dev/null
++++ b/watchlists/views/stats.py
+@@ -0,0 +1,13 @@
++from django.db.models import Count, Q
++from rest_framework.response import Response
++from rest_framework.views import APIView
++
++from watchlists.models import Watchlist
++
++
++class WatchlistStatsView(APIView):
++    def get(self, request):
++        counts = Watchlist.objects.filter(organization=request.user.organization).aggregate(
++            total=Count("id"), archived=Count("id", filter=Q(archived=True))
++        )
++        return Response(counts)
+diff --git a/watchlists/views/watchlists.py b/watchlists/views/watchlists.py
+new file mode 100644
+index 0000000..366e611
+--- /dev/null
++++ b/watchlists/views/watchlists.py
+@@ -0,0 +1,14 @@
++from rest_framework import viewsets
++
++from watchlists.models import Watchlist
++from watchlists.serializers import WatchlistSerializer
++
++
++class WatchlistViewSet(viewsets.ModelViewSet):
++    serializer_class = WatchlistSerializer
++
++    def get_queryset(self):
++        return Watchlist.objects.filter(organization=self.request.user.organization)
++
++    def perform_create(self, serializer):
++        serializer.save(organization=self.request.user.organization)

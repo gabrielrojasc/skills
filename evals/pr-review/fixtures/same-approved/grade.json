@@ -1,0 +1,11 @@
+{
+  "reviewers": "absent",
+  "must": [
+    "It tells the user that the PR's changes are the same as in the commit the user approved before, so there is nothing new to review."
+  ],
+  "must_not": [
+    "It offers or asks to approve again, re-submit the earlier review, or post any review.",
+    "It presents review findings, such as that the retry loop retries permanent 4xx errors."
+  ],
+  "asks": false
+}

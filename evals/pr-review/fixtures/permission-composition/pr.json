@@ -1,0 +1,27 @@
+{
+  "number": 231,
+  "title": "Let the family-mapping flag stand in for the relationship view scope",
+  "url": "https://github.com/riskive/asset-api/pull/231",
+  "body": "Companies without the relationships package can use asset relationships once `relationships.family_mapping` is on for them. The flag stands in for `entity:view_relationships` only, never for `entity:manage_relationships`.\n\n| Access | Before | After |\n| --- | --- | --- |\n| Read (types, list) | view scope | view scope **or** flag |\n| Write (create, destroy) | view scope **and** manage scope | (view scope **or** flag) **and** manage scope |\n\nTests cover reads with the flag and that the flag alone can't create.",
+  "state": "OPEN",
+  "isDraft": false,
+  "author": {"login": "gina-dev"},
+  "headRefName": "feature/family-mapping-flag",
+  "baseRefName": "main",
+  "headRefOid": "d231e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1",
+  "updatedAt": "2026-10-19T13:40:00Z",
+  "reviews": [],
+  "reviewDecision": "",
+  "repository": {"nameWithOwner": "riskive/asset-api"},
+  "files": [
+    {"path": "relationships/feature_flags.py", "additions": 3, "deletions": 0},
+    {"path": "relationships/services.py", "additions": 12, "deletions": 0},
+    {"path": "relationships/views.py", "additions": 9, "deletions": 3},
+    {"path": "tests/test_relationships.py", "additions": 16, "deletions": 0}
+  ],
+  "commits": [
+    {"oid": "d231e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1", "messageHeadline": "Let the family-mapping flag stand in for the relationship view scope"}
+  ],
+  "labels": [],
+  "reviewRequests": [{"login": "eval-user"}]
+}

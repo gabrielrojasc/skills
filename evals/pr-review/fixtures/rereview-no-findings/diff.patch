@@ -1,0 +1,32 @@
+diff --git a/relay/sender.py b/relay/sender.py
+index 5c2e1a0..8a4d2c7 100644
+--- a/relay/sender.py
++++ b/relay/sender.py
+@@ -1,9 +1,11 @@
+ """Webhook delivery."""
+
+ import requests
+
++HEADERS = {"User-Agent": "webhook-relay"}
++
+
+ def send_webhook(url, payload):
+-    response = requests.post(url, json=payload, timeout=5)
++    response = requests.post(url, json=payload, headers=HEADERS, timeout=5)
+     response.raise_for_status()
+     return response
+diff --git a/tests/test_sender.py b/tests/test_sender.py
+new file mode 100644
+index 0000000..3b7e9d1
+--- /dev/null
++++ b/tests/test_sender.py
+@@ -0,0 +1,9 @@
++from unittest import mock
++
++from relay import sender
++
++
++def test_send_webhook_sends_the_user_agent():
++    with mock.patch.object(sender.requests, "post") as post:
++        sender.send_webhook("https://receiver.test/hook", {"id": 1})
++    assert post.call_args.kwargs["headers"] == {"User-Agent": "webhook-relay"}

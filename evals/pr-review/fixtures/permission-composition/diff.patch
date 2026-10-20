@@ -1,0 +1,108 @@
+diff --git a/relationships/feature_flags.py b/relationships/feature_flags.py
+new file mode 100644
+index 0000000..8ad39ab
+--- /dev/null
++++ b/relationships/feature_flags.py
+@@ -0,0 +1,3 @@
++from core.flags import FlagName
++
++FAMILY_MAPPING_FLAG = FlagName("relationships.family_mapping")
+diff --git a/relationships/services.py b/relationships/services.py
+index 437a849..1d822ed 100644
+--- a/relationships/services.py
++++ b/relationships/services.py
+@@ -1,3 +1,6 @@
++from core.flags import is_feature_enabled
++from core.opa import has_scope
++from relationships.feature_flags import FAMILY_MAPPING_FLAG
+ from relationships.models import Relationship
+
+ VIEW_RELATIONSHIPS_SCOPE = "entity:view_relationships"
+@@ -8,6 +11,15 @@ class RelationshipConflictError(Exception):
+     pass
+
+
++def can_view_relationships(request) -> bool:
++    """The view scope, or the family-mapping flag that stands in for it."""
++    if request is None:
++        return False
++    if has_scope(request, VIEW_RELATIONSHIPS_SCOPE):
++        return True
++    return is_feature_enabled(request, FAMILY_MAPPING_FLAG)
++
++
+ def create_relationship(company, parent, child, relationship_type):
+     if Relationship.objects.filter(company=company, parent=parent, child=child).exists():
+         raise RelationshipConflictError(f"{parent.pk} -> {child.pk} already exists")
+diff --git a/relationships/views.py b/relationships/views.py
+index 4313de5..c82465e 100644
+--- a/relationships/views.py
++++ b/relationships/views.py
+@@ -1,4 +1,5 @@
+ from rest_framework import mixins, status, viewsets
++from rest_framework.permissions import BasePermission
+ from rest_framework.response import Response
+
+ from core.permissions import DEFAULT_GATES, OPAScoped
+@@ -10,21 +11,26 @@ from relationships.serializers import (
+ )
+ from relationships.services import (
+     MANAGE_RELATIONSHIPS_SCOPE,
+-    VIEW_RELATIONSHIPS_SCOPE,
+     RelationshipConflictError,
++    can_view_relationships,
+     create_relationship,
+ )
+
+ WRITE_METHODS = ("POST", "PUT", "PATCH", "DELETE")
+
+
++class CanViewRelationships(BasePermission):
++    def has_permission(self, request, view):
++        return can_view_relationships(request)
++
++
+ class ManageOnWrite(OPAScoped(MANAGE_RELATIONSHIPS_SCOPE)):
+     def has_permission(self, request, view):
+         return request.method not in WRITE_METHODS or super().has_permission(request, view)
+
+
+ class RelationshipTypeViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+-    permission_classes = [*DEFAULT_GATES, OPAScoped(VIEW_RELATIONSHIPS_SCOPE)]
++    permission_classes = [*DEFAULT_GATES, CanViewRelationships]
+     serializer_class = RelationshipTypeSerializer
+     pagination_class = None
+     queryset = RelationshipType.objects.all()
+@@ -33,7 +39,7 @@ class RelationshipTypeViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+ class RelationshipViewSet(
+     mixins.ListModelMixin, mixins.CreateModelMixin, mixins.DestroyModelMixin, viewsets.GenericViewSet
+ ):
+-    permission_classes = [*DEFAULT_GATES, OPAScoped(VIEW_RELATIONSHIPS_SCOPE), ManageOnWrite]
++    permission_classes = [*DEFAULT_GATES, CanViewRelationships, ManageOnWrite]
+     serializer_class = RelationshipSerializer
+
+     def get_queryset(self):
+diff --git a/tests/test_relationships.py b/tests/test_relationships.py
+index 7bd760b..e628edd 100644
+--- a/tests/test_relationships.py
++++ b/tests/test_relationships.py
+@@ -23,3 +23,19 @@ def test_create_requires_manage_scope(api_client, user, scopes, parent, child, r
+     scopes.set(user, ["entity:view_relationships"])
+     body = {"parent": parent.pk, "child": child.pk, "type": relationship_type.pk}
+     assert api_client.post(LIST_URL, body).status_code == 403
++
++
++@pytest.mark.django_db
++def test_list_with_family_mapping_flag(api_client, user, scopes, flags, relationship):
++    scopes.set(user, [])
++    flags.enable(user.company, "relationships.family_mapping")
++    assert api_client.get(LIST_URL).status_code == 200
++    assert api_client.get(TYPES_URL).status_code == 200
++
++
++@pytest.mark.django_db
++def test_flag_does_not_grant_create(api_client, user, scopes, flags, parent, child, relationship_type):
++    scopes.set(user, [])
++    flags.enable(user.company, "relationships.family_mapping")
++    body = {"parent": parent.pk, "child": child.pk, "type": relationship_type.pk}
++    assert api_client.post(LIST_URL, body).status_code == 403

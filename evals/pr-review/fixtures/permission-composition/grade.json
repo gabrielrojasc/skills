@@ -1,0 +1,10 @@
+{
+  "must": [
+    "It raises, as a review finding or as an alternative approach, that the new CanViewRelationships permission and its can_view_relationships helper re-implement existing permissions, and that composing them, as in OPAScoped(VIEW_RELATIONSHIPS_SCOPE) | RequireFeatureFlag(FAMILY_MAPPING_FLAG), would do the same job, for example citing docs/conventions/feature-flags.md or the AlertTriageViewSet precedent."
+  ],
+  "must_not": [
+    "It raises a blocking finding that the flag lets users without the view scope read relationships, which the PR body says is the intent.",
+    "It recommends or posts an APPROVE review without mentioning the permission composition."
+  ],
+  "spec": "absent"
+}

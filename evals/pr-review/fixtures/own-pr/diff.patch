@@ -1,0 +1,95 @@
+diff --git a/relay/api.py b/relay/api.py
+index bcd2332..5b1f077 100644
+--- a/relay/api.py
++++ b/relay/api.py
+@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
+ from django.views.decorators.http import require_POST
+
+ from relay.auth import staff_required
++from relay.health import receiver_is_reachable
+ from relay.models import Subscription
+
+
+@@ -10,6 +11,8 @@ from relay.models import Subscription
+ @staff_required
+ def activate_subscription(request, subscription_id):
+     subscription = get_object_or_404(Subscription, pk=subscription_id)
++    if not receiver_is_reachable(subscription.url):
++        return JsonResponse({"error": "receiver unreachable"}, status=422)
+     subscription.active = True
+     subscription.save(update_fields=["active"])
+     return JsonResponse({"id": subscription.id, "active": True})
+diff --git a/relay/health.py b/relay/health.py
+new file mode 100644
+index 0000000..ef4c230
+--- /dev/null
++++ b/relay/health.py
+@@ -0,0 +1,10 @@
++import requests
++
++
++def receiver_is_reachable(url):
++    """Whether the receiver answers a HEAD request without a server error."""
++    try:
++        response = requests.head(url)
++    except requests.RequestException:
++        return False
++    return response.status_code < 500
+diff --git a/tests/test_api.py b/tests/test_api.py
+index d324c42..4613419 100644
+--- a/tests/test_api.py
++++ b/tests/test_api.py
+@@ -1,3 +1,5 @@
++from unittest import mock
++
+ import pytest
+ from django.test import RequestFactory
+
+@@ -16,8 +18,20 @@ def staff_post():
+ def test_activates_a_subscription():
+     subscription = Subscription.objects.create(url="https://receiver.test/hook")
+
+-    response = activate_subscription(staff_post(), subscription.id)
++    with mock.patch("relay.api.receiver_is_reachable", return_value=True):
++        response = activate_subscription(staff_post(), subscription.id)
+
+     assert response.status_code == 200
+     subscription.refresh_from_db()
+     assert subscription.active
++
++
++def test_refuses_an_unreachable_receiver():
++    subscription = Subscription.objects.create(url="https://receiver.test/hook")
++
++    with mock.patch("relay.api.receiver_is_reachable", return_value=False):
++        response = activate_subscription(staff_post(), subscription.id)
++
++    assert response.status_code == 422
++    subscription.refresh_from_db()
++    assert not subscription.active
+diff --git a/tests/test_health.py b/tests/test_health.py
+new file mode 100644
+index 0000000..fe5f21c
+--- /dev/null
++++ b/tests/test_health.py
+@@ -0,0 +1,20 @@
++from unittest import mock
++
++import requests
++
++from relay.health import receiver_is_reachable
++
++
++def test_reachable_when_the_receiver_answers():
++    with mock.patch("relay.health.requests.head", return_value=mock.Mock(status_code=405)):
++        assert receiver_is_reachable("https://receiver.test/hook")
++
++
++def test_unreachable_on_a_server_error():
++    with mock.patch("relay.health.requests.head", return_value=mock.Mock(status_code=502)):
++        assert not receiver_is_reachable("https://receiver.test/hook")
++
++
++def test_unreachable_when_the_connection_fails():
++    with mock.patch("relay.health.requests.head", side_effect=requests.ConnectionError()):
++        assert not receiver_is_reachable("https://receiver.test/hook")
