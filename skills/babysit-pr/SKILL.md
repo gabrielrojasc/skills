@@ -31,9 +31,10 @@ each PR is ready for them to take over. A stack runs as one loop, bottom up.
 6. Push once, with the CI and feedback fixes together.
 
 Stop when required checks pass or are gated, no unresolved thread is left except
-ones the user kept open, and nothing conflicts. Unwatch every PR before you hand
-it over or stop. Hand the PR over with its link, what changed across rounds,
-fixes beyond its purpose, and what's left for the user, such as approvals, gated
-runs, reviewers, draft state, and merging. If a fresh progress agent finds the
-rounds going in circles, stop and report what's unresolved and what each round
-tried.
+ones the user kept open, and nothing conflicts. List unresolved threads with the
+`gh-review-comments` fetch script and `--threads-only`. Unwatch every PR before
+you hand it over or stop. Hand the PR over with its link, what changed across
+rounds, fixes beyond its purpose, and what's left for the user, such as
+approvals, gated runs, reviewers, draft state, and merging. If a fresh progress
+agent finds the rounds going in circles, stop and report what's unresolved and
+what each round tried.

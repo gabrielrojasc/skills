@@ -107,9 +107,10 @@ answer. Do nothing beyond the two.
   threads, without waiting for CI. Leave partial or disputed threads open, and
   resolve a raised Dismiss only when the user said so.
 - Mutations: `addPullRequestReviewThreadReply` to reply in a thread,
-  `resolveReviewThread` with the thread's `id`, `gh pr comment --body-file` for
-  a top-level answer (a new comment that links its source), and `addReaction`.
-  Pass bodies through a file.
+  `resolveReviewThread` with the thread's `id` from the fetch output,
+  `gh pr comment --body-file` for a top-level answer (a new comment that links
+  its source), and `addReaction`. Pass bodies through a file.
 
-Before ending, confirm each resolved thread's `isResolved`, and list any
-thread left open with its reason.
+Before ending, fetch again with `--threads-only` and without `--all-threads`.
+No thread you resolved may appear in it; list each thread left open with its
+reason.
