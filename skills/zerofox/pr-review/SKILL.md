@@ -9,10 +9,8 @@ Review one or more GitHub PRs with independent reviewer subagents, verify their
 drafts with fresh subagents, raise only the findings that need the user's
 judgment, and submit one review per PR.
 
-Submit a `COMMENT` review of routine findings without asking. Keep every other
-draft local until the user explicitly approves the review for that PR in this
-session; one approval covers its routine findings too. Subagents are read-only
-outside their assigned files.
+Follow [Submit](#submit) for permission to post. Subagents are read-only outside
+their assigned files.
 
 ## Setup
 
@@ -22,8 +20,9 @@ title](references/session-title.md).
 
 Create a private run directory with `mktemp -d`, with a folder per PR named
 `<owner>__<repo>__<number>__<short-head-sha>`. Each folder holds `src/`,
-`standards.md`, `spec.md`, `verify-<axis>-<round>-input.md`,
-`verify-<axis>-<round>.md`, `triage.md`, `final-review.md`, and `review.json`.
+`standards.md`, `spec.md`, `risk.md`, `approach.md`,
+`verify-<axis>-<round>-input.md`, `verify-<axis>-<round>.md`, `triage.md`,
+`final-review.md`, and `review.json`.
 These files, not the conversation, hold the draft text, so a summarized
 conversation can't change what gets posted. Give subagents absolute paths to the
 files they write and to `src/`, and report the run directory in updates.
@@ -44,13 +43,17 @@ Before starting reviewers, run
 `<SKILL_DIR>/scripts/changes-since-review.py <owner>/<repo> <n>` per PR:
 
 - `none`: review in full.
-- `same`: nothing the PR changes differs from what the user reviewed. Start no
-  reviewers. Report the status of that review's threads and ask whether to
-  re-submit its event through [Submit](#submit) or stop. GitHub dismisses only
-  approvals and change requests, so for a `DISMISSED` review, ask which it was.
+- `same`: nothing the PR changes differs from what the user reviewed. Report
+  the status of that review's threads. If the script reports the review as
+  dismissed, ask whether to re-submit its event through [Submit](#submit);
+  otherwise stop. Start no reviewers and report no problems of your own, unless
+  the script reports a rebase: then, first, one Standards reviewer checks only
+  the code, contracts, and config the patch relies on that changed on the base,
+  and its drafts go through Verify and Triage.
 - `changed`: review only the printed differences, with the full diff as
   context, and report only problems they introduce, including breakage they
-  cause elsewhere.
+  cause elsewhere. After a reported rebase, also check what the patch relies
+  on that changed on the base.
 - `unknown`: review in full and tell the user why.
 
 A re-review covers every PR in this session's run directories unless the user
@@ -71,13 +74,19 @@ review](references/choose-review.md) before starting reviewers. Python standards
 live under `docs/` in `riskive/python-standards`; use the files relevant to the
 diff.
 
+Unless the user authored the PR, it also gets a Risk agent and an Approach
+agent.
+
+Pick the agent tier once per head, from the diff, and use it for every reviewer
+and verifier on that head.
+
 ## Review
 
 Do the setup, the earlier-review check, and the review choice yourself; they
-take a few commands. Then start one Standards subagent per PR and, when the
-table calls for it, one Spec subagent, in the background. Gather no diffs,
-threads, or source for them beyond `src/`. Each axis moves to verification as
-soon as its own reviewer returns. Keep the axes in separate reports.
+take a few commands. Then start, in the background, one subagent per axis the
+review choice selected for each PR. Gather no diffs, threads, or source for them
+beyond `src/`. Each axis moves to verification as soon as its own reviewer
+returns. Keep the axes in separate reports.
 
 Wait only when no work can proceed, and when you must poll agents, wait several
 minutes per call. In Codex, update at least every 60 seconds from what you know;
@@ -89,11 +98,41 @@ Message a running agent only to stop it, when its head moved or its PR closed.
 
 The Standards agent judges code, documentation, and agent instructions against
 the chosen standards, not the ticket or acceptance criteria. A repository's
-standards are its `AGENTS.md`, the docs it points to, and any file under `docs/`
-about how code is written. Always apply Fowler's code smells (*Refactoring*,
-chapter 3); the repository wins a conflict. When the diff changes documentation,
-agent instructions, or documentation automation, reviewers and verifiers read
-[Documentation and agent instructions](references/documentation-review.md).
+standards are its `AGENTS.md`, `CLAUDE.md`, and `CONTRIBUTING.md`, the docs they
+point to, the development sections of `README.md`, and any file under `docs/`
+about how code is written. Always apply Fowler's code smells
+(*Refactoring*, chapter 3); the repository wins a conflict. When the diff
+changes documentation, agent instructions, or documentation automation, or
+makes unchanged ones false, reviewers and verifiers read [Documentation and
+agent instructions](references/documentation-review.md). Configuration the diff
+makes false is a finding too. Guidance or configuration that was already stale
+before this PR goes in the notes.
+
+### Risk axis
+
+The Risk agent writes `## Risk` with `low`, `medium`, or `high` and one line
+per reason naming the paths, even when it finds nothing to draft. It looks for
+changes to authentication, authorization, tenant isolation, secrets, stored-data
+schemas, CI or infrastructure, and shared code with many callers, and for
+effects a revert can't undo, such as dropped columns, backfills, or sent
+messages. For each, it checks that the PR says how to undo or recover and how a
+failure would be noticed, and checks authorization, tenant scoping, timing-safe
+comparisons, secret handling, and input validation. Its drafts follow the
+finding bar.
+
+### Approach axis
+
+The Approach agent reads the problem, the ticket and its parent, earlier review
+threads, and the code around the change before the diff. It looks for one
+concrete simpler route: existing code, a framework feature, a config change, or
+a change in the service that owns the concern, fetched at a pinned commit. It
+raises an alternative only when the alternative preserves required behavior and
+removes a real maintenance, operational, or coordination cost; equally valid
+alternatives go in its notes. It reopens a decision made in a thread only with
+new evidence. It writes at most two alternatives, each with the replacement, its
+evidence, the constraints it preserves, and the switching cost, and names the
+context it lacked. Its alternatives skip Verify and go to the user in Triage as
+notes.
 
 ### Spec axis
 
@@ -111,9 +150,13 @@ from the PR description.
 ### Finding bar
 
 Report blockers (broken behavior, real defects, security holes, missing or wrong
-requirements) and major tech-debt introduction. Report only problems the diff
+requirements) and major tech-debt introduction. Report problems the diff
 introduces, including breakage it causes in unchanged code and requirements it
-leaves missing. Every other finding needs a consequence of leaving it as is:
+leaves missing. Also report defects and broken documented rules that predate the
+diff in code it touches, moved code included, as pre-existing findings. They
+never block or count toward the event; mark a small one optional, and ask the
+author to take on a larger one in this PR or a follow-up. Every finding other
+than a blocker needs a consequence of leaving it as is:
 
 - a caller or reader who will get something wrong;
 - a second copy the next edit will miss;
@@ -145,36 +188,48 @@ and line, names the change, and says nothing else.
 
 The correction preserves required behavior, useful information, contracts, and
 conventions, and stays local and proportionate. Missing evidence is a
-verification gap, not proof of redundancy. Cleanup findings are nonblocking
-unless they meet the blocker or major-debt bar on their own.
+verification gap, not proof of redundancy. Apart from pre-existing findings and
+deciding questions, only mechanical local cleanup is nonblocking; every other
+finding blocks. A deciding question asks for a fact only the author has, such
+as intent or a deployment constraint, without which you can't tell whether the
+PR is acceptable. Don't ask about a design preference or an option the PR body
+already weighed; when the body accepts a defect, report the defect.
 
 ### Rules for every reviewer
 
 1. Read the PR metadata, diff, and review threads, and source from `src/`. Don't
    repeat a point already made or resolved in a thread; when an unresolved bot
-   comment meets the finding bar, draft a +1 on it instead. If the user reviewed
-   the PR before, report each of their earlier threads as addressed,
-   unaddressed, or author replied.
-2. Anchor a finding inline when a changed line owns the problem, otherwise in
+   comment meets the finding bar, draft a +1 on it instead. Skip a problem a CI
+   check already reports on the same line. If the user reviewed the PR before,
+   report each of their earlier threads as addressed, unaddressed, or author
+   replied.
+2. When you find a problem, search the diff and the files it touches for the
+   same pattern, and list every instance in one finding. On a re-review, list
+   only instances in the changes under review.
+3. Anchor a finding inline when a changed line owns the problem, otherwise in
    the review body. Never invent an anchor.
-3. For defects and spec gaps, give a concrete example of what goes wrong; for
+4. For defects and spec gaps, give a concrete example of what goes wrong; for
    cleanup, say what is unnecessary or misleading, its consequence, and the
    correction. Prefer a casual question ("do we need X here so Y happens?") when
    the author is senior or the fix is obvious.
-4. Write the result with headings `## Target head`, `## Verdict` (APPROVE,
+5. Start every draft with its [Conventional Comments](https://conventionalcomments.org/)
+   label: `issue (blocking):`, `nitpick (non-blocking):` for mechanical local
+   cleanup, `issue (non-blocking, pre-existing):`, or `question:` for a deciding
+   question.
+6. Write the result with headings `## Target head`, `## Verdict` (APPROVE,
    COMMENT, or REQUEST_CHANGES with one line of reasoning), `## Comment drafts`
    (`- **file:line** — text` using new-file line numbers,
    `- **review body** — text`, or `- **+1 <comment URL>** — why it holds`),
    and `## Notes for the reviewer (not for posting)`. Spec agents use
    `## Spec verdict` and `## Spec findings`. Return only the file path and the
    verdict line.
-5. If nothing qualifies, return APPROVE with no drafts and no praise.
+7. If nothing qualifies, return APPROVE with no drafts and no praise.
 
 ## Verify
 
 No draft reaches the user unverified. An axis with no drafts skips verification
-and reports "no review issues found". When no axis has drafts, re-check the head
-and PR state yourself and go to [Submit](#submit).
+and reports "no review issues found". When no axis has drafts, go to
+[Triage](#triage).
 
 When an axis's reviewer returns drafts, assign stable axis-prefixed IDs (`S1`,
 `P1`) and write only the IDs, draft text, and any `user-promoted` marker to the
@@ -200,10 +255,11 @@ bot's comment is the claim. New findings from the verifier get fresh IDs. When a
 round leaves a draft at `revise` or adds a finding, follow [Further verification
 rounds](references/verify-rounds.md) before triage.
 
-Set the axis verdict from the confirmed set: none means APPROVE, and nonblocking
-findings alone mean COMMENT. The review event is the most severe axis verdict.
-Refuted and dropped drafts, with their reasons, and the reviewers' notes go in
-`triage.md`.
+Group confirmed findings across axes that share the problem and the fix, then
+set the event from them, pre-existing ones excluded: `REQUEST_CHANGES` for a
+blocker or more than 3 nitpicks; otherwise `COMMENT` for a deciding question,
+or `APPROVE`. Refuted and dropped drafts, with
+their reasons, and the reviewers' notes go in `triage.md`.
 
 ## Triage
 
@@ -219,9 +275,15 @@ Refuted and dropped drafts, with their reasons, and the reviewers' notes go in
      another human reviewer's position.
    - It is a Spec finding that rests on an ambiguous ticket line.
 
-3. Show the event that would be posted, each axis's verdict, and, on a
-   re-review, each earlier thread's status. Give each raised finding its own
-   heading and each field its own paragraph:
+3. Open with the Risk agent's line and reasons, if one ran, a three-line
+   summary of what the change does, and the evidence: CI state at the head,
+   what the author tested, and what the review didn't check. When an HTML render tool is available,
+   show these as one rendered card. Then show each Approach alternative in one
+   line, the event that would be posted, and, on a re-review, each earlier
+   thread's status. On the third or later
+   review that still has blockers, add a line suggesting a call or a rethink of
+   the approach. Give each raised finding its own heading and each field its own
+   paragraph:
 
    ```markdown
    ### S1 · blocking
@@ -247,11 +309,14 @@ Refuted and dropped drafts, with their reasons, and the reviewers' notes go in
    line with the sticking point.
 
    Then list routine findings one line each, with ID, link, and full draft; a +1
-   links the bot's comment and says why it holds. End with the counts of refuted
-   and dropped drafts and of reviewer notes, and the path to `triage.md`.
-4. When nothing is raised and the event is `COMMENT`, go to [Submit](#submit)
-   and report what was posted. Otherwise, show the whole batch in one message
-   and ask one question, not one per finding, saying that approving the batch as
+   links the bot's comment and says why it holds. Show each note about
+   direction or a new pattern others will copy in one line. End with the counts
+   of refuted and dropped drafts and of other notes, and the path to
+   `triage.md`.
+4. On the user's own PR, stop after showing the findings; nothing posts.
+   Otherwise, follow [Submit](#submit) to determine whether the package may
+   post automatically. If it may not, show the whole batch in one message and
+   ask one question, not one per finding, saying that approving the batch as
    shown posts the review. The user may instead decide or reword by ID, go one
    by one, or mix the two. Record every decision in `triage.md`.
 5. One by one means one raised finding at a time, with a short explanation of
@@ -264,18 +329,28 @@ Refuted and dropped drafts, with their reasons, and the reviewers' notes go in
    PR, pasted unchanged: hand-typed links carry the old MD5 hash or a space
    before `R<line>`, which GitHub can't resolve. Posted comment bodies stay
    plain.
-8. Write posted comments in lowercase, with no praise or follow-up-ticket
-   suggestions.
+8. Write posted comments in lowercase, after their label, with no praise.
+   Suggest a follow-up only for a pre-existing finding.
 
 ## Submit
 
-Assemble `final-review.md` with the review event, every kept inline comment in
-order, a review body only for kept findings without an inline anchor, and every
-kept +1. When the user hasn't been asked to decide on this review's findings or
-package and Triage step 4 came straight here, or the user approved the batch as
-shown, submit. Otherwise, including an `APPROVE` with no drafts, show the exact
-package and ask. An instruction not to approve forbids posting the approval, not
-asking.
+Assemble `final-review.md` with the event, kept inline comments in order, kept
++1s, and a body only for unanchored findings or when the nitpick count alone
+requires changes; then the body says the set needs fixing before merge.
+
+A review with no kept findings is an `APPROVE` package, never a `COMMENT`, even
+under an instruction to post only `COMMENT` reviews; don't offer one either.
+
+The user grants standing permission to submit an `APPROVE` whose only findings
+are at most three nitpicks, only when the Risk agent reports low risk and the
+Approach agent raised no alternative. Changes to authentication, authorization,
+stored-data schemas, CI or infrastructure, or irreversible behavior are
+ineligible, and so are missing or uncertain Risk or Approach results. Submit a
+`COMMENT` without asking only when it holds a deciding question and no raised
+finding. When the user approved the batch as
+shown, submit. For any other package, show it exactly and ask. An instruction
+not to approve overrides the standing permission and forbids posting the
+approval, not asking.
 
 Immediately before submitting, re-check the head, confirm every target line is
 still in the diff, and build `review.json` in the PR folder from

@@ -4,7 +4,8 @@
   changes-since-review.py <owner>/<repo> <number> [<reviewed-sha>]
 
 Without <reviewed-sha>, the reviewed commit is the one the authenticated user's
-latest submitted review of the PR was made on.
+latest submitted review of the PR was made on. A dismissed review is reported
+with the event it had before dismissal.
 
 Each side is the PR's diff against its merge base with the base branch, so a
 rebase onto a newer base doesn't count as a change. Only added and removed
@@ -15,6 +16,9 @@ The first line of output is one of:
   same       the PR's changes match the reviewed commit's
   changed    they differ; the files and line differences follow
   unknown    the comparison isn't possible; the reason follows
+
+After `same` or `changed`, a second line says `rebased onto <sha>` when the
+PR's merge base moved since the reviewed commit.
 """
 
 import difflib
@@ -44,9 +48,23 @@ def latest_review(repo, number):
     return max(mine, key=lambda r: r.get("submitted_at") or "") if mine else None
 
 
+def review_state(repo, number, review):
+    """Return the review's state, giving a dismissed review's event before dismissal."""
+    if review["state"] != "DISMISSED":
+        return review["state"]
+    events = gh("api", f"repos/{repo}/issues/{number}/timeline", "--paginate", "--jq",
+                '.[] | select(.event == "review_dismissed") | .dismissed_review | @json')
+    for line in events.splitlines():
+        dismissed = json.loads(line) if line.strip() else {}
+        if dismissed.get("review_id") == review.get("id") and dismissed.get("state"):
+            return f"dismissed {dismissed['state'].upper()}"
+    return "dismissed (event unknown)"
+
+
 def pr_changes(repo, base, sha):
-    """Return {file key: [added and removed lines]} for base...sha, or raise ValueError."""
+    """Return ({file key: [added and removed lines]}, merge base sha) for base...sha, or raise ValueError."""
     data = json.loads(gh("api", f"repos/{repo}/compare/{base}...{sha}"))
+    merge_base = (data.get("merge_base_commit") or {}).get("sha")
     files = data.get("files") or []
     if len(files) >= MAX_FILES:
         raise ValueError(f"{sha[:7]} changes {len(files)} files, more than the compare API lists")
@@ -59,7 +77,7 @@ def pr_changes(repo, base, sha):
         if patch is None and f.get("changes", 0) > 0:
             raise ValueError(f"{key} has no patch at {sha[:7]} (binary or too large)")
         changes[key] = [l for l in (patch or "").splitlines() if l[:1] in "+-"]
-    return changes
+    return changes, merge_base
 
 
 def main():
@@ -77,21 +95,22 @@ def main():
                 print("none")
                 return
             reviewed = review["commit_id"]
-            label = f"your {review['state']} review from {review.get('submitted_at', '?')} was on"
+            label = f"your {review_state(repo, number, review)} review from {review.get('submitted_at', '?')} was on"
         print_header = lambda status: print(f"{status}: {label} {reviewed[:7]}; head is {head[:7]}")
         if reviewed == head:
             print_header("same")
             return
-        before, after = pr_changes(repo, base, reviewed), pr_changes(repo, base, head)
+        (before, old_base), (after, new_base) = pr_changes(repo, base, reviewed), pr_changes(repo, base, head)
     except (RuntimeError, ValueError) as exc:
         print(f"unknown: {exc}")
         return
 
     differing = sorted(k for k in before.keys() | after.keys() if before.get(k) != after.get(k))
+    print_header("changed" if differing else "same")
+    if old_base and new_base and old_base != new_base:
+        print(f"rebased onto {new_base[:7]}")
     if not differing:
-        print_header("same")
         return
-    print_header("changed")
     print("Each line below is a line of the PR's diff. Its first character says whether the")
     print("current head gained (+) or lost (-) that line since the reviewed commit.")
     for key in differing:

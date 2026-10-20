@@ -12,7 +12,8 @@ finding IDs, drafts, and any triage decisions. Don't restart triage.
    `<SKILL_DIR>/scripts/changes-since-review.py <owner>/<repo> <n> <old-head>`.
    On `changed`, a reviewer per axis reviews only the printed differences, as
    in Check for an earlier review, and its drafts go through Verify as usual.
-   On `same`, as after a plain rebase, there is nothing new to review. On
+   On `same`, review only what the patch relies on that changed on the base,
+   and only after a reported rebase, as in Check for an earlier review. On
    `unknown`, it reviews the full diff.
 3. For findings that still apply, keep the user's earlier decision without
    asking again. Drop fixed findings. Sort changed, new, and untriaged findings
