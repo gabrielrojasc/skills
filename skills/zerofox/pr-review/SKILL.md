@@ -99,8 +99,9 @@ Message a running agent only to stop it, when its head moved or its PR closed.
 The Standards agent judges code, documentation, and agent instructions against
 the chosen standards, not the ticket or acceptance criteria. A repository's
 standards are its `AGENTS.md`, `CLAUDE.md`, and `CONTRIBUTING.md`, the docs they
-point to, the development sections of `README.md`, and any file under `docs/`
-about how code is written. Always apply Fowler's code smells
+point to, the development sections of `README.md`, any file under `docs/`
+about how code is written, and any review guide, such as `REVIEW.md` or a PR
+review playbook, whose scope covers the diff. Always apply Fowler's code smells
 (*Refactoring*, chapter 3); the repository wins a conflict. When the diff
 changes documentation, agent instructions, or documentation automation, or
 makes unchanged ones false, reviewers and verifiers read [Documentation and
@@ -117,22 +118,29 @@ schemas, CI or infrastructure, and shared code with many callers, and for
 effects a revert can't undo, such as dropped columns, backfills, or sent
 messages. For each, it checks that the PR says how to undo or recover and how a
 failure would be noticed, and checks authorization, tenant scoping, timing-safe
-comparisons, secret handling, and input validation. Its drafts follow the
-finding bar.
+comparisons, secret handling, input validation, and whether data a serializer
+or permission hides still leaks through ordering, filters, errors, or logs,
+including logs in unchanged helpers on the call path. It also finds who else
+writes the data the diff relies on, such as jobs writing tables with raw SQL,
+and who consumes what it returns or emits, fetching a named repository at a
+pinned commit, and checks the change still holds for each. Its drafts follow
+the finding bar.
 
 ### Approach axis
 
 The Approach agent reads the problem, the ticket and its parent, earlier review
 threads, and the code around the change before the diff. It looks for one
 concrete simpler route: existing code, a framework feature, a config change, or
-a change in the service that owns the concern, fetched at a pinned commit. It
-raises an alternative only when the alternative preserves required behavior and
-removes a real maintenance, operational, or coordination cost; equally valid
-alternatives go in its notes. It reopens a decision made in a thread only with
-new evidence. It writes at most two alternatives, each with the replacement, its
-evidence, the constraints it preserves, and the switching cost, and names the
-context it lacked. Its alternatives skip Verify and go to the user in Triage as
-notes.
+a change in the service that owns the concern, fetched at a pinned commit.
+Before judging a new class, function, or helper, it lists the existing ones in
+the touched and imported modules that do the same kind of job, such as
+permissions, pagination, or service helpers. It raises an alternative only when
+the alternative preserves required behavior and removes a real maintenance,
+operational, or coordination cost; equally valid alternatives go in its notes.
+It reopens a decision made in a thread only with new evidence. It writes at most
+two alternatives, each with the replacement, its evidence, the constraints it
+preserves, and the switching cost, and names the context it lacked. Its
+alternatives skip Verify and go to the user in Triage as notes.
 
 ### Spec axis
 
@@ -206,24 +214,27 @@ already weighed; when the body accepts a defect, report the defect.
 2. When you find a problem, search the diff and the files it touches for the
    same pattern, and list every instance in one finding. On a re-review, list
    only instances in the changes under review.
-3. Anchor a finding inline when a changed line owns the problem, otherwise in
+3. For each hook, signal, callback, task, or retry the diff adds or changes,
+   state when it runs, what has already been saved or made visible by then,
+   and what happens when it fails or runs twice.
+4. Anchor a finding inline when a changed line owns the problem, otherwise in
    the review body. Never invent an anchor.
-4. For defects and spec gaps, give a concrete example of what goes wrong; for
+5. For defects and spec gaps, give a concrete example of what goes wrong; for
    cleanup, say what is unnecessary or misleading, its consequence, and the
    correction. Prefer a casual question ("do we need X here so Y happens?") when
    the author is senior or the fix is obvious.
-5. Start every draft with its [Conventional Comments](https://conventionalcomments.org/)
+6. Start every draft with its [Conventional Comments](https://conventionalcomments.org/)
    label: `issue (blocking):`, `nitpick (non-blocking):` for mechanical local
    cleanup, `issue (non-blocking, pre-existing):`, or `question:` for a deciding
    question.
-6. Write the result with headings `## Target head`, `## Verdict` (APPROVE,
+7. Write the result with headings `## Target head`, `## Verdict` (APPROVE,
    COMMENT, or REQUEST_CHANGES with one line of reasoning), `## Comment drafts`
    (`- **file:line** — text` using new-file line numbers,
    `- **review body** — text`, or `- **+1 <comment URL>** — why it holds`),
    and `## Notes for the reviewer (not for posting)`. Spec agents use
    `## Spec verdict` and `## Spec findings`. Return only the file path and the
    verdict line.
-7. If nothing qualifies, return APPROVE with no drafts and no praise.
+8. If nothing qualifies, return APPROVE with no drafts and no praise.
 
 ## Verify
 
