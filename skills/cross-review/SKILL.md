@@ -23,5 +23,6 @@ round and push once nothing is left to fix.
    reasons. Repeat from step 2.
 
 When a round leaves nothing to fix, push. If the loop goes in circles, stop
-without pushing and report what's unresolved. Report the commits and every
-dismissal with its reason.
+without pushing and report what's unresolved. Report how many review rounds
+ran with each round's `taskId`, the commits, and every dismissal with its
+reason.
