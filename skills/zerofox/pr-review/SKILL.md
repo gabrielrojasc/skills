@@ -15,7 +15,8 @@ their assigned files.
 ## Setup
 
 With more than one PR, also follow [Multiple PRs](references/multiple-prs.md).
-When a tool to set the session title is available, follow [Session
+When a tool to set the session title is available, such as T3's
+`t3_thread_update` with `action: "rename"`, follow [Session
 title](references/session-title.md).
 
 Create a private run directory with `mktemp -d`, with a folder per PR named
