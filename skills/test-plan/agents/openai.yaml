@@ -1,0 +1,5 @@
+interface:
+  display_name: "Test plan"
+  short_description: "Plans pre-prod checks. Use when a feature is ready to ship."
+policy:
+  allow_implicit_invocation: false

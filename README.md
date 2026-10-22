@@ -45,6 +45,9 @@ installation, updates, and lock tracking.
   failures in rounds through `gh-review-comments`, pushes once per round, and
   hands the PR back when it's ready to merge, stuck, or has a decision for the
   user.
+- [`test-plan`](skills/test-plan/SKILL.md) lists the ways a feature could fail
+  in prod, plans a check for each, probes which checks the agent's current
+  access can run, and asks for the access the rest need.
 - [`developer-documentation-style`](skills/developer-documentation-style/SKILL.md)
   reads the live Google guide before writing, editing, or reviewing developer
   documentation.
