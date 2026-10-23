@@ -67,6 +67,9 @@ installation, updates, and lock tracking.
 - [`slack-message`](skills/slack-message/SKILL.md) writes Slack messages in the
   user's style with Slack markup, and uses standard Markdown when posting
   through the Slack connector.
+- [`chief-of-staff`](skills/chief-of-staff/SKILL.md) tracks the user's open T3
+  threads, opens each update with a GitHub stat panel from its `glance` script,
+  and ranks what needs the user, with links to each chat.
 
 Matt Pocock's skills cover general research, specification, implementation, TDD,
 architecture, and review. They are intentionally not copied here.
