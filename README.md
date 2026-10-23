@@ -64,6 +64,9 @@ installation, updates, and lock tracking.
 - [`computer-use`](skills/computer-use/SKILL.md) drives the user's signed-in
   browser and native apps: Claude through Claude in Chrome, Codex through
   browser use and Computer Use, and Claude hands native apps to Codex.
+- [`slack-message`](skills/slack-message/SKILL.md) writes Slack messages in the
+  user's style with Slack markup, and uses standard Markdown when posting
+  through the Slack connector.
 
 Matt Pocock's skills cover general research, specification, implementation, TDD,
 architecture, and review. They are intentionally not copied here.
