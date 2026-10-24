@@ -38,14 +38,17 @@ ownership, or the author's intent, check the PR body, its linked issue, and the
 conversation, and cite what settles it. Otherwise pick the best-supported call
 and state the assumption.
 
-## 3. Challenge each call
+## 3. Challenge the calls
 
-As each item is classified, start a background subagent that makes the
-strongest evidence-backed case against the call: missed callers, contracts,
-tests, or edge cases. Revise when it holds and send it back, until it returns
-`No material objection` or a fresh progress agent finds the loop going in
-circles. Your own review doesn't replace it. Mark any disagreement left as
-`Disputed:` with the deciding assumption.
+Once a PR's items are classified, start one background subagent for that PR
+that makes the strongest evidence-backed case against each call: missed
+callers, contracts, tests, or edge cases. Your own review doesn't replace it.
+Give it every numbered call and have it answer each by number. Revise each call
+an objection holds against, and send the revisions and your reasons for
+rejecting the other objections back to it. A call is settled when the
+challenger returns `No material objection` for it or repeats, without new
+evidence, an objection you already answered; mark the latter `Disputed:` with
+the deciding assumption. Continue until every call is settled.
 
 ## 4. Decision pack
 

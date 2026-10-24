@@ -16,10 +16,11 @@ each PR is ready for them to take over. A stack runs as one loop, bottom up.
    which `gh run list --commit <head-sha> --status action_required` or
    `--status waiting` lists. Leave gated checks to the user; they are neither
    pending nor failed.
-2. Give each round a fresh subagent that runs steps 3 to 6 and returns raised
-   items as `gh-review-comments` decision-pack blocks instead of asking. To ask
-   the user, unwatch every PR, watch again once they answer, and pass the
-   answers to that PR's next round.
+2. Give each round a fresh subagent that runs steps 3 to 6 and returns each
+   fix it attempted, with the thread or failing check and the request or error
+   it addressed, and raised items as `gh-review-comments` decision-pack blocks
+   instead of asking. To ask the user, unwatch every PR, watch again once they
+   answer, and pass the answers to that PR's next round.
 3. Handle the feedback with `gh-review-comments`.
 4. Fix each failed check, flaky tests and failures already on the base branch
    included. Those fixes count as within the PR's scope; add each one beyond its
@@ -35,6 +36,7 @@ ones the user kept open, and nothing conflicts. List unresolved threads with the
 `gh-review-comments` fetch script and `--threads-only`. Unwatch every PR before
 you hand it over or stop. Hand the PR over with its link, what changed across
 rounds, fixes beyond its purpose, and what's left for the user, such as
-approvals, gated runs, reviewers, draft state, and merging. If a fresh progress
-agent finds the rounds going in circles, stop and report what's unresolved and
-what each round tried.
+approvals, gated runs, reviewers, draft state, and merging. If a round repeats a
+fix an earlier round tried for the same request or error, stop and report what's
+unresolved and what each round tried. Reruns of transient failures follow
+step 4.

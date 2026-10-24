@@ -39,10 +39,10 @@ it.
 3. Adjudicate every objection against the evidence. Merge duplicates. Accept and
    fix supported findings within scope; reject unsupported findings with a
    concrete reason. Keep a compact record in the conversation of each finding,
-   disposition, and verification. Resolve disagreements through source checks or
-   bounded experiments, not reviewer votes. If resolution requires missing
-   authority or a human decision, finish independent work and report the
-   blocker.
+   disposition, revision, and verification. Resolve disagreements through
+   source checks or bounded experiments, not reviewer votes. If resolution
+   requires missing authority or a human decision, finish independent work and
+   report the blocker.
 
 4. Run the checks appropriate to each accepted revision. Send the revised
    target, changes, verification results, and any rejection rationale back to
@@ -52,20 +52,17 @@ it.
    reviewers share a round.
 
 5. Finish when all assigned reviewers return `No material objection` for the
-   current target and required checks pass. Otherwise, after each round a fresh
-   read-only progress agent reads the objections, dispositions, and revisions so
-   far and decides whether another round can make progress. It doesn't judge the
-   objections themselves. Continue while another round has a concrete path to
-   resolve an objection or verify a revision. A high round count alone is not a
-   reason to stop.
+   current target and required checks pass. Otherwise, after each round, check
+   your record from step 3 for a stall: objections repeat without new evidence,
+   revisions cycle between equivalent alternatives, or further progress requires
+   unavailable evidence or a decision outside scope. Continue while another
+   round has a concrete path to resolve an objection or verify a revision. A
+   high round count alone is not a reason to stop.
 
-   The progress agent stops the loop when it is stalling: objections repeat
-   without new evidence, revisions cycle between equivalent alternatives, or
-   further progress requires unavailable evidence or a decision outside scope.
-   Report its reason why another round would not help, citing the unresolved
-   findings and attempts made. Honor any user-specified budget. Stalling,
-   exhausted budgets, unavailable reviewers, and unresolved disagreements are
-   not clean results.
+   On a stall, stop and report why another round would not help, citing the
+   unresolved findings and attempts made. Honor any user-specified budget.
+   Stalling, exhausted budgets, unavailable reviewers, and unresolved
+   disagreements are not clean results.
 
 ## Report
 

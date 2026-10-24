@@ -14,9 +14,8 @@ round and push once nothing is left to fix.
    review of `<base>...HEAD` in the worktree's absolute path with `pr-review`
    when it's installed and `code-review` when not, and tell the reviewer not to
    edit files. Answer the reviewer's questions yourself.
-2. A fresh subagent, without your reasoning, loads the `gh-review-comments`
-   skill and triages the findings with it. It decides instead of asking the
-   user, and there are no PR threads to reply to or resolve.
+2. Classify and challenge the findings with steps 2 and 3 of the
+   `gh-review-comments` skill, treating the change as one PR.
 3. Make the fixes, run the checks, and commit.
 4. Ask for a re-review with a new `delegate_task` call. Pass the original
    brief, every round's findings, the fixes, and the dismissals with their
