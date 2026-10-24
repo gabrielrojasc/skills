@@ -18,9 +18,11 @@ ask.
 3. Run `<SKILL_DIR>/scripts/glance <n>` and render its page with
    `html_render`. `n` counts threads waiting on my answer, approval, or action;
    `pendingRequestCount` misses plain questions.
-4. Lead with the most valuable thing for me to do now. Rank my calls by prod
-   impact, then deadline, then effort, each with its chat link and what it
-   needs. Then list what moved without me, and unchanged items one line each.
+4. Lead with the most valuable thing for me to do now. Rank my work calls by
+   prod impact, then deadline, then effort, each with its chat link and what it
+   needs. Give personal calls, those not tied to my job, their own group ranked
+   by deadline, so work never buries them. Then list what moved without me, and
+   unchanged items one line each.
    Keep `RV <repo>#<n>` review threads out of that ranking. Close with a table
    of them: the PR, whether its review waits on me to post, and the chat link.
 
