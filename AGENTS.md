@@ -34,7 +34,8 @@
 - Add a subagent step only for work the user-level `AGENTS.md` "Multi-agent
   work" section says to delegate. Keep sequential steps that share state in
   the main agent, and start one subagent per shared context, such as one
-  challenger per PR, not one per item.
+  challenger per PR, not one per item. Background:
+  [When to fold subagents into your main agent loop](https://claude.com/resources/articles/building-agents-when-to-fold-subagents-into-your-main-agent-loop).
 - Key every trigger and stop condition to something the agent can observe when
   it decides: the kind of task, a tool, or a fact in its record. "When you'll
   make 10+ tool calls" fails because the agent can't know the count beforehand.
