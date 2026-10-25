@@ -31,6 +31,14 @@
   keep them identical.
 - Choose model invocation only when the agent must discover the skill itself.
   Otherwise set `disable-model-invocation: true`.
+- Add a subagent step only for work the user-level `AGENTS.md` "Multi-agent
+  work" section says to delegate. Keep sequential steps that share state in
+  the main agent, and start one subagent per shared context, such as one
+  challenger per PR, not one per item.
+- Key every trigger and stop condition to something the agent can observe when
+  it decides: the kind of task, a tool, or a fact in its record. "When you'll
+  make 10+ tool calls" fails because the agent can't know the count beforehand.
+  When a stop rule compares rounds, have each round report what it compares.
 
 ## Change rules
 
