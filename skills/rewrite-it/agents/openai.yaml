@@ -1,0 +1,5 @@
+interface:
+  display_name: "Rewrite it"
+  short_description: "Rewrites text by my guidelines. Use when asked to rewrite text."
+policy:
+  allow_implicit_invocation: false

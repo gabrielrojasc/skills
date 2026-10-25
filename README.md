@@ -70,6 +70,9 @@ installation, updates, and lock tracking.
 - [`chief-of-staff`](skills/chief-of-staff/SKILL.md) tracks the user's open T3
   threads, opens each update with a GitHub stat panel from its `glance` script,
   and ranks what needs the user, with links to each chat.
+- [`rewrite-it`](skills/rewrite-it/SKILL.md) rewrites text the user points at
+  with the Writing section of the user's global `AGENTS.md`, and asks what to
+  rewrite when the user names nothing.
 
 Matt Pocock's skills cover general research, specification, implementation, TDD,
 architecture, and review. They are intentionally not copied here.
