@@ -1,0 +1,5 @@
+interface:
+  display_name: "Google Docs"
+  short_description: "Use when a task writes to a Google Doc."
+policy:
+  allow_implicit_invocation: true

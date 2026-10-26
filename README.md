@@ -81,6 +81,11 @@ installation, updates, and lock tracking.
 Matt Pocock's skills cover general research, specification, implementation, TDD,
 architecture, and review. They are intentionally not copied here.
 
+### Claude only
+
+- [`google-docs`](skills/claude/google-docs/SKILL.md) reads Google Docs through
+  Claude's Drive connector and hands writes, including tab edits, to Codex.
+
 ### ZeroFox
 
 - [`pr-review`](skills/zerofox/pr-review/SKILL.md) reviews PRs against
@@ -94,6 +99,7 @@ architecture, and review. They are intentionally not copied here.
 
 ```text
 skills/          General personal skills
+skills/claude/   Claude-only skills
 skills/zerofox/  ZeroFox-specific skills
 scripts/         Repository validation
 evals/           Claude Code and Codex eval harnesses
