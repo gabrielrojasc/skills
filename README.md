@@ -41,10 +41,13 @@ installation, updates, and lock tracking.
   GitHub review threads, top-level comments, and review bodies by default,
   handles routine fixes, replies, and resolutions on its own, and raises only
   the decisions that need the user's judgment.
-- [`babysit-pr`](skills/babysit-pr/SKILL.md) fixes review feedback and CI
-  failures in rounds through `gh-review-comments`, pushes once per round, and
-  hands the PR back when it's ready to merge, stuck, or has a decision for the
-  user.
+- [`babysit-pr`](skills/babysit-pr/SKILL.md) fixes review feedback and the CI
+  failures a PR causes in rounds through `gh-review-comments`, lists failures
+  already on the base as follow-ups, pushes once per round, and hands the PR
+  back as merge-ready, waiting on people, or blocked.
+- [`full-stop`](skills/full-stop/SKILL.md) takes a change to a merge-ready PR
+  while the user isn't watching: it proves the change, runs `cross-review`,
+  files the PR, runs `babysit-pr`, and leaves the merge to the user.
 - [`test-plan`](skills/test-plan/SKILL.md) lists the ways a feature could fail
   in prod, plans a check for each, probes which checks the agent's current
   access can run, and asks for the access the rest need.
@@ -60,7 +63,8 @@ installation, updates, and lock tracking.
 - [`cross-review`](skills/cross-review/SKILL.md) has the other agent review a
   code change through T3's `delegate_task`, triages the findings with
   `gh-review-comments`, fixes and commits each round, repeats until a round
-  leaves nothing to fix, and then pushes.
+  leaves nothing to fix within a budget of 3 rounds, or 5 for risky changes,
+  and then pushes and records the reviewer's verdict in the PR.
 - [`computer-use`](skills/computer-use/SKILL.md) drives the user's signed-in
   browser and native apps: Claude through Claude in Chrome, Codex through
   browser use and Computer Use, and Claude hands native apps to Codex.

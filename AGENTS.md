@@ -29,7 +29,9 @@
 - Copy a script into each skill that uses it, so every skill installs on its
   own. When you change a script, find same-named copies under `skills/` and
   keep them identical.
-- Choose model invocation only when the agent must discover the skill itself.
+- Choose model invocation only when the agent must discover the skill itself,
+  or when the user starts the workflow with a trigger phrase, such as
+  `full-stop`'s "full stop", so one request can chain several skills.
   Otherwise set `disable-model-invocation: true`.
 - Add a subagent step only for work the user-level `AGENTS.md` "Multi-agent
   work" section says to delegate. Keep sequential steps that share state in

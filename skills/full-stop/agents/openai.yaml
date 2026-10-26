@@ -1,0 +1,5 @@
+interface:
+  display_name: "Full Stop"
+  short_description: "Ships work to a merge-ready PR. Use when told 'full stop'."
+policy:
+  allow_implicit_invocation: true
