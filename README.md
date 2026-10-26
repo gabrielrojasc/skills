@@ -74,18 +74,9 @@ installation, updates, and lock tracking.
 - [`chief-of-staff`](skills/chief-of-staff/SKILL.md) tracks the user's open T3
   threads, opens each update with a GitHub stat panel from its `glance` script,
   and ranks what needs the user, with links to each chat.
-- [`rewrite-it`](skills/rewrite-it/SKILL.md) rewrites text the user points at
-  with the Writing section of the user's global `AGENTS.md`, and asks what to
-  rewrite when the user names nothing.
 
 Matt Pocock's skills cover general research, specification, implementation, TDD,
 architecture, and review. They are intentionally not copied here.
-
-### Claude only
-
-- [`google-docs`](skills/claude-only/google-docs/SKILL.md) reads Google Docs
-  through Claude's Drive connector and hands writes, including tab edits, to
-  Codex.
 
 ### ZeroFox
 
@@ -100,7 +91,6 @@ architecture, and review. They are intentionally not copied here.
 
 ```text
 skills/              General personal skills
-skills/claude-only/  Claude-only skills
 skills/zerofox/      ZeroFox-specific skills
 scripts/             Repository validation
 evals/               Claude Code and Codex eval harnesses
