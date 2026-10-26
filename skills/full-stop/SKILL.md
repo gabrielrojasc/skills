@@ -10,11 +10,8 @@ runs unattended: own the work from its current state to a PR the user can
 merge, and leave the merge to them. When the user only mentions the phrase,
 for example asking what it means, work normally instead.
 
-`<SKILL_DIR>` is this file's directory. Before step 1, check that
-`<SKILL_DIR>/../cross-review/SKILL.md`, `<SKILL_DIR>/../babysit-pr/SKILL.md`,
-and `<SKILL_DIR>/../pr/SKILL.md` exist, and report any that is missing
-instead of starting. Also confirm the Linear issue for the `ref:` footer the
-user-level Git rules require, and ask now if there is none.
+Before step 1, confirm the Linear issue for the `ref:` footer the user-level
+Git rules require, and ask now if there is none.
 
 1. Finish the change the user agreed to, and commit it.
 2. Prove it with the end-to-end check the user-level Testing rules ask for,
