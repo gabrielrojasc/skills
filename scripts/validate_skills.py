@@ -105,8 +105,8 @@ class Validator:
             self.fail(f"{name} must declare a single-line description")
         elif description.startswith(('"', "'")) or description.endswith(('"', "'")):
             self.fail(f"{name} description must be an unquoted YAML scalar")
-        elif not re.fullmatch(r".+\. Use when .+\.", description):
-            self.fail(f"{name} description must use '<what it does>. Use when <trigger>.'")
+        elif not re.fullmatch(r"Use when [^.]+(\.[^.\s][^.]*)*\.", description):
+            self.fail(f"{name} description must use 'Use when <trigger>.'")
         elif not 25 <= len(description) <= 64:
             self.fail(f"{name} description must be 25-64 characters")
         metadata_file = skill_dir / "agents" / "openai.yaml"

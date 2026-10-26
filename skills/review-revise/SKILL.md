@@ -1,6 +1,6 @@
 ---
 name: review-revise
-description: Reviews and revises. Use when adversarial loops are requested.
+description: Use when adversarial review loops are requested.
 ---
 
 # Review-revise

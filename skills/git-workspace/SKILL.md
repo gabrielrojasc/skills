@@ -1,6 +1,6 @@
 ---
 name: git-workspace
-description: Clones repos, manages worktrees. Use when tasks start or merge.
+description: Use when cloning repos or when tasks start or merge.
 ---
 
 # Git workspace

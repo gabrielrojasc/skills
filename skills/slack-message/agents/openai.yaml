@@ -1,5 +1,5 @@
 interface:
   display_name: "Slack message"
-  short_description: "Writes Slack messages. Use when drafting a Slack message."
+  short_description: "Use when drafting a Slack message."
 policy:
   allow_implicit_invocation: false

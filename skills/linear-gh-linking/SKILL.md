@@ -1,6 +1,6 @@
 ---
 name: linear-gh-linking
-description: Defines Linear links. Use when starting work or linking PRs.
+description: Use when starting Linear work or linking its PRs.
 ---
 
 # Linear GitHub linking

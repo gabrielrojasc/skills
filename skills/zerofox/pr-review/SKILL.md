@@ -1,6 +1,6 @@
 ---
 name: pr-review
-description: Reviews GitHub PRs. Use when reviewing a PR.
+description: Use when reviewing a GitHub PR.
 ---
 
 # PR review

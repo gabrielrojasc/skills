@@ -1,6 +1,6 @@
 ---
 name: linear-work-breakdown
-description: Structures Linear work. Use when planning levels or tickets.
+description: Use when planning Linear levels or tickets.
 ---
 
 # Linear work breakdown

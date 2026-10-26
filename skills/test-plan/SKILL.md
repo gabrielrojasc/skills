@@ -1,6 +1,6 @@
 ---
 name: test-plan
-description: Plans pre-prod checks. Use when a feature is ready to ship.
+description: Use when a feature is ready for pre-prod checks.
 disable-model-invocation: true
 ---
 

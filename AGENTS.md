@@ -17,10 +17,12 @@
   `skills/zerofox/`.
 - Give every skill a `SKILL.md` whose frontmatter name matches its directory.
 - Add `agents/openai.yaml` for Codex display metadata and invocation policy.
-- Write each description as a compact, unquoted, single-line `<what it does>.
-  Use when <trigger>.` entrypoint. Keep the `SKILL.md` description and
-  `agents/openai.yaml` `interface.short_description` identical so agents receive
-  the same capability and trigger from either source.
+- Write each description as one compact, unquoted `Use when <trigger>.`
+  sentence. Name the domain in the trigger, such as "Linear work" or "a
+  GitHub PR", since no summary of what the skill does precedes it. Keep the
+  `SKILL.md` description and `agents/openai.yaml`
+  `interface.short_description` identical so agents receive the same trigger
+  from either source.
 - Keep ordered agent steps in `SKILL.md`. Move branch-specific reference
   material behind a direct pointer under `references/`.
 - Put repeatable mechanics in `scripts/`. Keep cross-task policy in the
@@ -56,10 +58,14 @@
 - Run `scripts/validate-skills.sh` after changing skills, metadata, or scripts.
 - When you add, rename, or change the description or invocation policy of a
   model-invoked skill, keep its link in `evals/triggers/skills/` and its cases
-  in `evals/triggers/evals/` current, then run
+  in `evals/triggers/evals/` current, then propose running
   `evals/triggers/run-evals.sh --case '*<name>*'`.
-- Run every eval in both Claude Code and Codex, and report both tools' results.
-  A result from one tool doesn't stand in for the other.
+- Treat every eval run as a gate. Show the command and the cases it covers,
+  and start it only after the user approves that run. An approval covers one
+  run: a rerun, a wider case set, or a fallback for a tool that failed each
+  needs its own approval, even later in the same session.
+- Run every approved eval in both Claude Code and Codex, and report both tools'
+  results. A result from one tool doesn't stand in for the other.
 - Preserve approval gates for external writes and for removing worktrees or
   deleting branches that hold unmerged work.
 - Do not change global installations, global agent guidance, or external

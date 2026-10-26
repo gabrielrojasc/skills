@@ -1,6 +1,6 @@
 ---
 name: gh-review-comments
-description: Triages PR review comments. Use when addressing PR feedback.
+description: Use when addressing PR review feedback.
 ---
 
 # GitHub review comment triage

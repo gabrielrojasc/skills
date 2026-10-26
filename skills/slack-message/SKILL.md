@@ -1,6 +1,6 @@
 ---
 name: slack-message
-description: Writes Slack messages. Use when drafting a Slack message.
+description: Use when drafting a Slack message.
 disable-model-invocation: true
 ---
 

@@ -16,7 +16,7 @@ SPEC = importlib.util.spec_from_file_location(
 )
 validator = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(validator)
-DESCRIPTION = "Checks sample skills. Use when testing the validator."
+DESCRIPTION = "Use when testing the validator."
 METADATA = (
     'interface:\n  display_name: "Sample"\n'
     f'  short_description: "{DESCRIPTION}"\n'
@@ -106,16 +106,26 @@ def test_duplicate_names_across_categories_are_rejected(repo):
 
 
 @pytest.mark.parametrize("description, expected", [
-    ("x. Use when y.", "25-64 characters"),
-    ("x" * 65 + ". Use when testing.", "25-64 characters"),
+    ("Use when x.", "25-64 characters"),
+    ("Use when " + "x" * 60 + ".", "25-64 characters"),
     ("Missing the trigger sentence.", "must use"),
-    ('"Quoted. Use when testing the validator."', "unquoted"),
-    ("Different description. Use when testing this.", "description differs"),
+    ("Checks sample skills. Use when testing the validator.", "must use"),
+    ("Use when testing the validator. Then report.", "must use"),
+    ('"Use when testing the validator."', "unquoted"),
+    ("Use when testing something else.", "description differs"),
 ])
 def test_description_length_shape_and_metadata_match(repo, description, expected):
     write(repo, "skills/sample/SKILL.md", f"---\nname: sample\ndescription: {description}\n---\n")
     git(repo, "add", ".")
     assert_invalid(repo, expected)
+
+
+def test_description_allows_dots_inside_words(repo):
+    description = "Use when editing a .md file."
+    write(repo, "skills/sample/SKILL.md", f"---\nname: sample\ndescription: {description}\n---\n")
+    write(repo, "skills/sample/agents/openai.yaml", METADATA.replace(DESCRIPTION, description))
+    git(repo, "add", ".")
+    assert validate(repo) == (0, ""), "a dot inside a word is not a second sentence"
 
 
 def test_invocation_policy(repo):

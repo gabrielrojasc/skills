@@ -1,6 +1,6 @@
 ---
 name: cross-review
-description: Cross-model review loop. Use when the other agent should review.
+description: Use when the other agent should review.
 disable-model-invocation: true
 ---
 

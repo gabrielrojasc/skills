@@ -1,6 +1,6 @@
 ---
 name: babysit-pr
-description: Drives PRs to merge-ready. Use when babysitting a PR.
+description: Use when babysitting a PR.
 disable-model-invocation: true
 ---
 
@@ -17,8 +17,8 @@ state. This skill runs unattended. A stack runs as one loop, bottom up.
    `--status waiting` lists. Leave gated checks to the user; they are neither
    pending nor failed.
 2. At the start of each round, read `isInMergeQueue` and `autoMergeRequest`
-   with `gh api graphql`. If either is set, raise it and hold the round until
-   the user answers.
+   with `gh api graphql`. If either is set and the user hasn't answered for
+   this PR yet, raise it and hold the round until they do.
 3. Give each round a fresh subagent that runs steps 4 to 7 and returns the head
    and base SHAs it ended on, each fix it attempted, with the thread or failing
    check and the request or error it addressed, and raised items as

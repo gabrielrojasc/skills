@@ -1,6 +1,6 @@
 ---
 name: full-stop
-description: Ships work to a merge-ready PR. Use when told 'full stop'.
+description: Use when told 'full stop'.
 ---
 
 # Full stop

@@ -1,5 +1,5 @@
 interface:
   display_name: "Chief of staff"
-  short_description: "Tracks my T3 threads. Use when acting as my chief of staff."
+  short_description: "Use when acting as my chief of staff."
 policy:
   allow_implicit_invocation: false

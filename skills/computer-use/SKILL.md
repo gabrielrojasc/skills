@@ -1,6 +1,6 @@
 ---
 name: computer-use
-description: Drives signed-in sites and Mac apps. Use when a task needs one.
+description: Use when a task needs a signed-in site or a Mac app.
 ---
 
 # Computer use

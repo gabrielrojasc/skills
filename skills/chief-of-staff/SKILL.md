@@ -1,6 +1,6 @@
 ---
 name: chief-of-staff
-description: Tracks my T3 threads. Use when acting as my chief of staff.
+description: Use when acting as my chief of staff.
 disable-model-invocation: true
 ---
 

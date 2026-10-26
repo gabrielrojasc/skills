@@ -1,6 +1,6 @@
 ---
 name: rewrite-it
-description: Rewrites text by my guidelines. Use when asked to rewrite text.
+description: Use when asked to rewrite text.
 disable-model-invocation: true
 ---
 

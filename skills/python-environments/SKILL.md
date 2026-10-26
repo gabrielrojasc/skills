@@ -1,6 +1,6 @@
 ---
 name: python-environments
-description: Manages Python venvs. Use when running Python tests or installs.
+description: Use when running Python tests or installs.
 ---
 
 # Python environments
