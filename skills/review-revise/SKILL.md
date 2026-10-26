@@ -5,67 +5,64 @@ description: Use when adversarial review loops are requested.
 
 # Review-revise
 
-Run an adversarial review of code, prose, plans, or recommendations. Use when
-invoked by name or when the user explicitly asks for an adversarial
-review-revise loop. Ordinary review or implementation requests do not trigger
-it.
+Have independent reviewers attack a piece of work, such as code, prose, or a
+plan, and revise it until no reviewer has a material objection or the loop
+stalls. A skill that runs this loop, such as `cross-review`, may set the
+reviewer, the budget, and additions to the brief.
 
-## Workflow
+## Set up
 
-1. Establish the target, requirements, evidence, and authorized edits from the
-   current task. A review-only request permits revising the assessment or
-   proposed patch, not changing the underlying artifact. Default to one
-   reviewer with no fixed round limit. Honor explicit reviewer counts and
-   user-specified budgets. State the reviewer count and any explicit budget
-   briefly before dispatch.
+Name the target, its requirements, and what you may edit. A review-only request
+lets you revise your assessment or proposed patch, not the work itself. Use one
+reviewer and no round limit unless the user or the calling skill sets them, and
+state both before the first round.
 
-2. Dispatch independent, read-only subagents. Give each the target or exact
-   revision, requirements, constraints, relevant source locations, and one
-   bounded review assignment. With multiple reviewers, assign distinct concerns
-   that together cover the target. Let them inspect source evidence
-   independently of the author's rationale. Reviewers must not edit, publish,
-   or delegate further. If delegation is unavailable, report the limitation;
-   self-review does not satisfy this workflow.
+## Review
 
-   Use this brief, adapted to the assignment:
+Start read-only subagents that don't edit, publish, or start subagents. Give
+each the target at an exact revision, its requirements and constraints, the
+source locations, and one assignment. With several reviewers, split the
+concerns so together they cover the target. If you can't start a subagent,
+report that; reviewing your own work doesn't count.
 
-   > Find material reasons this work fails its requirements. Check assumptions,
-   > edge cases, and unnecessary complexity against source evidence. Return each
-   > objection with its location, consequence, evidence or counterexample, and
-   > smallest adequate correction. Separate unresolved evidence gaps from
-   > demonstrated defects. Report `No material objection` if none remain.
-   > Finding a problem is not a quota; preference alone is not a defect.
+Adapt this brief:
 
-3. Adjudicate every objection against the evidence. Merge duplicates. Accept and
-   fix supported findings within scope; reject unsupported findings with a
-   concrete reason. Keep a compact record in the conversation of each finding,
-   disposition, revision, and verification. Resolve disagreements through
-   source checks or bounded experiments, not reviewer votes. If resolution
-   requires missing authority or a human decision, finish independent work and
-   report the blocker.
+> Find material reasons this work fails its requirements. Check assumptions,
+> edge cases, and needless complexity against the source. Return each
+> objection with its location, consequence, evidence or counterexample, and the
+> smallest correction that fixes it. Keep evidence gaps apart from shown
+> defects. Report `No material objection` if none remain. You don't need to
+> find a problem, and a preference isn't a defect.
 
-4. Run the checks appropriate to each accepted revision. Send the revised
-   target, changes, verification results, and any rejection rationale back to
-   the relevant reviewers. Ask them to verify dispositions and inspect for
-   regressions. Any reviewer whose assignment is affected must review the latest
-   revision. Count each review-and-response cycle as one round; parallel
-   reviewers share a round.
+## Adjudicate
 
-5. Finish when all assigned reviewers return `No material objection` for the
-   current target and required checks pass. Otherwise, after each round, check
-   your record from step 3 for a stall: objections repeat without new evidence,
-   revisions cycle between equivalent alternatives, or further progress requires
-   unavailable evidence or a decision outside scope. Continue while another
-   round has a concrete path to resolve an objection or verify a revision. A
-   high round count alone is not a reason to stop.
+Check every objection against the evidence and merge duplicates. Fix the
+supported ones within scope, and reject the rest with a concrete reason. Settle
+disagreements with a source check or a small experiment, not by vote. Keep a
+record in the conversation of each objection, its outcome, the revision, and
+its check. If an objection needs authority or a decision you don't have, finish
+the rest and report it.
 
-   On a stall, stop and report why another round would not help, citing the
-   unresolved findings and attempts made. Honor any user-specified budget.
-   Stalling, exhausted budgets, unavailable reviewers, and unresolved
-   disagreements are not clean results.
+## Next round
+
+Run the checks each revision needs. Send every reviewer whose assignment the
+revision touches the new revision, the changes, the check results, and your
+reason for each rejection, and ask it to confirm the outcomes and look for
+regressions. A round is one review and your response to it; parallel reviewers
+share a round.
+
+## Stop
+
+Finish when every reviewer returns `No material objection` on the current
+revision and the checks pass. Otherwise, after each round, check your record
+for a stall: an objection repeats without new evidence, revisions cycle between
+equivalent versions, or progress needs evidence or a decision you can't get.
+Keep going while another round has a concrete way to settle an objection; a
+high round count alone isn't a reason to stop. A stall, a spent budget, a
+missing reviewer, or an open disagreement isn't a clean result.
 
 ## Report
 
-Summarize the changes, checks, reviewer count, rounds used, and remaining
-objections or unverified changes. If the loop stalled, state "Stopped after
-<N> rounds because <specific reason>" and what would allow progress to resume.
+Report the changes, the checks, the reviewer count, the rounds, and any open
+objections or unverified changes. After a stall, write "Stopped after <N>
+rounds because <reason>" and what would let the loop continue.

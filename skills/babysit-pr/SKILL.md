@@ -24,17 +24,20 @@ state. This skill runs unattended. A stack runs as one loop, bottom up.
    `gh-review-comments` decision-pack blocks instead of asking. To ask the
    user, unwatch every PR, watch again once they answer, and pass the answers
    to that PR's next round.
-4. Handle the feedback with `gh-review-comments`.
+4. Handle the feedback with `gh-review-comments` up to its Push section, and
+   leave the push to step 7.
 5. Fix each failed check the PR causes. A check that also failed on the base
    head, as `gh api repos/<owner>/<repo>/commits/<base-sha>/check-runs` shows,
    is a follow-up: list it and leave it unfixed. Rerun a transient failure
    once, and raise it if it repeats. Raise a fix that changes a contract or
-   rests on an assumption, as `gh-review-comments` defines them.
+   rests on an assumption, as `gh-review-comments`' Decision pack defines
+   them.
 6. Rebase onto the base when the PR conflicts with it or `mergeStateStatus` is
    `BEHIND`. When nothing else is left, also rebase if base commits since the
    last round's base SHA touch files the PR changes. Raise a conflict whose
    resolution needs judgment.
-7. Push once, with the CI and feedback fixes together.
+7. Push once, with the CI and feedback fixes together, then finish
+   `gh-review-comments` from its Reply section.
 
 When `gh` reports the GraphQL rate limit is used up, wait in the background
 until the time `gh api rate_limit --jq .resources.graphql.reset` gives, then

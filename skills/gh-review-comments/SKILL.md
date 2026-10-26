@@ -6,10 +6,11 @@ description: Use when addressing PR review feedback.
 # GitHub review comment triage
 
 Classify feedback on one or more PRs, raise only what needs the user's
-judgment, and handle the rest without asking. `<SKILL_DIR>` is this file's
-directory.
+judgment, and handle the rest without asking. A skill that runs this one, such
+as `babysit-pr`, may take over the push and the question; follow its brief.
+`<SKILL_DIR>` is this file's directory.
 
-## 1. Fetch
+## Fetch
 
 Run `<SKILL_DIR>/scripts/fetch-pr-comments.py <pr>...`, or with no PR for the
 current branch's. It returns unresolved inline threads, conversation comments,
@@ -19,7 +20,7 @@ a thread's `comments.pageInfo.hasNextPage` is true, fetch the rest with
 and review bodies into concrete concerns, merge duplicates while keeping every
 source link, and treat praise and status summaries as context.
 
-## 2. Classify
+## Classify
 
 Read each PR's code in a local worktree on its branch, or fetch its head with
 `<SKILL_DIR>/scripts/fetch-source.sh <owner>/<repo> <head-sha> <dir>` into a
@@ -39,19 +40,16 @@ ownership, or the author's intent, check the PR body, its linked issue, and the
 conversation, and cite what settles it. Otherwise pick the best-supported call
 and state the assumption.
 
-## 3. Challenge the calls
+## Challenge the calls
 
-Once a PR's items are classified, start one background subagent for that PR
-that makes the strongest evidence-backed case against each call: missed
-callers, contracts, tests, or edge cases. Your own review doesn't replace it.
-Give it every numbered call and have it answer each by number. Revise each call
-an objection holds against, and send the revisions and your reasons for
-rejecting the other objections back to it. A call is settled when the
-challenger returns `No material objection` for it or repeats, without new
-evidence, an objection you already answered; mark the latter `Disputed:` with
-the deciding assumption. Continue until every call is settled.
+Once a PR's items are classified, run `review-revise` on its numbered calls in
+the background, with one reviewer for that PR. Brief it to make the strongest
+evidence-backed case against each call, such as a missed caller, contract,
+test, or edge case, and to answer each call by number. Your own review doesn't
+replace it. Mark a call `Disputed:` with the deciding assumption when the
+reviewer repeats an objection you already answered without new evidence.
 
-## 4. Decision pack
+## Decision pack
 
 Raise an item for the user's judgment when any of these holds; every other item
 is routine:
@@ -100,18 +98,24 @@ the proposed change, when it's an edit
 Ask about raised items in one question, and start on routine items without
 waiting for the answer.
 
-## 5. Act
+## Fix
 
 Routine items carry the user's standing approval; raised items need their
-answer. Do nothing beyond the two.
+answer. Do nothing beyond the two. Per PR, apply the fixes on one branch and
+run the covering checks once. Work on separate PRs in parallel, each in its own
+worktree.
 
-- Per PR, apply the fixes on one branch and run the covering checks once; work
-  on separate PRs in parallel, each in its own worktree.
-- Push each PR once, after all its items are settled, so bots re-review once.
-- Then reply, react, and resolve Fix, Already addressed, and routine Dismiss
-  threads, without waiting for CI. Resolve a thread only once its reply
-  mutation returned the comment's `url`. Leave partial or disputed threads
-  open, and resolve a raised Dismiss only when the user said so.
+## Push
+
+Push each PR once, after all its items are settled, so bots re-review once.
+
+## Reply
+
+- Reply, react, and resolve Fix, Already addressed, and routine Dismiss
+  threads against the pushed head, without waiting for CI. Resolve a thread
+  only once its reply mutation returned the comment's `url`. Leave partial or
+  disputed threads open, and resolve a raised Dismiss only when the user said
+  so.
 - Mutations: `addPullRequestReviewThreadReply` to reply in a thread,
   `resolveReviewThread` with the thread's `id` from the fetch output,
   `gh pr comment --body-file` for a top-level answer (a new comment that links

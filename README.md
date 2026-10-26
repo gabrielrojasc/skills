@@ -59,12 +59,12 @@ installation, updates, and lock tracking.
   repository's dependency workflow.
 - [`review-revise`](skills/review-revise/SKILL.md) runs adversarial
   review-revise loops with independent reviewers until findings are resolved or
-  the loop stalls.
-- [`cross-review`](skills/cross-review/SKILL.md) has the other agent review a
-  code change through T3's `delegate_task`, triages the findings with
-  `gh-review-comments`, fixes and commits each round, repeats until a round
-  leaves nothing to fix within a budget of 3 rounds, or 5 for risky changes,
-  and then pushes and records the reviewer's verdict in the PR.
+  the loop stalls. `cross-review` and `gh-review-comments` run on it.
+- [`cross-review`](skills/cross-review/SKILL.md) runs `review-revise` with the
+  other agent as reviewer through T3's `delegate_task`, fixes and commits each
+  round, repeats until a round leaves nothing to fix within a budget of 3
+  rounds, or 5 for risky changes, and then pushes and records the reviewer's
+  verdict in the PR.
 - [`computer-use`](skills/computer-use/SKILL.md) drives the user's signed-in
   browser and native apps: Claude through Claude in Chrome, Codex through
   browser use and Computer Use, and Claude hands native apps to Codex.

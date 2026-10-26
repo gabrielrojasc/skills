@@ -24,9 +24,10 @@ Git rules require, and ask now if there is none.
 5. Run `babysit-pr` until it reports an end state.
 6. When babysitting changed behavior after the last proof or review and
    `cross-review`'s budget has a round left, prove it again, run
-   `babysit-pr`'s step 2 check, run one more `cross-review` round scoped by its
-   step 4, update the verdict line, and return to step 5. When the budget is
-   spent, set the verdict to `incomplete` and hand off.
+   `babysit-pr`'s merge-queue check, run one more `cross-review` round scoped
+   as its Re-review section says, update the verdict line, and return to
+   step 5. When the budget is spent, set the verdict to `incomplete` and hand
+   off.
 
 Ask only when you can't prove the change, the goal is ambiguous in a way that
 changes the result, or the next step is a one-way door. Decide the rest
