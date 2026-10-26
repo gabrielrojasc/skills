@@ -83,8 +83,9 @@ architecture, and review. They are intentionally not copied here.
 
 ### Claude only
 
-- [`google-docs`](skills/claude/google-docs/SKILL.md) reads Google Docs through
-  Claude's Drive connector and hands writes, including tab edits, to Codex.
+- [`google-docs`](skills/claude-only/google-docs/SKILL.md) reads Google Docs
+  through Claude's Drive connector and hands writes, including tab edits, to
+  Codex.
 
 ### ZeroFox
 
@@ -98,11 +99,11 @@ architecture, and review. They are intentionally not copied here.
 ## Repository layout
 
 ```text
-skills/          General personal skills
-skills/claude/   Claude-only skills
-skills/zerofox/  ZeroFox-specific skills
-scripts/         Repository validation
-evals/           Claude Code and Codex eval harnesses
+skills/              General personal skills
+skills/claude-only/  Claude-only skills
+skills/zerofox/      ZeroFox-specific skills
+scripts/             Repository validation
+evals/               Claude Code and Codex eval harnesses
 ```
 
 ## Development
