@@ -10,6 +10,24 @@
 - Keep project-specific skills in the project that owns their assumptions and
   tooling.
 
+## Where each rule goes
+
+The user runs these skills from repositories under `~/git`, not from here. A
+rule reaches a session only through a file that session loads:
+
+| Rule | File | Loaded |
+|---|---|---|
+| Cross-task policy: Doors, Writing, Git, Linear defaults | user-level `AGENTS.md` (`~/.codex/AGENTS.md`, imported by `~/.claude/CLAUDE.md`) | every session |
+| A workflow, its gates, and what it expects from the skills it calls | the skill's `SKILL.md` or `references/` | each session that loads the skill |
+| How to write, validate, and evaluate skills | this file | only while editing this repository |
+| Team Linear workflow | `riskive/ai-tooling` plugin, and this repository's copies for machines without it | each session that loads the skill |
+
+- Put no rule an agent needs while running a skill in this file; those
+  sessions never read it.
+- Don't restate a user-level rule in a skill, since both load together. Name
+  it only to narrow or extend it, as `pr-review` does with its standing
+  permission to approve.
+
 ## Skill structure
 
 - Put each installable skill under `skills/<name>/` or
@@ -25,9 +43,7 @@
   from either source.
 - Keep ordered agent steps in `SKILL.md`. Move branch-specific reference
   material behind a direct pointer under `references/`.
-- Put repeatable mechanics in `scripts/`. Keep cross-task policy in the
-  user-level `AGENTS.md` and domain-specific workflow in the skill that triggers
-  it.
+- Put repeatable mechanics in `scripts/`.
 - Copy a script into each skill that uses it, so every skill installs on its
   own. When you change a script, find same-named copies under `skills/` and
   keep them identical.
@@ -35,6 +51,11 @@
   by their triggers, as in "take it over, full stop". When a related task
   shouldn't start the skill, as with one that pushes or runs unattended, key
   the trigger to an explicit request: "Use when asked to babysit a GitHub PR."
+- A skill that another skill runs leaves the push and the questions to the
+  user to its caller when the caller asks. The caller names the sections to
+  skip and finishes them itself, so one round pushes once.
+- Refer to another skill's steps by section heading or by what they do, not
+  by step number, so renumbering one skill doesn't break another.
 - Add a subagent step only for work the user-level `AGENTS.md` "Multi-agent
   work" section says to delegate. Keep sequential steps that share state in
   the main agent, and start one subagent per shared context, such as one
