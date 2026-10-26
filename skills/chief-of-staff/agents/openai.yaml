@@ -1,5 +1,5 @@
 interface:
   display_name: "Chief of staff"
-  short_description: "Use when acting as my chief of staff."
+  short_description: "Use when asked for chief-of-staff updates in T3."
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

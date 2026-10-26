@@ -2,4 +2,4 @@ interface:
   display_name: "Rewrite it"
   short_description: "Use when asked to rewrite text."
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

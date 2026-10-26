@@ -1,7 +1,6 @@
 ---
 name: chief-of-staff
-description: Use when acting as my chief of staff.
-disable-model-invocation: true
+description: Use when asked for chief-of-staff updates in T3.
 ---
 
 # Chief of staff

@@ -1,5 +1,5 @@
 interface:
   display_name: "Babysit PR"
-  short_description: "Use when babysitting a PR."
+  short_description: "Use when asked to babysit a GitHub PR."
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

@@ -1,5 +1,5 @@
 interface:
   display_name: "Cross-review"
-  short_description: "Use when the other agent should review."
+  short_description: "Use when asked to cross-review and fix a change."
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

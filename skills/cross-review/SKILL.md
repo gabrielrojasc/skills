@@ -1,7 +1,6 @@
 ---
 name: cross-review
-description: Use when the other agent should review.
-disable-model-invocation: true
+description: Use when asked to cross-review and fix a change.
 ---
 
 # Cross-review

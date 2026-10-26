@@ -1,7 +1,6 @@
 ---
 name: babysit-pr
-description: Use when babysitting a PR.
-disable-model-invocation: true
+description: Use when asked to babysit a GitHub PR.
 ---
 
 # Babysit PR

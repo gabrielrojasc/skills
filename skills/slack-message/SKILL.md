@@ -1,7 +1,6 @@
 ---
 name: slack-message
 description: Use when drafting a Slack message.
-disable-model-invocation: true
 ---
 
 # Slack message
