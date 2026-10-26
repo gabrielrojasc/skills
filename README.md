@@ -50,7 +50,8 @@ installation, updates, and lock tracking.
   files the PR, runs `babysit-pr`, and leaves the merge to the user.
 - [`test-plan`](skills/test-plan/SKILL.md) lists the ways a feature could fail
   in prod, plans a check for each, probes which checks the agent's current
-  access can run, and asks for the access the rest need.
+  access can run, and asks for the access the rest need. It replies with a
+  Mermaid diagram of risks and checks and writes the details to a file.
 - [`developer-documentation-style`](skills/developer-documentation-style/SKILL.md)
   reads the live Google guide before writing, editing, or reviewing developer
   documentation.
