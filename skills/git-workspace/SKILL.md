@@ -1,6 +1,6 @@
 ---
 name: git-workspace
-description: Use when cloning repos or when tasks start or merge.
+description: Use when Git repos need cloning, sync, task setup, or cleanup.
 ---
 
 # Git workspace
