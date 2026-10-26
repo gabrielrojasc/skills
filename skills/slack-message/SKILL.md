@@ -5,8 +5,6 @@ description: Use when drafting a Slack message.
 
 # Slack message
 
-Apply the `unslop` skill and the Writing section of my `AGENTS.md`.
-
 Format text I'll paste into Slack with Slack markup:
 
 - `*bold*`, `_italic_`, `~strike~`
