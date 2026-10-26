@@ -179,8 +179,9 @@ than a blocker needs a consequence of leaving it as is:
 A finding with a consequence is reported however small. A true observation
 without one goes in the notes, with preferences, equally valid alternatives, and
 speculative benefits. "Cleaner", "could be shorter", "the precedent does it the
-other way", or log volume alone is not a consequence. Documentation lost by
-deletion is tested by the documentation guidance instead.
+other way", style that hides no bug, or log volume alone is not a
+consequence. Documentation lost by deletion is tested by the documentation
+guidance instead.
 
 Allow no unnecessary code or prose in any PR: redundant wrappers, speculative
 abstractions, duplicated state, needless configuration, custom logic that an
@@ -196,10 +197,16 @@ When a broken standards rule is the only consequence, the draft cites the doc
 and line, names the change, and says nothing else.
 
 The correction preserves required behavior, useful information, contracts, and
-conventions, and stays local and proportionate. Missing evidence is a
-verification gap, not proof of redundancy. Apart from pre-existing findings and
-deciding questions, only mechanical local cleanup is nonblocking; every other
-finding blocks. A deciding question asks for a fact only the author has, such
+conventions, and stays local and proportionate. It deletes or narrows code
+before adding a lock, cache, helper, or option. Missing evidence is a
+verification gap, not proof of redundancy.
+
+Apart from pre-existing findings and deciding questions, two kinds of finding
+don't block: mechanical local cleanup, and a defect that shows only on a path
+outside the PR's purpose, in a rare case, or as a small performance cost,
+unless it breaks an existing caller or risks security or stored data. Every
+other finding blocks. Nonblocking findings don't add up to a block, however
+many there are. A deciding question asks for a fact only the author has, such
 as intent or a deployment constraint, without which you can't tell whether the
 PR is acceptable. Don't ask about a design preference or an option the PR body
 already weighed; when the body accepts a defect, report the defect.
@@ -226,7 +233,8 @@ already weighed; when the body accepts a defect, report the defect.
    the author is senior or the fix is obvious.
 6. Start every draft with its [Conventional Comments](https://conventionalcomments.org/)
    label: `issue (blocking):`, `nitpick (non-blocking):` for mechanical local
-   cleanup, `issue (non-blocking, pre-existing):`, or `question:` for a deciding
+   cleanup, `suggestion (non-blocking):` for a defect the finding bar limits,
+   `issue (non-blocking, pre-existing):`, or `question:` for a deciding
    question.
 7. Write the result with headings `## Target head`, `## Verdict` (APPROVE,
    COMMENT, or REQUEST_CHANGES with one line of reasoning), `## Comment drafts`
@@ -269,9 +277,9 @@ rounds](references/verify-rounds.md) before triage.
 
 Group confirmed findings across axes that share the problem and the fix, then
 set the event from them, pre-existing ones excluded: `REQUEST_CHANGES` for a
-blocker or more than 3 nitpicks; otherwise `COMMENT` for a deciding question,
-or `APPROVE`. Refuted and dropped drafts, with
-their reasons, and the reviewers' notes go in `triage.md`.
+blocker; otherwise `COMMENT` for a deciding question, or `APPROVE`. Refuted
+and dropped drafts, with their reasons, and the reviewers' notes go in
+`triage.md`.
 
 ## Triage
 
@@ -348,8 +356,7 @@ their reasons, and the reviewers' notes go in `triage.md`.
 ## Submit
 
 Assemble `final-review.md` with the event, kept inline comments in order, kept
-+1s, and a body only for unanchored findings or when the nitpick count alone
-requires changes; then the body says the set needs fixing before merge.
++1s, and a body only for unanchored findings.
 
 A review with no kept findings is an `APPROVE` package, never a `COMMENT`, even
 under an instruction to post only `COMMENT` reviews; don't offer one either.
