@@ -14,17 +14,17 @@ The budget is 3 review rounds, or 5 when the change touches authentication,
 authorization, secrets, deletion of stored data, or concurrency.
 
 1. Call `delegate_task` with the other provider at the chosen rung. Ask for a
-   review of `<base>...HEAD` in the worktree's absolute path with `pr-review`
-   when it's installed and `code-review` when not, and tell the reviewer not to
-   edit files. Have it label each finding against the change's intent:
-   `blocker` when the intended case is wrong, `should` for a bug callers will
-   hit, and `nit` for the rest, with security and data-loss findings at least
-   `should`. Have it end with `VERDICT: APPROVE` or `VERDICT: CHANGES`. Record
-   the round's head and base SHAs. Answer the reviewer's questions yourself.
+   review of `<base>...HEAD` in the worktree's absolute path against the
+   change's intent, and tell the reviewer not to edit files. Have it start each
+   finding with a Conventional Comments label: `issue (blocking):` for a
+   defect, security and data-loss risks included, `nitpick (non-blocking):` for
+   mechanical cleanup, or `question:`. Have it end with `VERDICT: APPROVE` or
+   `VERDICT: CHANGES`. Record the round's head and base SHAs. Answer the
+   reviewer's questions yourself.
 2. Classify and challenge the findings with steps 2 and 3 of the
    `gh-review-comments` skill, treating the change as one PR.
 3. Make the fixes, run the checks, and commit.
-4. When this round fixed anything beyond nits and comment, doc, or format
+4. When this round fixed anything beyond nitpicks and comment, doc, or format
    changes, and the budget allows, ask for a re-review with a new
    `delegate_task` call. Pass the original brief, every round's findings, the
    fixes, and the dismissals with their reasons. Scope it to the commits since
@@ -32,7 +32,7 @@ authorization, secrets, deletion of stored data, or concurrency.
    `<base>...HEAD` when the base SHA changed since that review. Repeat from
    step 2.
 
-When the budget runs out with a `blocker` or `should` open, or the loop goes in
+When the budget runs out with an `issue (blocking)` open, or the loop goes in
 circles, stop without pushing and report what's unresolved; running out of
 rounds isn't approval. Otherwise push.
 
