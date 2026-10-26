@@ -28,9 +28,10 @@ all at once. Each item is:
 
 - **Fix:** a real defect, missing behavior, contract mismatch, test gap, or
   maintainability problem worth changing. Nits count when the change genuinely
-  improves the code.
+  improves the code and stays within the PR's purpose.
 - **Dismiss:** incorrect, stale, out of scope, or outweighed by an existing
-  constraint.
+  constraint. List a valid nit beyond the PR's purpose as a follow-up in your
+  report.
 - **Already addressed:** the code already handles it.
 
 When the code can't settle a call, as with product behavior, preference,
@@ -58,7 +59,8 @@ is routine:
 - It rests on an assumption: it is `Disputed:` or nothing cited settles it.
 - It changes a contract or scope: user-visible behavior, a public API, config,
   stored data, a dependency, or work beyond the PR's purpose.
-- It dismisses or only partly accepts a human's comment.
+- It dismisses or only partly accepts a human's comment, other than a nit
+  listed as a follow-up.
 
 Give each raised item a full block so the user can decide without opening a
 link, then list routine items one line each. Number items across PRs:
@@ -107,8 +109,9 @@ answer. Do nothing beyond the two.
   on separate PRs in parallel, each in its own worktree.
 - Push each PR once, after all its items are settled, so bots re-review once.
 - Then reply, react, and resolve Fix, Already addressed, and routine Dismiss
-  threads, without waiting for CI. Leave partial or disputed threads open, and
-  resolve a raised Dismiss only when the user said so.
+  threads, without waiting for CI. Resolve a thread only once its reply
+  mutation returned the comment's `url`. Leave partial or disputed threads
+  open, and resolve a raised Dismiss only when the user said so.
 - Mutations: `addPullRequestReviewThreadReply` to reply in a thread,
   `resolveReviewThread` with the thread's `id` from the fetch output,
   `gh pr comment --body-file` for a top-level answer (a new comment that links
