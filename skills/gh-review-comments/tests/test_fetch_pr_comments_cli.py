@@ -52,9 +52,15 @@ class FeedbackTests(unittest.TestCase):
                 )
             return {"data": {"repository": {"pullRequest": pr}}}
 
+        def thread_comments_page(thread_id, cursor):
+            self.assertEqual(cursor, "comment-100", "paging resumes at the thread's end cursor")
+            return {"nodes": [{"id": "comment-101"}],
+                    "pageInfo": {"hasNextPage": False, "endCursor": None}}
+
         output = io.StringIO()
         with patch.object(sys, "argv", ["fetch-pr-comments.py", "owner/repo#1", *flags]), \
                 patch.object(fetch, "graphql", side_effect=graphql), \
+                patch.object(fetch, "thread_comments_page", side_effect=thread_comments_page), \
                 contextlib.redirect_stdout(output):
             self.assertEqual(fetch.main(), 0)
         return json.loads(output.getvalue())["pull_requests"][0], calls
@@ -86,13 +92,14 @@ class FeedbackTests(unittest.TestCase):
         result, _ = self.run_cli("--include-context")
         self.assertTrue(result["context_included"])
 
-    def test_incomplete_thread_history_is_visible_in_both_modes(self):
+    def test_long_thread_history_is_completed_in_both_modes(self):
         for flags in [(), ("--threads-only",)]:
             with self.subTest(flags=flags):
                 result, _ = self.run_cli(*flags)
-                page = result["review_threads"][0]["comments"]["pageInfo"]
-                self.assertTrue(page["hasNextPage"])
-                self.assertEqual(page["endCursor"], "comment-100")
+                comments = result["review_threads"][0]["comments"]
+                self.assertFalse(comments["pageInfo"]["hasNextPage"], "no page is left unfetched")
+                self.assertEqual([c["id"] for c in comments["nodes"]],
+                                 ["first-comment", "comment-101"], "later pages follow the first")
 
 
 if __name__ == "__main__":

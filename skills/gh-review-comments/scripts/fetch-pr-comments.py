@@ -77,6 +77,30 @@ query(
 }
 """
 
+THREAD_COMMENTS_QUERY = """\
+query($threadId: ID!, $cursor: String!) {
+  node(id: $threadId) {
+    ... on PullRequestReviewThread {
+      comments(first: 100, after: $cursor) {
+        pageInfo { hasNextPage endCursor }
+        nodes {
+          id
+          url
+          body
+          createdAt
+          updatedAt
+          path
+          line
+          originalLine
+          diffHunk
+          author { login __typename }
+        }
+      }
+    }
+  }
+}
+"""
+
 CONTEXT_QUERY = """\
 query(
   $owner: String!,
@@ -247,6 +271,24 @@ def graphql(owner: str, repo: str, number: int, query: str, variables: dict[str,
     return run_json(cmd, stdin=query)
 
 
+def thread_comments_page(thread_id: str, cursor: str) -> dict[str, Any]:
+    payload = run_json(
+        ["gh", "api", "graphql", "-F", "query=@-", "-F", f"threadId={thread_id}", "-F", f"cursor={cursor}"],
+        stdin=THREAD_COMMENTS_QUERY,
+    )
+    if payload.get("errors"):
+        raise RuntimeError(json.dumps(payload["errors"], indent=2))
+    return payload["data"]["node"]["comments"]
+
+
+def complete_thread_comments(thread: dict[str, Any]) -> None:
+    page = thread.get("comments")
+    while page and page_info(page):
+        next_page = thread_comments_page(thread["id"], page_info(page))
+        page["nodes"].extend(next_page["nodes"])
+        page["pageInfo"] = next_page["pageInfo"]
+
+
 def extend_unique(target: list[dict[str, Any]], seen: set[str], nodes: list[dict[str, Any]]) -> None:
     for node in nodes:
         node_id = str(node.get("id") or "")
@@ -322,6 +364,8 @@ def fetch_pr(owner: str, repo: str, number: int, include_context: bool, include_
 
     unresolved_threads = [thread for thread in threads if not thread.get("isResolved")]
     selected_threads = threads if include_resolved else unresolved_threads
+    for thread in selected_threads:
+        complete_thread_comments(thread)
 
     return {
         "pull_request": pr_meta,

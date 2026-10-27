@@ -125,3 +125,48 @@ def test_graphql_sends_typed_booleans_including_false(monkeypatch):
     assert "reviewsCursor=next-page" in fields
     assert not any(field.startswith("commentsCursor=") for field in fields)
     assert stdin == fetch.CONTEXT_QUERY
+
+
+def comments_page(ids, next_cursor=None):
+    return {
+        "nodes": [{"id": i} for i in ids],
+        "pageInfo": {"hasNextPage": next_cursor is not None, "endCursor": next_cursor},
+    }
+
+
+def test_long_thread_comments_are_paged_to_the_end(monkeypatch):
+    def graphql(owner, repo, number, query, variables):
+        pr = {
+            "id": "pr1", "number": number, "url": "u", "title": "t",
+            "state": "OPEN", "isDraft": False, "reviewDecision": None,
+            "reviewThreads": {
+                "nodes": [
+                    {"id": "long", "isResolved": False, "comments": comments_page(["c0"], "1")},
+                    {"id": "short", "isResolved": False, "comments": comments_page(["s0"])},
+                ],
+                "pageInfo": {"hasNextPage": False, "endCursor": None},
+            },
+        }
+        return {"data": {"repository": {"pullRequest": pr}}}
+
+    calls = []
+    pages = {"1": comments_page(["c1"], "2"), "2": comments_page(["c2"])}
+
+    def thread_comments_page(thread_id, cursor):
+        calls.append((thread_id, cursor))
+        return pages[cursor]
+
+    monkeypatch.setattr(fetch, "graphql", graphql)
+    monkeypatch.setattr(fetch, "thread_comments_page", thread_comments_page)
+    result = fetch.fetch_pr("owner", "repo", 1, False, False)
+    threads = {t["id"]: t["comments"] for t in result["review_threads"]}
+    assert calls == [("long", "1"), ("long", "2")], "only the long thread is paged, once per page"
+    assert [c["id"] for c in threads["long"]["nodes"]] == ["c0", "c1", "c2"], "pages append in order"
+    assert threads["long"]["pageInfo"]["hasNextPage"] is False, "a fully paged thread reports no next page"
+    assert [c["id"] for c in threads["short"]["nodes"]] == ["s0"], "short threads are untouched"
+
+
+def test_thread_comments_page_raises_on_graphql_errors(monkeypatch):
+    monkeypatch.setattr(fetch, "run_json", lambda command, *, stdin: {"errors": [{"message": "boom"}]})
+    with pytest.raises(RuntimeError, match="boom"):
+        fetch.thread_comments_page("thread", "cursor")
