@@ -4,14 +4,14 @@
 
 Run
 `<SKILL_DIR>/scripts/team-member.sh riskive/t-executive-protection <author>`.
-On `member`, run the Spec axis; on `not-member`, skip it. On `unknown`, start
-the Standards axis, recommend running or skipping the Spec axis based on what
-you know about the author, and ask the user.
+On `member`, run the Spec reviewer; on `not-member`, skip it. On `unknown`,
+start the reviewer, recommend running or skipping the Spec reviewer based on
+what you know about the author, and ask the user.
 
 The api-specialist lens follows `docs/api_specialist_review.md` in riskive/API.
 Read it and the convention docs it links that are relevant to the diff, from
 the PR's base branch. Keep its exclusions. Correctness and acceptance criteria
-belong to the Spec axis when it runs.
+belong to the Spec reviewer when it runs.
 
 ## Non-Python infrastructure
 

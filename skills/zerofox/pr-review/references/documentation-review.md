@@ -20,7 +20,7 @@ code alone does not justify deletion.
 
 Verify changed links, anchors, imports, and examples with safe checks. Before
 recommending removal of planning material, establish whether its work is
-complete. Route ticket-status questions to the Spec axis. If that axis does not
+complete. Route ticket-status questions to the Spec reviewer. If it does not
 run or status cannot be established, record the evidence gap rather than
 recommending deletion on that basis.
 
