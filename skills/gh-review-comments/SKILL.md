@@ -71,9 +71,8 @@ after all its items are settled, so bots re-review once.
 ## Reply
 
 Once the fixes are pushed, reply, react, and resolve Fix, Already addressed,
-and routine Dismiss threads, without waiting for CI. For a bot's comment
-(`author.__typename` is `Bot`), add `THUMBS_UP` or `THUMBS_DOWN` for whether it
-was right.
+and routine Dismiss threads, without waiting for CI. React to every comment you
+answer with `THUMBS_UP` or `THUMBS_DOWN` for whether it was right.
 
 - Resolve a thread only once its reply mutation returned the comment's `url`.
   Leave partial or disputed threads open, and resolve a raised Dismiss only

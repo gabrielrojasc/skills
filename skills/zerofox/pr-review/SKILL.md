@@ -38,10 +38,10 @@ Run `<SKILL_DIR>/scripts/changes-since-review.py <owner>/<repo> <n>` per PR:
 
 Start, in the background, one reviewer subagent per PR, and a Spec reviewer
 when the PR's title, branch, body, or commits name a Linear issue, such as
-`EPL-123`. When the commits or branch show which agent wrote the PR, such as a
-`Co-Authored-By: Claude` trailer or a `codex/` branch, run the reviewer on the
-other provider through `delegate_task`. Pick one rung per head from the diff
-and use it for every reviewer and verifier.
+`EPL-123`. Run the reviewer on Codex, or on Claude when the commits or branch
+show Codex wrote the PR, such as a `codex/` branch, using `delegate_task` when
+that isn't your own provider. Pick one rung per head from the diff and use it
+for every reviewer and verifier.
 
 The reviewer judges the diff against these standards, read from `src/`: the
 repository's `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, the docs they point
@@ -181,7 +181,7 @@ A review with no findings is an `APPROVE`, never a `COMMENT`, even under an
 instruction to post only `COMMENT` reviews.
 
 The user grants standing permission to submit an `APPROVE` whose only findings
-are at most three nitpicks, when the risk is `low`, the reviewer named no
+are nitpicks, however many, when the risk is `low`, the reviewer named no
 simpler route, and the diff doesn't touch authentication, authorization,
 stored-data schemas, CI or infrastructure, or irreversible behavior. Also
 submit without asking a `COMMENT` that holds a question and no raised finding,
