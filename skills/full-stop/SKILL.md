@@ -15,19 +15,20 @@ Git rules require, and ask now if there is none.
 
 1. Finish the change the user agreed to, and commit it.
 2. Prove it with the end-to-end check the user-level Testing rules ask for,
-   and keep its artifact. If nothing you can run proves the change, ask.
-3. Review it with `cross-review`. If it stops without pushing, hand off as
-   Blocked with its report.
-4. If `gh pr list --head <branch>` shows no PR, file one with the `pr` skill.
-   Open its Summary with one sentence on the problem, in the user's words. Add
-   how you proved the change and the `cross-review` verdict line.
+   and keep its artifact. Open no one-way door for the proof. If nothing you
+   can run without one proves the change, ask.
+3. Review it with `cross-review`, and leave its push to step 4. If it stops
+   with findings open, hand off as Blocked with its report.
+4. Push. If `gh pr list --head <branch>` shows no PR, file one with the `pr`
+   skill. Open its Summary with one sentence on the problem, in the user's
+   words. Add how you proved the change and the `cross-review` verdict line.
 5. Run `babysit-pr` until it reports an end state.
 6. When babysitting changed behavior after the last proof or review and
    `cross-review`'s budget has a round left, prove it again, run
    `babysit-pr`'s merge-queue check, run one more `cross-review` round scoped
-   as its Re-review section says, update the verdict line, and return to
-   step 5. When the budget is spent, set the verdict to `incomplete` and hand
-   off.
+   as its Re-review section says, update the verdict line, push, and return
+   to step 5. When the budget is spent, set the verdict to `incomplete` and
+   hand off.
 
 Ask only when you can't prove the change, the goal is ambiguous in a way that
 changes the result, or the next step is a one-way door. Decide the rest

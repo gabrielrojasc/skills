@@ -21,17 +21,16 @@ state. This skill runs unattended. A stack runs as one loop, bottom up.
 3. Give each round a fresh subagent that runs steps 4 to 7 and returns the head
    and base SHAs it ended on, each fix it attempted, with the thread or failing
    check and the request or error it addressed, and raised items as
-   `gh-review-comments` decision-pack blocks instead of asking. To ask the
-   user, unwatch every PR, watch again once they answer, and pass the answers
-   to that PR's next round.
-4. Handle the feedback with `gh-review-comments` up to its Push section, and
-   leave the push to step 7.
+   `gh-review-comments`' Raise section describes them, instead of asking. To
+   ask the user, unwatch every PR, watch again once they answer, and pass the
+   answers to that PR's next round.
+4. Handle the feedback with `gh-review-comments`, and leave its push to
+   step 7.
 5. Fix each failed check the PR causes. A check that also failed on the base
    head, as `gh api repos/<owner>/<repo>/commits/<base-sha>/check-runs` shows,
    is a follow-up: list it and leave it unfixed. Rerun a transient failure
-   once, and raise it if it repeats. Raise a fix that changes a contract or
-   rests on an assumption, as `gh-review-comments`' Decision pack defines
-   them.
+   once, and raise it if it repeats. Raise a fix that goes beyond the PR's
+   purpose or rests on an assumption.
 6. Rebase onto the base when the PR conflicts with it or `mergeStateStatus` is
    `BEHIND`. When nothing else is left, also rebase if base commits since the
    last round's base SHA touch files the PR changes. Raise a conflict whose

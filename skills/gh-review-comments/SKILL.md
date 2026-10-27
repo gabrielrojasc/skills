@@ -5,20 +5,18 @@ description: Use when addressing PR review feedback.
 
 # GitHub review comment triage
 
-Classify feedback on one or more PRs, raise only what needs the user's
-judgment, and handle the rest without asking. A skill that runs this one, such
-as `babysit-pr`, may take over the push and the question; follow its brief.
-`<SKILL_DIR>` is this file's directory.
+Classify feedback on one or more PRs, fix what holds up, and reply to every
+thread. Raise only what needs the user's judgment. A skill that runs this one
+may take over the push and the question; follow its brief. `<SKILL_DIR>` is
+this file's directory.
 
 ## Fetch
 
 Run `<SKILL_DIR>/scripts/fetch-pr-comments.py <pr>...`, or with no PR for the
 current branch's. It returns unresolved inline threads, conversation comments,
-and review bodies; add `--all-threads` or `--threads-only` only when asked. When
-a thread's `comments.pageInfo.hasNextPage` is true, fetch the rest with
-`gh api graphql`; if you can't, leave that item open and say so. Split comments
-and review bodies into concrete concerns, merge duplicates while keeping every
-source link, and treat praise and status summaries as context.
+and review bodies; add `--all-threads` or `--threads-only` only when asked.
+Split comments and review bodies into concrete concerns, merge duplicates while
+keeping every source link, and treat praise and status summaries as context.
 
 ## Classify
 
@@ -40,82 +38,46 @@ ownership, or the author's intent, check the PR body, its linked issue, and the
 conversation, and cite what settles it. Otherwise pick the best-supported call
 and state the assumption.
 
-## Challenge the calls
+## Check the dismissals
 
-Once a PR's items are classified, run `review-revise` on its numbered calls in
-the background, with one reviewer for that PR. Brief it to make the strongest
-evidence-backed case against each call, such as a missed caller, contract,
-test, or edge case, and to answer each call by number. Your own review doesn't
-replace it. Mark a call `Disputed:` with the deciding assumption when the
-reviewer repeats an objection you already answered without new evidence.
+Once a PR's items are classified, start one read-only subagent for that PR
+that makes the strongest evidence-backed case against each Dismiss and Already
+addressed call, by number. Flip a call to Fix when its objection holds. Mark a
+call `Disputed:` with the deciding assumption when you reject an objection.
+Skip this check when the PR has no such calls.
 
-## Decision pack
+## Raise
 
 Raise an item for the user's judgment when any of these holds; every other item
 is routine:
 
 - It rests on an assumption: it is `Disputed:` or nothing cited settles it.
-- It changes a contract or scope: user-visible behavior, a public API, config,
-  stored data, a dependency, or work beyond the PR's purpose.
+- It does work beyond the PR's purpose.
 - It dismisses or only partly accepts a human's comment, other than a nit
   listed as a follow-up.
 
-Give each raised item a full block so the user can decide without opening a
-link, then list routine items one line each. Number items across PRs:
-
-~~~markdown
-## PR <number>: <title>
-
-### 1 · Fix: <the call to settle, and your pick>
-
-[path:line](link) · [thread](url)
-
-The concern, whether it holds, and why you pick this call, in one or two
-sentences.
-
-```diff
-the proposed change, when it's an edit
-```
-
-**Reply:**
-
-> the exact text, only when one is proposed
-
-### Routine
-
-| # | Call | Item | Action |
-| - | ---- | ---- | ------ |
-| 2 | Fix | [path:line](link) · [thread](url) | the change, reply, and reaction |
-~~~
-
-- Print file links with
-  `<SKILL_DIR>/scripts/file-links.sh <owner>/<repo> <n> <path>:<line>...` and
-  paste them unchanged.
-- For a bot concern (`author.__typename` is `Bot`), add `THUMBS_UP` or
-  `THUMBS_DOWN` to the Reply line for whether it was right.
-- Keep replies short and about the code.
-
-Ask about raised items in one question, and start on routine items without
-waiting for the answer.
+Give each raised item its link from
+`<SKILL_DIR>/scripts/file-links.sh <owner>/<repo> <n> <path>:<line>...`, pasted
+unchanged, the concern, your pick and why, and the exact change or reply, so
+the user can decide without opening the link. Ask about raised items in one
+question, and start on routine items without waiting for the answer.
 
 ## Fix
 
 Routine items carry the user's standing approval; raised items need their
-answer. Do nothing beyond the two. Per PR, apply the fixes on one branch and
-run the covering checks once. Work on separate PRs in parallel, each in its own
-worktree.
-
-## Push
-
-Push each PR once, after all its items are settled, so bots re-review once.
+answer. Do nothing beyond the two. Commit the fixes, then push each PR once,
+after all its items are settled, so bots re-review once.
 
 ## Reply
 
-- Reply, react, and resolve Fix, Already addressed, and routine Dismiss
-  threads against the pushed head, without waiting for CI. Resolve a thread
-  only once its reply mutation returned the comment's `url`. Leave partial or
-  disputed threads open, and resolve a raised Dismiss only when the user said
-  so.
+Once the fixes are pushed, reply, react, and resolve Fix, Already addressed,
+and routine Dismiss threads, without waiting for CI. For a bot's comment
+(`author.__typename` is `Bot`), add `THUMBS_UP` or `THUMBS_DOWN` for whether it
+was right.
+
+- Resolve a thread only once its reply mutation returned the comment's `url`.
+  Leave partial or disputed threads open, and resolve a raised Dismiss only
+  when the user said so.
 - Mutations: `addPullRequestReviewThreadReply` to reply in a thread,
   `resolveReviewThread` with the thread's `id` from the fetch output,
   `gh pr comment --body-file` for a top-level answer (a new comment that links

@@ -6,7 +6,8 @@ description: Use when asked to cross-review and fix a change.
 # Cross-review
 
 Run `review-revise` on the change with the other agent as its one reviewer,
-fix what holds up, and push. Don't ask the user. Commit locally each round.
+fix what holds up, and push. Don't ask the user. Commit locally each round. A
+skill that runs this one may take over the push.
 
 The budget is 3 review rounds, or 5 when the change touches authentication,
 authorization, secrets, deletion of stored data, or concurrency.
@@ -17,13 +18,13 @@ Start each round with a new `delegate_task` call to the other provider at the
 chosen rung. Ask for a review of `<base>...HEAD` in the worktree's absolute
 path against the change's intent, and add to the `review-revise` brief:
 
-> Don't edit files. Skip style unless it hides a bug, and flag code, tests, or
-> guards the intent doesn't need. Start each finding with a Conventional
-> Comments label: `issue (blocking):` for a bug callers will hit in the
-> intended behavior, security and data-loss risks included,
-> `nitpick (non-blocking):` for anything else, or `question:`. Give each
-> finding an ID, such as `F1`, and keep IDs across rounds. End with
-> `VERDICT: APPROVE` or `VERDICT: CHANGES`.
+> Don't edit files. Skip style preferences, but flag a broken rule from the
+> repository's docs or style guide. Flag code, tests, or guards the intent
+> doesn't need. Start each finding with a Conventional Comments label:
+> `issue (blocking):` for a bug callers will hit in the intended behavior,
+> security and data-loss risks included, `nitpick (non-blocking):` for
+> anything else, or `question:`. Give each finding an ID, such as `F1`, and
+> keep IDs across rounds. End with `VERDICT: APPROVE` or `VERDICT: CHANGES`.
 
 Record the round's head and base SHAs, and answer the reviewer's questions
 yourself.
@@ -34,7 +35,8 @@ Adjudicate as `review-revise` says. A finding about another path, a rare case,
 or a small cost is a nitpick whatever its label. Fix with the smallest change,
 deleting or narrowing code before adding a lock, cache, helper, or option.
 Decline a nitpick outside the change's purpose in one line and list it as a
-follow-up. Run the checks and commit.
+follow-up. Don't accept a finding just to end the loop, and when review grew
+the diff, cut before the next round. Run the checks and commit.
 
 ## Re-review
 
@@ -48,7 +50,8 @@ or to all of `<base>...HEAD` when the base SHA changed since that review.
 
 When the budget runs out with an `issue (blocking)` open, or the loop stalls as
 `review-revise` defines it, stop without pushing and report what's unresolved;
-running out of rounds isn't approval. Otherwise push.
+running out of rounds isn't approval. Otherwise push, unless the skill that ran
+this one owns the push.
 
 Add this line to the PR description, or to your report when there is no PR:
 
