@@ -74,6 +74,8 @@ rule reaches a session only through a file that session loads:
   agent behavior; leave out what agents already know or would recover from on
   their own.
 - Keep `README.md` and the skill inventory in sync.
+- When an article, video, or repository shapes a skill, add it to
+  `REFERENCES.md` with what it contributed and the skills it touched.
 - When a changed skill has a same-named skill in `riskive/ai-tooling`, propose
   the matching team PR. The team copy may differ from this one.
 - Run `scripts/validate-skills.sh` after changing skills, metadata, or scripts.

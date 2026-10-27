@@ -50,17 +50,17 @@ installation, updates, and lock tracking.
   files the PR, runs `babysit-pr`, and leaves the merge to the user.
 - [`test-plan`](skills/test-plan/SKILL.md) lists the ways a feature could fail
   in prod, plans a check for each, probes which checks the agent's current
-  access can run, and asks for the access the rest need. It replies with a
-  Mermaid diagram of risks and checks and writes the details to a file.
+  access can run, and asks for the access the rest need. It plans end-to-end
+  checks in the chat, with a Mermaid diagram of the services they drive.
 - [`developer-documentation-style`](skills/developer-documentation-style/SKILL.md)
   reads the live Google guide before writing, editing, or reviewing developer
   documentation.
-- [`python-environments`](skills/python-environments/SKILL.md) creates and
-  manages project-local Python environments with `uv venv` while preserving each
-  repository's dependency workflow.
+- [`python-environments`](skills/python-environments/SKILL.md) creates Python
+  environments with `uv venv` and leaves everything inside them to the
+  repository's own tooling.
 - [`review-revise`](skills/review-revise/SKILL.md) runs adversarial
   review-revise loops with independent reviewers until findings are resolved or
-  the loop stalls. `cross-review` and `gh-review-comments` run on it.
+  the loop stalls, 3 rounds by default. `cross-review` runs on it.
 - [`cross-review`](skills/cross-review/SKILL.md) runs `review-revise` with the
   other agent as reviewer through T3's `delegate_task`, fixes and commits each
   round, repeats until a round leaves nothing to fix within a budget of 3
@@ -81,12 +81,15 @@ architecture, and review. They are intentionally not copied here.
 
 ### ZeroFox
 
-- [`pr-review`](skills/zerofox/pr-review/SKILL.md) reviews PRs against
-  repository and ZeroFox Python standards, applies the api-specialist lens to
-  every riskive/API PR and adds a spec review for its own team's authors,
-  verifies every finding independently, +1s bot comments it agrees with, raises
-  only the findings that need the user's judgment, posts a `COMMENT` review of
-  routine findings on its own, and asks before any other.
+- [`pr-review`](skills/zerofox/pr-review/SKILL.md) reviews PRs with one
+  reviewer that covers repository and ZeroFox Python standards, risk, and
+  simpler routes, applies the api-specialist lens to every riskive/API PR and
+  adds a spec review for its own team's authors, verifies every finding with a
+  fresh agent, +1s bot comments it agrees with, raises only the findings that
+  need the user's judgment, posts low-risk approvals and questions on its own,
+  and asks before any other.
+
+Sources that shaped these skills are listed in [REFERENCES.md](REFERENCES.md).
 
 ## Repository layout
 
