@@ -66,7 +66,8 @@ The reviewer also:
 - Reads the problem, its ticket, and the earlier threads before the diff, and
   names at most two simpler routes, such as existing code, a framework feature,
   or a config change, that keep required behavior and remove a real cost.
-  These go in its notes, unverified.
+  These go in `## Approach`, with the evidence and switching cost for each, or
+  the existing code it compared against when it found none.
 - Rates the risk `low`, `medium`, or `high` with a reason per path. It checks
   authentication, authorization, tenant isolation, secrets, stored-data
   schemas, CI and infrastructure, shared code with many callers, and effects a
@@ -86,8 +87,8 @@ The Spec reviewer reports only requirements the diff misses, implements
 partly, or gets wrong, quoting the ticket line for each. When the ticket has no
 real spec for this change, it reports `no spec available` and stops.
 
-Each writes `## Target head`, `## Risk` (the reviewer only), `## Findings`, and
-`## Notes`, and returns the file path.
+Each writes `## Target head`, `## Risk` and `## Approach` (the reviewer only),
+`## Findings`, and `## Notes`, and returns the file path.
 
 ## Finding bar
 
@@ -135,8 +136,9 @@ A fresh read-only verifier per report checks each finding against the source
 at the head, the threads, the standards, and, for Spec, the ticket. It reads
 the report and primary sources only, and returns `confirmed`, `revised` with a
 corrected draft, or `refuted`, each with one line of evidence. It never refutes
-a finding for being small. Drop refuted findings, with their reasons, into
-`triage.md`.
+a finding for being small. It checks each simpler route the same way: the code
+or feature it names exists at the head and keeps the required behavior. Drop
+refuted findings and routes, with their reasons, into `triage.md`.
 
 Set the event from confirmed findings, pre-existing ones excluded:
 `REQUEST_CHANGES` for any `issue (blocking)`; otherwise `COMMENT` for a
@@ -159,10 +161,12 @@ header](references/rendered-report.md). Then report in Markdown:
    earlier thread as addressed, unaddressed, or author replied. On the third or
    later review with blockers still open, suggest a call or rethinking the
    approach.
-2. Each raised finding under its own heading, with its link, the problem and
+2. The approach: how the PR solves the problem in one line, then each
+   confirmed simpler route in one line with its evidence, or that none held up
+   and what the reviewer compared against.
+3. Each raised finding under its own heading, with its link, the problem and
    the case where it goes wrong, why it matters, and the full draft.
-3. Routine findings one line each, with link and full draft, then each simpler
-   route from the notes in one line.
+4. Routine findings one line each, with link and full draft.
 
 Link files with one run of
 `<SKILL_DIR>/scripts/file-links.sh <owner>/<repo> <n> <path>:<line>...` per PR,
@@ -181,8 +185,8 @@ A review with no findings is an `APPROVE`, never a `COMMENT`, even under an
 instruction to post only `COMMENT` reviews.
 
 The user grants standing permission to submit an `APPROVE` whose only findings
-are nitpicks, however many, when the risk is `low`, the reviewer named no
-simpler route, and the diff doesn't touch authentication, authorization,
+are nitpicks, however many, when the risk is `low`, no simpler route was
+confirmed, and the diff doesn't touch authentication, authorization,
 stored-data schemas, CI or infrastructure, or irreversible behavior. Also
 submit without asking a `COMMENT` that holds a question and no raised finding,
 and a batch the user approved as shown. Show any other review exactly and ask.
