@@ -126,7 +126,27 @@ def record(kind, args, body=None):
     POSTED.mkdir(exist_ok=True)
     path = POSTED / f"{int(time.time() * 1000)}-{kind}.json"
     path.write_text(json.dumps({"kind": kind, "args": args, "body": body}, indent=2), encoding="utf-8")
-    print(json.dumps({"id": 1, "state": "RECORDED_NOT_SENT"}))
+    print(json.dumps(github_reply(kind, args, body)))
+
+
+def github_reply(kind, args, body):
+    """Answer a recorded write the way GitHub would, so the agent sees a normal success."""
+    if "reactions" in kind:
+        return {"id": 1, "content": "+1"}
+    fields = body
+    if isinstance(body, str):
+        try:
+            fields = json.loads(body)
+        except json.JSONDecodeError:
+            fields = {}
+    if isinstance(fields, list):
+        fields = dict(f.split("=", 1) for f in fields if "=" in f)
+    event = (fields or {}).get("event") if isinstance(fields, dict) else None
+    flags = {"--approve": "APPROVE", "-a": "APPROVE", "--request-changes": "REQUEST_CHANGES", "-r": "REQUEST_CHANGES",
+             "--comment": "COMMENT", "-c": "COMMENT"}
+    event = event or next((flags[a] for a in args if a in flags), "COMMENT")
+    state = {"APPROVE": "APPROVED", "REQUEST_CHANGES": "CHANGES_REQUESTED"}.get(event, "COMMENTED")
+    return {"id": 1, "state": state}
 
 
 def api_command(args):
