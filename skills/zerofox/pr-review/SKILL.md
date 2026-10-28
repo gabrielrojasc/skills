@@ -40,15 +40,16 @@ Start, in the background, one reviewer subagent per PR, and a Spec reviewer
 when the PR's title, branch, body, or commits name a Linear issue, such as
 `EPL-123`. Run the reviewer on Codex, or on Claude when the commits or branch
 show Codex wrote the PR, such as a `codex/` branch, using `delegate_task` when
-that isn't your own provider. Pick one rung per head from the diff and use it
-for every reviewer and verifier.
+that isn't your own provider. Without `delegate_task`, run it as your own
+subagent. Pick one rung per head from the diff and use it for every reviewer
+and verifier.
 
 The reviewer judges the diff against these standards, read from `src/`: the
 repository's `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, the docs they point
 to, any file under `docs/` about how code is written, and any review guide
 whose scope covers the diff, such as `REVIEW.md`. Add more by repository:
 
-| PR | Also apply | Spec reviewer |
+| PR | Also apply | Spec reviewer, when a Linear issue is named |
 |---|---|---|
 | riskive/API | Python standards and the api-specialist lens | Only for `t-executive-protection` authors |
 | Other Python repositories | Python standards | Yes |
@@ -73,13 +74,17 @@ The reviewer also:
   schemas, CI and infrastructure, shared code with many callers, and effects a
   revert can't undo, and whether the PR says how to undo or notice a failure.
   It finds who else writes the data the diff relies on and who consumes what
-  it returns, and checks the change holds for each.
+  it returns, and checks the change holds for each. A diff that lets a request
+  through without a credential check it used to pass is `issue (blocking)`
+  even when the PR body says it's deliberate, and the finding says how to limit
+  it. A deliberate change to who may access something is not this case.
 - States, for each hook, signal, callback, task, or retry the diff adds or
   changes, when it runs, what is saved by then, and what happens when it fails
   or runs twice.
 - Skips points already made in a thread and problems CI reports on the same
   line, and drafts a +1 on an unresolved bot comment that meets the finding
-  bar.
+  bar. A +1 takes the label the bot's concern would get, and the verifier
+  checks the bot's claim.
 - Lists every instance of a problem in one finding, anchored to a changed line
   that owns it or else to the review body.
 
@@ -88,7 +93,8 @@ partly, or gets wrong, quoting the ticket line for each. When the ticket has no
 real spec for this change, it reports `no spec available` and stops.
 
 Each writes `## Target head`, `## Risk` and `## Approach` (the reviewer only),
-`## Findings`, and `## Notes`, and returns the file path.
+`## Findings`, and `## Notes`, and returns the file path. The reviewer numbers
+its findings `R1`, `R2`, and so on, and the Spec reviewer `S1`, `S2`.
 
 ## Finding bar
 
@@ -123,12 +129,13 @@ Label each finding:
   option the PR body already weighed.
 
 Give a defect a concrete case that goes wrong, and cleanup the correction and
-what it saves. For a broken rule, cite the doc and line and name the change,
-nothing else. The correction is the smallest that works, deleting or narrowing
-code before adding a lock, cache, helper, or option. Prefer a casual question
-("do we need X here so Y happens?") when the author is senior or the fix is
-obvious. Name the specific problem, never "slop", and leave out who or what
-wrote it.
+what it saves. When one correction fixes several problems, name each, since the
+author may fix it another way. For a broken rule, cite the doc and line and name
+the change, nothing else. The correction is the smallest that works, deleting or
+narrowing code before adding a lock, cache, helper, or option. Prefer a casual
+question ("do we need X here so Y happens?") when the author is senior or the
+fix is obvious. Name the specific problem, never "slop", and leave out who or
+what wrote it.
 
 ## Verify
 
@@ -164,9 +171,9 @@ header](references/rendered-report.md). Then report in Markdown:
 2. The approach: how the PR solves the problem in one line, then each
    confirmed simpler route in one line with its evidence, or that none held up
    and what the reviewer compared against.
-3. Each raised finding under its own heading, with its link, the problem and
-   the case where it goes wrong, why it matters, and the full draft.
-4. Routine findings one line each, with link and full draft.
+3. Each raised finding under a heading with its ID, with its link, the problem
+   and the case where it goes wrong, why it matters, and the full draft.
+4. Routine findings one line each, with ID, link, and full draft.
 
 Link files with one run of
 `<SKILL_DIR>/scripts/file-links.sh <owner>/<repo> <n> <path>:<line>...` per PR,
