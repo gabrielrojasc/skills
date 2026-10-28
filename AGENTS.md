@@ -92,4 +92,5 @@ rule reaches a session only through a file that session loads:
 - Preserve approval gates for external writes and for removing worktrees or
   deleting branches that hold unmerged work.
 - Do not change global installations, global agent guidance, or external
-  services as part of a repository edit without explicit approval.
+  services as part of a repository edit without explicit approval. The user
+  updates installed skills; don't propose installs.
