@@ -7,13 +7,14 @@
 # RUNG_POLICY=tier2-reviewers scores normal PRs' reviewers against tier 2
 # instead of tier 3 (see lib/score-rungs.py).
 #
-# Each fixture is a folder under fixtures/. Several fixtures make one batch
+# Each fixture is a folder under fixtures/, or under $FIXTURES when set. Several fixtures make one batch
 # request, followed by each fixture's optional `instructions` file, such as a
 # dispatcher's constraints. Nothing is posted: the fake gh records writes under
 # posted/.
 set -euo pipefail
 tool="${1:?tool}"; out="${2:?out dir}"; shift 2
 here="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)"
+fx="${FIXTURES:-${here}/fixtures}"
 mkdir -p "$out"; out="$(CDPATH= cd -- "$out" && pwd -P)"
 cd "$out"
 # A workspace inside a git repo makes agents sync or review that repo instead.
@@ -24,14 +25,14 @@ fi
 "${here}/lib/scaffold.sh" "$@"
 refs=(); expect=()
 for fixture in "$@"; do
-  n="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["number"])' "${here}/fixtures/${fixture}/pr.json")"
-  risk="$(cat "${here}/fixtures/${fixture}/risk")"
-  repo="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["repository"]["nameWithOwner"])' "${here}/fixtures/${fixture}/pr.json")"
+  n="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["number"])' "${fx}/${fixture}/pr.json")"
+  risk="$(cat "${fx}/${fixture}/risk")"
+  repo="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["repository"]["nameWithOwner"])' "${fx}/${fixture}/pr.json")"
   refs+=("${repo}#${n}"); expect+=("${n}=${risk}")
 done
 prompt="Use the pr-review skill to review ${refs[*]}."
 for fixture in "$@"; do
-  extra="${here}/fixtures/${fixture}/instructions"
+  extra="${fx}/${fixture}/instructions"
   if [[ -f "$extra" ]]; then prompt+=$'\n\n'"$(cat "$extra")"; fi
 done
 # Agents run commands in a login shell; a private ZDOTDIR keeps the fake gh first

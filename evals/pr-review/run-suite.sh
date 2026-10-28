@@ -4,6 +4,8 @@
 #
 #   run-suite.sh <out-dir> [fixture...]     (default: every fixture with a grade.json)
 #
+# FIXTURES=<dir> reads fixtures from another folder, such as a holdout set.
+#
 # Runs go JOBS at a time (default 4). TOOLS=codex limits the run to one tool.
 # RUNS=<n> repeats every cell n times under <out-dir>/r<i>/. Each cell's
 # workspace holds its trace, rung scores, grades, and elapsed seconds;
@@ -13,7 +15,7 @@ here="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)"
 out="${1:?out dir}"; shift
 mkdir -p "$out"; out="$(CDPATH= cd -- "$out" && pwd -P)"
 if [[ $# -gt 0 ]]; then fixtures=("$@"); else
-  fixtures=(); for g in "$here"/fixtures/*/grade.json; do fixtures+=("$(basename "$(dirname "$g")")"); done
+  fixtures=(); for g in "${FIXTURES:-$here/fixtures}"/*/grade.json; do fixtures+=("$(basename "$(dirname "$g")")"); done
 fi
 runs="${RUNS:-1}"
 cells=()

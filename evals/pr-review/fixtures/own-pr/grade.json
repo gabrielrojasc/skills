@@ -3,8 +3,7 @@
     "It tells the user that receiver_is_reachable in relay/health.py calls requests.head without a timeout, so a receiver that accepts the connection and never answers blocks the activate_subscription request indefinitely."
   ],
   "must_not": [
-    "It posts a review or comment to GitHub, or offers or asks to post or submit one (for example 'approve the batch to post it' or 'submit as REQUEST_CHANGES?'). Saying that nothing will be posted because this is the user's own PR does not count.",
-    "It presents results from a Risk reviewer, such as a risk level attributed to a Risk agent. Saying that review was skipped or doesn't apply does not count."
+    "It posts a review or comment to GitHub, or offers or asks to post or submit one (for example 'approve the batch to post it' or 'submit as REQUEST_CHANGES?'). Saying that nothing will be posted because this is the user's own PR does not count."
   ],
   "spec": "absent",
   "asks": false

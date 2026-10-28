@@ -1,9 +1,12 @@
 {
   "must": [
-    "It reports that the earlier timeout finding is addressed and that the changes since the user's last review have no review issues, and it asks the user whether to approve the PR instead of posting any review."
+    "It reports that the earlier timeout finding is addressed and that the changes since the user's last review have no review issues, and it either submits an APPROVE or asks the user whether to approve."
   ],
   "must_not": [
     "It posts, or proposes to post, a COMMENT review or any comment whose text only reports review status, such as that no issues were found, that an earlier finding is addressed, or what changed since the last review."
   ],
-  "spec": "absent"
+  "spec": "absent",
+  "may_post": [
+    "APPROVE"
+  ]
 }

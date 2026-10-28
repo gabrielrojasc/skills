@@ -25,17 +25,21 @@ Fixture checks come from fixtures/<fixture>/grade.json:
   may_post   review events the skill may submit without asking, such as ["APPROVE"]
   asks       false: the run has nothing to ask, so one-question is skipped
 Must and must-not rubrics see the final message and every posted text.
-The judge is Claude Opus with a 2-of-3 vote per rubric line.
+The judge is Claude Opus with a 2-of-3 vote per rubric line, or Codex with
+JUDGE=codex. FIXTURES=<dir> reads fixtures from another folder.
 """
 
 import json
+import os
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 JUDGE_MODEL = "opus"
+FIXTURES = Path(os.environ.get("FIXTURES") or HERE.parent / "fixtures")
 
 
 def final_message(tool, ws):
@@ -106,6 +110,22 @@ def posts_allowed(posts, may_post):
     return not bad, bad
 
 
+def ask_judge(prompt):
+    if os.environ.get("JUDGE") != "codex":
+        return subprocess.run(
+            ["claude", "-p", prompt, "--model", JUDGE_MODEL, "--max-budget-usd", "0.5", "--no-session-persistence"],
+            capture_output=True, text=True, stdin=subprocess.DEVNULL,
+        ).stdout.strip()
+    with tempfile.TemporaryDirectory() as tmp:
+        answer = Path(tmp) / "answer.md"
+        subprocess.run(
+            ["codex", "exec", "--skip-git-repo-check", "--ephemeral", "-s", "read-only", "-C", tmp,
+             "-c", 'model_reasoning_effort="medium"', "-o", str(answer), prompt],
+            capture_output=True, text=True, stdin=subprocess.DEVNULL, timeout=600,
+        )
+        return answer.read_text(encoding="utf-8").strip() if answer.exists() else ""
+
+
 def judge(rubric, message):
     prompt = (
         "You grade one PR review produced by an agent. Grade meaning, not exact wording: the criterion is met when "
@@ -115,10 +135,7 @@ def judge(rubric, message):
     )
     votes = []
     for _ in range(3):
-        out = subprocess.run(
-            ["claude", "-p", prompt, "--model", JUDGE_MODEL, "--max-budget-usd", "0.5", "--no-session-persistence"],
-            capture_output=True, text=True, stdin=subprocess.DEVNULL,
-        ).stdout.strip()
+        out = ask_judge(prompt)
         first = out.splitlines()[0].strip().upper() if out else ""
         votes.append((first.startswith("PASS"), out))
         if sum(v for v, _ in votes) >= 2 or sum(not v for v, _ in votes) >= 2:
@@ -130,7 +147,7 @@ def judge(rubric, message):
 
 def main():
     tool, ws, fixture = sys.argv[1], Path(sys.argv[2]).resolve(), sys.argv[3]
-    spec = json.loads((HERE.parent / "fixtures" / fixture / "grade.json").read_text(encoding="utf-8"))
+    spec = json.loads((FIXTURES / fixture / "grade.json").read_text(encoding="utf-8"))
     message = final_message(tool, ws)
     rows = []
 
