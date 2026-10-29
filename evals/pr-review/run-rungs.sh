@@ -42,8 +42,8 @@ mkdir -p zdot ghconfig; printf 'export PATH="%s/bin:$PATH"\n' "$out" | tee zdot/
 export ZDOTDIR="${out}/zdot" GH_CONFIG_DIR="${out}/ghconfig" GH_TOKEN=pr-review-eval-no-access
 export GIT_CONFIG_GLOBAL=/dev/null GIT_SSH_COMMAND=false GIT_TERMINAL_PROMPT=0
 if [[ "$tool" == claude ]]; then
-  PATH="${out}/bin:${PATH}" claude -p "$prompt" --output-format stream-json --verbose \
-    --max-budget-usd "${MAX_BUDGET_USD:-5}" --permission-mode acceptEdits \
+  PATH="${out}/bin:${PATH}" CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0 claude -p "$prompt" --output-format stream-json --verbose \
+    --max-budget-usd "${MAX_BUDGET_USD:-10}" --permission-mode acceptEdits \
     --allowedTools "Bash Read Write Edit Glob Grep Skill Agent mcp__claude_ai_Linear__get_issue mcp__claude_ai_Linear__list_comments mcp__claude_ai_Linear__search_documentation" --no-session-persistence \
     < /dev/null > trace.jsonl 2> stderr.log
 else
