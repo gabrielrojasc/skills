@@ -119,18 +119,22 @@ def ask_judge(prompt):
         ).stdout.strip()
     with tempfile.TemporaryDirectory() as tmp:
         answer = Path(tmp) / "answer.md"
-        subprocess.run(
-            ["codex", "exec", "--skip-git-repo-check", "--ephemeral", "-s", "read-only", "-C", tmp,
-             "-c", 'model_reasoning_effort="medium"', "-o", str(answer), prompt],
-            capture_output=True, text=True, stdin=subprocess.DEVNULL, timeout=600,
-        )
+        try:
+            subprocess.run(
+                ["codex", "exec", "--skip-git-repo-check", "--ephemeral", "-s", "read-only", "-C", tmp,
+                 "-c", 'model_reasoning_effort="medium"', "-o", str(answer), prompt],
+                capture_output=True, text=True, stdin=subprocess.DEVNULL, timeout=600,
+            )
+        except subprocess.TimeoutExpired:
+            return ""
         return answer.read_text(encoding="utf-8").strip() if answer.exists() else ""
 
 
 def judge(rubric, message):
     prompt = (
         "You grade one PR review produced by an agent. Grade meaning, not exact wording: the criterion is met when "
-        "the review says the same thing in other words, whatever a finding's status or label. Answer with exactly "
+        "the review says the same thing in other words, whatever a finding's status or label, unless the criterion "
+        "itself names a label or review event, such as blocking or REQUEST_CHANGES; then it must match. Answer with exactly "
         "PASS or FAIL on the first line, then one short sentence of reasoning.\n\n"
         f"Criterion: {rubric}\n\n--- REVIEW OUTPUT ---\n{message}\n--- END ---"
     )
