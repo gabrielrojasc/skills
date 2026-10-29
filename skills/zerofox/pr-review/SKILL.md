@@ -120,22 +120,18 @@ Label each finding:
   documented rule, risks security or stored data, or is unneeded code that
   isn't a local cleanup.
 - `suggestion (non-blocking):` a defect that shows only on a path outside the
-  PR's purpose, in a rare case, or as a small performance cost. Also a PR
-  description the diff no longer matches, and a copy of existing logic that
-  still agrees with it.
+  PR's purpose, in a rare case, or as a small performance cost. Also a stale
+  PR description, or a copy of existing logic that still agrees with it.
 - `nitpick (non-blocking):` mechanical local cleanup, even when a documented
   style rule asks for it.
 - `issue (non-blocking, pre-existing):` a problem that predates the diff.
   Mark a small fix optional, and suggest a follow-up for a larger one.
 - `question:` a fact only the author has, such as intent or a deployment
   constraint, without which you can't judge the PR. Never a preference, an
-  option the PR body already weighed, or a doubt about code outside the repo
-  that nothing in the diff or the PR points to.
+  option the PR body already weighed, or a doubt nothing in the PR points to.
 
 A missing test is `issue (blocking)` only when the code as written could already
-fail on that path and risk security or stored data, such as writes that span
-databases, a nested helper that commits on its own, or a side effect inside a
-transaction. A test that only guards against a future change is a
+fail on that path and risk security or stored data; otherwise it's a
 `suggestion (non-blocking)`.
 
 Give a defect a concrete case that goes wrong, and cleanup the correction and
