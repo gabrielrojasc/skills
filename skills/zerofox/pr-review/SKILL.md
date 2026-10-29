@@ -120,13 +120,23 @@ Label each finding:
   documented rule, risks security or stored data, or is unneeded code that
   isn't a local cleanup.
 - `suggestion (non-blocking):` a defect that shows only on a path outside the
-  PR's purpose, in a rare case, or as a small performance cost.
-- `nitpick (non-blocking):` mechanical local cleanup.
+  PR's purpose, in a rare case, or as a small performance cost. Also a PR
+  description the diff no longer matches, and a copy of existing logic that
+  still agrees with it.
+- `nitpick (non-blocking):` mechanical local cleanup, even when a documented
+  style rule asks for it.
 - `issue (non-blocking, pre-existing):` a problem that predates the diff.
   Mark a small fix optional, and suggest a follow-up for a larger one.
 - `question:` a fact only the author has, such as intent or a deployment
-  constraint, without which you can't judge the PR. Never a preference or an
-  option the PR body already weighed.
+  constraint, without which you can't judge the PR. Never a preference, an
+  option the PR body already weighed, or a doubt about code outside the repo
+  that nothing in the diff or the PR points to.
+
+A missing test is `issue (blocking)` only when the code as written could already
+fail on that path and risk security or stored data, such as writes that span
+databases, a nested helper that commits on its own, or a side effect inside a
+transaction. A test that only guards against a future change is a
+`suggestion (non-blocking)`.
 
 Give a defect a concrete case that goes wrong, and cleanup the correction and
 what it saves. When one correction fixes several problems, name each, since the
@@ -195,9 +205,8 @@ The user grants standing permission to submit an `APPROVE` whose only findings
 are nitpicks, however many, when the risk is `low`, no simpler route was
 confirmed, and the diff doesn't touch authentication, authorization,
 stored-data schemas, CI or infrastructure, or irreversible behavior. Also
-submit without asking a `COMMENT` that holds a question and no raised finding,
-and a batch the user approved as shown. Show any other review exactly and ask.
-An instruction not to approve forbids posting the approval, not asking.
+submit a batch the user approved as shown. Show any other review exactly and
+ask. An instruction not to approve forbids posting the approval, not asking.
 
 Right before submitting, re-check the head and that every target line is still
 in the diff. Build `review.json` with `commit_id` (the verified head), `event`,
