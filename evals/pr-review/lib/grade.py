@@ -135,12 +135,15 @@ def judge(rubric, message):
         f"Criterion: {rubric}\n\n--- REVIEW OUTPUT ---\n{message}\n--- END ---"
     )
     votes = []
-    for _ in range(3):
+    for _ in range(9):
         out = ask_judge(prompt)
         first = out.splitlines()[0].strip().upper() if out else ""
-        votes.append((first.startswith("PASS"), out))
+        if first.startswith(("PASS", "FAIL")):
+            votes.append((first.startswith("PASS"), out))
         if sum(v for v, _ in votes) >= 2 or sum(not v for v, _ in votes) >= 2:
             break
+    else:
+        sys.exit(f"judge gave no PASS or FAIL vote majority in 9 attempts: {rubric}")
     passed = sum(v for v, _ in votes) >= 2
     reason = next((o for v, o in votes if v == passed), votes[-1][1])
     return passed, reason.replace("\n", " ")[:200]
