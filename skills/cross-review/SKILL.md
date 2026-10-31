@@ -32,8 +32,7 @@ yourself.
 ## Fix
 
 Adjudicate as `review-revise` says. A finding about another path, a rare case,
-or a small cost is a nitpick whatever its label, unless its harm is severe,
-such as a security hole, lost or corrupted data, a lost message, or an outage.
+or a small cost is a nitpick whatever its label, unless its harm is severe.
 Fix with the smallest change, deleting or narrowing code before adding a lock,
 cache, helper, or option.
 Decline a nitpick outside the change's purpose in one line and list it as a
