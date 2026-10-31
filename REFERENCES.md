@@ -22,6 +22,10 @@ it touched.
   one, so a review prompt must define them and skip them. Reviewing with a
   model family other than the author's caught 10% more bugs. Shaped
   `pr-review` and `cross-review`.
+- [Rate findings by likelihood and severity](https://x.com/Voxyz_ai/status/2115518965443076573)
+  (Voxyz). Judge a finding by how likely and how harmful it is, so a rare but
+  severe risk still gets fixed. Shaped the severity exception in
+  `cross-review`'s Fix rule.
 
 ## Workflows
 

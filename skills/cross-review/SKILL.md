@@ -32,8 +32,10 @@ yourself.
 ## Fix
 
 Adjudicate as `review-revise` says. A finding about another path, a rare case,
-or a small cost is a nitpick whatever its label. Fix with the smallest change,
-deleting or narrowing code before adding a lock, cache, helper, or option.
+or a small cost is a nitpick whatever its label, unless its harm is severe,
+such as a security hole, lost or corrupted data, a lost message, or an outage.
+Fix with the smallest change, deleting or narrowing code before adding a lock,
+cache, helper, or option.
 Decline a nitpick outside the change's purpose in one line and list it as a
 follow-up. Don't accept a finding just to end the loop, and when review grew
 the diff, cut before the next round. Run the checks and commit.
