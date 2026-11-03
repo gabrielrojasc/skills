@@ -109,23 +109,28 @@ class Validator:
             self.fail(f"{name} description must use 'Use when <trigger>.'")
         elif not 25 <= len(description) <= 64:
             self.fail(f"{name} description must be 25-64 characters")
+        relative = skill_dir.relative_to(self.root).as_posix()
+        if not relative.startswith("skills/bots/"):
+            self.validate_metadata(skill_dir, name, description, fields)
+        if f"{relative}/" not in readme:
+            self.fail(f"README.md does not link {relative}/")
+
+    def validate_metadata(self, skill_dir: Path, name: str, description: str,
+                          fields: dict[str, str]) -> None:
         metadata_file = skill_dir / "agents" / "openai.yaml"
         if not metadata_file.is_file():
             self.fail(f"{name} is missing agents/openai.yaml")
-        else:
-            try:
-                metadata = parse_openai_metadata(metadata_file.read_text(encoding="utf-8"))
-            except (OSError, UnicodeError, ValueError) as exc:
-                self.fail(f"{name} has invalid agents/openai.yaml structure: {exc}")
-            else:
-                if description != metadata["short_description"]:
-                    self.fail(f"{name} description differs between SKILL.md and agents/openai.yaml")
-                disabled = fields.get("disable-model-invocation") == "true"
-                if disabled != (metadata.get("allow_implicit_invocation") == "false"):
-                    self.fail(f"{name} invocation policy disagrees between SKILL.md and agents/openai.yaml")
-        relative = skill_dir.relative_to(self.root).as_posix()
-        if f"{relative}/" not in readme:
-            self.fail(f"README.md does not link {relative}/")
+            return
+        try:
+            metadata = parse_openai_metadata(metadata_file.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, ValueError) as exc:
+            self.fail(f"{name} has invalid agents/openai.yaml structure: {exc}")
+            return
+        if description != metadata["short_description"]:
+            self.fail(f"{name} description differs between SKILL.md and agents/openai.yaml")
+        disabled = fields.get("disable-model-invocation") == "true"
+        if disabled != (metadata.get("allow_implicit_invocation") == "false"):
+            self.fail(f"{name} invocation policy disagrees between SKILL.md and agents/openai.yaml")
 
     def validate_scripts(self) -> None:
         for directory in (self.root / "scripts", self.root / "skills"):

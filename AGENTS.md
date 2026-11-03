@@ -35,6 +35,7 @@ rule reaches a session only through a file that session loads:
   `skills/zerofox/`.
 - Give every skill a `SKILL.md` whose frontmatter name matches its directory.
 - Add `agents/openai.yaml` for Codex display metadata and invocation policy.
+  Bot skills under `skills/bots/` have no `agents/openai.yaml`.
 - Write each description as one compact, unquoted `Use when <trigger>.`
   sentence. Name the domain in the trigger, such as "Linear work" or "a
   GitHub PR", since no summary of what the skill does precedes it. Keep the

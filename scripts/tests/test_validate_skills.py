@@ -96,6 +96,16 @@ def test_category_skill_and_inventory_path(repo):
     assert_invalid(repo, "missing agents/openai.yaml")
 
 
+def test_bots_skill_needs_no_openai_metadata(repo):
+    category = repo / "skills/bots"
+    category.mkdir()
+    (repo / "skills/sample").rename(category / "sample")
+    (category / "sample/agents/openai.yaml").unlink()
+    write(repo, "README.md", "[Sample](skills/bots/sample/)\n")
+    git(repo, "add", ".")
+    assert validate(repo) == (0, ""), "a skills/bots/ skill passes without agents/openai.yaml"
+
+
 def test_duplicate_names_across_categories_are_rejected(repo):
     write(repo, "skills/zerofox/sample/SKILL.md",
           f"---\nname: sample\ndescription: {DESCRIPTION}\n---\n")

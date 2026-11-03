@@ -1,5 +1,0 @@
-interface:
-  display_name: "Grok Slack message"
-  short_description: "Use when drafting a Slack message as Grok Bot."
-policy:
-  allow_implicit_invocation: true
