@@ -1,0 +1,5 @@
+interface:
+  display_name: "Grok rewrite it"
+  short_description: "Use when asked to rewrite text as Grok Bot."
+policy:
+  allow_implicit_invocation: true

@@ -91,6 +91,21 @@ architecture, and review. They are intentionally not copied here.
   need the user's judgment, posts low-risk approvals and questions on its own,
   and asks before any other.
 
+### Bots
+
+The user's bots run on other computers without the user's local files. The
+`grok-` copies carry the rules their originals read from those files. The
+originals stay the versions for the user's own sessions.
+
+- [`grok-slack-message`](skills/bots/grok-slack-message/SKILL.md) is
+  `slack-message` for Grok Bot. It replies with the draft in Slack markup for
+  the user to send.
+- [`grok-rewrite-it`](skills/bots/grok-rewrite-it/SKILL.md) is `rewrite-it`
+  for Grok Bot, with the user's Writing rules and `unslop` inlined.
+- [`my-plate`](skills/bots/my-plate/SKILL.md) lists a bot's own open items,
+  its threads from the bots' shared ledger and the user's Linear issues in its
+  lane, grouped by whether they wait on the user. It reads only.
+
 Sources that shaped these skills are listed in [REFERENCES.md](REFERENCES.md).
 
 ## Repository layout
@@ -98,6 +113,7 @@ Sources that shaped these skills are listed in [REFERENCES.md](REFERENCES.md).
 ```text
 skills/              General personal skills
 skills/zerofox/      ZeroFox-specific skills
+skills/bots/         Skills for the user's bots
 scripts/             Repository validation
 evals/               Claude Code and Codex eval harnesses
 ```

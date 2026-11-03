@@ -1,0 +1,5 @@
+interface:
+  display_name: "My plate"
+  short_description: "Use when asked what's on your plate or the status of your items."
+policy:
+  allow_implicit_invocation: true
