@@ -1,0 +1,74 @@
+{
+  "019a3f10-james": {
+    "title": "Answer James's questions on export rate limits",
+    "machine": "gabriel-mac",
+    "project": "export-service",
+    "owner": "closer",
+    "status": "waiting-on-gabriel",
+    "links": ["https://linear.app/zerofox/issue/EP-1412/answer-james-export-rate-limit-questions"],
+    "reason": "open-question",
+    "decision": "James asks whether the export endpoint keeps its 100 requests per minute cap after the bulk export change, and who owns raising it.",
+    "since": "2026-11-02T14:10:00Z",
+    "updatedAt": "2026-11-02T14:10:00Z",
+    "notified": true
+  },
+  "019a3f11-retention": {
+    "title": "Europe PII retention purge for EU tenants",
+    "machine": "gabriel-mac",
+    "project": "privacy-jobs",
+    "owner": "closer",
+    "status": "pr-open",
+    "links": [
+      "https://linear.app/zerofox/issue/EP-1398/europe-pii-retention-purge",
+      "https://github.com/riskive/privacy-jobs/pull/318"
+    ],
+    "reason": "tracking",
+    "decision": null,
+    "since": "2026-10-30T18:00:00Z",
+    "updatedAt": "2026-11-03T09:20:00Z",
+    "notified": false
+  },
+  "019a3f12-deploy": {
+    "title": "Deploy ep-api 4.12 to prod",
+    "machine": "gabriel-mac",
+    "project": "ep-api",
+    "owner": "closer",
+    "status": "waiting-on-others",
+    "links": [
+      "https://linear.app/zerofox/issue/EP-1405/deploy-ep-api-4-12",
+      "https://github.com/riskive/ep-api/pull/2231"
+    ],
+    "reason": "tracking",
+    "decision": null,
+    "followUp": "Waiting on the SRE deploy window on Thursday.",
+    "since": "2026-11-01T12:00:00Z",
+    "updatedAt": "2026-11-03T08:00:00Z",
+    "notified": false
+  },
+  "019a3f13-scim": {
+    "title": "Okta SCIM group sync",
+    "machine": "gabriel-mac",
+    "project": "identity",
+    "owner": "closer",
+    "status": "running",
+    "links": ["https://linear.app/zerofox/issue/EP-1420/okta-scim-group-sync"],
+    "reason": "tracking",
+    "decision": null,
+    "since": "2026-11-03T10:30:00Z",
+    "updatedAt": "2026-11-03T10:30:00Z",
+    "notified": false
+  },
+  "019a3f14-dag": {
+    "title": "Airflow retries for the nightly feed DAG",
+    "machine": "gabriel-mac",
+    "project": "data-pipelines",
+    "owner": "closer",
+    "status": "kept-open",
+    "links": ["https://linear.app/zerofox/issue/EP-1377/airflow-nightly-feed-retries"],
+    "reason": "tracking",
+    "decision": null,
+    "since": "2026-10-20T16:00:00Z",
+    "updatedAt": "2026-10-28T16:00:00Z",
+    "notified": false
+  }
+}

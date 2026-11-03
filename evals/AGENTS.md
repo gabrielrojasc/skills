@@ -13,6 +13,11 @@ prompts the way the user would ask, without naming the skill. Give each skill
 at least one positive case, and add a near miss wherever a sibling skill or a
 plain answer competes for the prompt.
 
+When a skill should load for a near miss but keep its reply narrow, grade the
+reply instead: `regex` graders with `match: contains` or `not_contains` check
+the final message for names from a fixture, with flags `i` and `s` only, so
+`lib/codex.py` grades them the same way.
+
 Name a case `hard-*` when a realistic request makes the trigger hard to see:
 the skill is one step of a larger task, the clue is only in the working
 directory, or the request is terse. A case puts files in the working directory

@@ -102,9 +102,9 @@ originals stay the versions for the user's own sessions.
   the user to send.
 - [`grok-rewrite-it`](skills/bots/grok-rewrite-it/SKILL.md) is `rewrite-it`
   for Grok Bot, with the user's Writing rules and `unslop` inlined.
-- [`my-plate`](skills/bots/my-plate/SKILL.md) lists a bot's own open items,
-  its threads from the bots' shared ledger and the user's Linear issues in its
-  lane, grouped by whether they wait on the user. It reads only.
+- [`open-items`](skills/bots/open-items/SKILL.md) lists a bot's own open
+  items, its threads from the bots' shared ledger and the user's Linear issues
+  in its lane, grouped by whether they wait on the user. It reads only.
 
 Sources that shaped these skills are listed in [REFERENCES.md](REFERENCES.md).
 

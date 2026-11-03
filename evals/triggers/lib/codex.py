@@ -5,12 +5,14 @@
 
 Codex has no Skill tool: it loads a skill by reading its SKILL.md. Each read of
 `.../<name>/SKILL.md` counts as one `skills:<name>` call, so the cases' Claude
-graders apply unchanged. Each run gets a private HOME and CODEX_HOME holding only
-the skills linked in --skills (default ../skills) and auth, so the user's other
-skills, AGENTS.md, and config stay out. A case's scaffold script fills the run's
-working directory first. The model and reasoning effort come from the user's
-config. Runs are read-only, have no connectors, plugins, or web search, and stop
-after MAX_ACTIONS tool calls, or the case's max_turns if higher, like the Claude
+graders apply unchanged. A `regex` grader checks the final reply, as in Claude,
+with the `i` and `s` flags; a run cut off by the action cap has no final reply.
+Each run gets a private HOME and CODEX_HOME holding only the skills linked in
+--skills (default ../skills) and auth, so the user's other skills, AGENTS.md,
+and config stay out. A case's scaffold script fills the run's working directory
+first. The model and reasoning effort come from the user's config. Runs are
+read-only, have no connectors, plugins, or web search, and stop after
+MAX_ACTIONS tool calls, or the case's max_turns if higher, like the Claude
 cases' turn cap.
 """
 
@@ -47,6 +49,30 @@ def frontmatter(path):
     return fields, body.strip()
 
 
+def regex_grader(path, fields):
+    flags = fields.get("flags", "")
+    if fields.get("target", "last_message") != "last_message" or set(flags) - set("is") \
+            or fields.get("match", "contains") not in ("contains", "not_contains"):
+        sys.exit(f"error: {path}: Codex runs regex graders on last_message with flags i and s, "
+                 "matching contains or not_contains")
+    compiled = re.compile(fields["pattern"], (re.I if "i" in flags else 0) | (re.S if "s" in flags else 0))
+    return {"name": path.stem, "regex": compiled, "contains": fields.get("match", "contains") == "contains"}
+
+
+def grade(grader, calls, final):
+    if "regex" in grader:
+        if not final:
+            return False, "no final reply"
+        found = grader["regex"].search(final)
+        expected = "contains" if grader["contains"] else "does not contain"
+        return grader["contains"] == bool(found), \
+            f"final reply {expected} /{grader['regex'].pattern}/" + (f"; found {found.group(0)!r}" if found else "")
+    count = sum(1 for call in calls if grader["pattern"].search(call))
+    high = grader["max"]
+    passed = grader["min"] <= count and (high is None or count <= high)
+    return passed, f"Skill called {count}x (expected {grader['min']}..{'∞' if high is None else high})"
+
+
 def load_cases(pattern):
     cases = []
     for prompt in sorted((HERE / "evals").glob("*/prompt.md")):
@@ -56,8 +82,11 @@ def load_cases(pattern):
         graders = []
         for path in sorted((prompt.parent / "graders").glob("*.md")):
             fields, _ = frontmatter(path)
+            if fields.get("type") == "regex":
+                graders.append(regex_grader(path, fields))
+                continue
             if fields.get("type") != "tool_used" or fields.get("tool") != "Skill":
-                sys.exit(f"error: {path}: only tool_used Skill graders run in Codex")
+                sys.exit(f"error: {path}: only tool_used Skill and regex graders run in Codex")
             graders.append({
                 "name": path.stem,
                 "pattern": re.compile(fields["input_match"]),
@@ -107,7 +136,7 @@ def run(case, run_dir, env, model_args):
     # `codex exec` can hang without output or fail on capacity, so a timer
     # enforces the deadline and such runs are retried instead of graded.
     for attempt in range(1, ATTEMPTS + 1):
-        reads, actions, error = [], 0, None
+        reads, actions, error, last_message, final = [], 0, None, "", ""
         start = time.monotonic()
         # An empty directory outside out/ keeps Codex from finding other runs'
         # prompts and traces when it searches upward.
@@ -126,13 +155,18 @@ def run(case, run_dir, env, model_args):
                     trace.flush()
                     event = json.loads(line)
                     item = event.get("item") or {}
+                    if event.get("type") == "item.completed" and item.get("type") == "agent_message":
+                        last_message = item.get("text") or ""
                     if event.get("type") == "item.started":
                         reads += SKILL_READ.findall(item.get("command") or "")
                         actions += 1
                     if event.get("type") == "turn.failed":
                         error = event["error"]["message"]
                         break
-                    if actions >= case["max_actions"] or event.get("type") == "turn.completed":
+                    if event.get("type") == "turn.completed":
+                        final = last_message
+                        break
+                    if actions >= case["max_actions"]:
                         break
                 else:
                     # Codex can exit without turn.failed, e.g. on a startup error.
@@ -149,12 +183,10 @@ def run(case, run_dir, env, model_args):
     calls = [f"skills:{name}" for name in reads]
     graders = []
     for grader in case["graders"]:
-        count = sum(1 for call in calls if grader["pattern"].search(call))
-        high = grader["max"]
-        passed = grader["min"] <= count and (high is None or count <= high)
-        graders.append({"name": grader["name"], "passed": passed,
-                        "explanation": f"Skill called {count}x (expected {grader['min']}..{'∞' if high is None else high})"})
+        passed, explanation = grade(grader, calls, final)
+        graders.append({"name": grader["name"], "passed": passed, "explanation": explanation})
     result = {"case": case["name"], "skills": calls, "actions": actions, "error": error,
+              "final_reply": final,
               "seconds": round(time.monotonic() - start), "graders": graders,
               "passed": error is None and all(g["passed"] for g in graders)}
     (run_dir / "result.json").write_text(json.dumps(result, indent=2) + "\n")
