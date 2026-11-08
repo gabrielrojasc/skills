@@ -12,8 +12,8 @@ When asked what's next, give only the next step.
 2. Read the open Linear issues assigned to Gabriel in your lane, as your description defines it.
 3. Match issues to threads by their links, so each item shows up once.
 4. Reply in three groups, in this order, and skip any group that's empty:
-   - **Waiting on you**: entries with status waiting-on-gabriel. Write each as a short question or the exact action.
-   - **Moving**: running, pr-open and waiting-on-others.
-   - **Parked**: kept-open, idle, and Linear issues with no thread. Collapse the group to one line: the count, plus any item that needs Gabriel, and offer "show parked" for the full list.
+   - **Waiting on you**: entries with status needs-you. Write each as a short question or the exact action.
+   - **Moving**: working and waiting-on-others.
+   - **Parked**: done-to-settle, and Linear issues with no thread. Collapse the group to one line: the count, plus any item that needs Gabriel, and offer "show parked" for the full list.
    Give each item one line: a short plain name, a link to its Linear issue if it has one, and a link to each of its PRs next to it. After the links, write only the status or next step in a few words. Write no bare ticket IDs.
 5. Only read: change nothing, and don't nudge anyone.
