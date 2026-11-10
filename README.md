@@ -41,9 +41,9 @@ installation, updates, and lock tracking.
   GitHub review threads, top-level comments, and review bodies by default,
   handles routine fixes, replies, and resolutions on its own, and raises only
   the decisions that need the user's judgment.
-- [`babysit-pr`](skills/babysit-pr/SKILL.md) fixes review feedback and the CI
-  failures a PR causes in rounds through `gh-review-comments`, lists failures
-  already on the base as follow-ups, pushes once per round, and hands the PR
+- [`babysit-pr`](skills/babysit-pr/SKILL.md) fixes review feedback and every
+  failed check on a PR in rounds through `gh-review-comments`, including
+  checks that also fail on the base, pushes once per round, and hands the PR
   back as merge-ready, waiting on people, or blocked.
 - [`full-stop`](skills/full-stop/SKILL.md) takes a change to a merge-ready PR
   while the user isn't watching: it proves the change, runs `cross-review`,

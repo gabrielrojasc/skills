@@ -8,11 +8,11 @@ description: Use when asked to babysit a GitHub PR.
 Fix review feedback and CI failures in rounds until each PR reaches an end
 state. This skill runs unattended. A stack runs as one loop, bottom up.
 
-1. Call `watch_pull_request` on each PR. Run the first round right away, then
-   end your turn after each round until a wake starts the next. On a wake,
-   wait in the background until every check that isn't gated finishes. A
-   gated check belongs to a workflow run that waits on maintainer approval,
-   which `gh run list --commit <head-sha> --status action_required` or
+1. Call `watch_pull_request` on each PR. Run the first round right away and
+   another on each wake, without waiting for running checks. End your turn
+   after each round until a wake starts the next. A gated check belongs to a
+   workflow run that waits on maintainer approval, which
+   `gh run list --commit <head-sha> --status action_required` or
    `--status waiting` lists. Leave gated checks to the user; they are neither
    pending nor failed.
 2. At the start of each round, read `isInMergeQueue` and `autoMergeRequest`
@@ -26,11 +26,11 @@ state. This skill runs unattended. A stack runs as one loop, bottom up.
    answers to that PR's next round.
 4. Handle the feedback with `gh-review-comments`, and leave its push to
    step 7.
-5. Fix each failed check the PR causes. A check that also failed on the base
-   head, as `gh api repos/<owner>/<repo>/commits/<base-sha>/check-runs` shows,
-   is a follow-up: list it and leave it unfixed. Rerun a transient failure
-   once, and raise it if it repeats. Raise a fix that goes beyond the PR's
-   purpose or rests on an assumption.
+5. Fix every failed check on the PR's head, including one that also fails on
+   the base head. A CI repair counts as part of the PR's purpose. Rerun a
+   transient failure once, and raise it if it repeats. Raise a fix that
+   changes product behavior beyond the PR's purpose or rests on an
+   assumption.
 6. Rebase onto the base when the PR conflicts with it or `mergeStateStatus` is
    `BEHIND`. When nothing else is left, also rebase if base commits since the
    last round's base SHA touch files the PR changes. Raise a conflict whose
@@ -46,13 +46,13 @@ Stop when each PR reaches one of these states on its current head. List
 unresolved threads with the `gh-review-comments` fetch script and
 `--threads-only`.
 
-- **Merge-ready:** `mergeStateStatus` is `CLEAN`, or `UNSTABLE` only from
-  follow-up failures, and no unresolved thread is left except ones the user
-  kept open.
-- **Waiting on people:** only approvals, gated runs, requested reviewers, or
-  draft state remain.
-- **Blocked:** a follow-up failure fails a required check, a round repeats a
-  fix an earlier round tried for the same request or error, or something else
+- **Merge-ready:** `mergeStateStatus` is `CLEAN` and no unresolved thread is
+  left except ones the user kept open.
+- **Waiting on people:** every check that isn't gated has finished without a
+  failure, and only approvals, gated runs, requested reviewers, or draft
+  state remain.
+- **Blocked:** a failed check needs the user, a round repeats a fix an
+  earlier round tried for the same request or error, or something else
   remains that this loop can't fix. Reruns of transient failures follow
   step 5.
 
