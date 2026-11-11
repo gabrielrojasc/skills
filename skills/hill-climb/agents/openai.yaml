@@ -1,0 +1,5 @@
+interface:
+  display_name: "Hill-climb"
+  short_description: "Use when asked to hill climb work against an eval."
+policy:
+  allow_implicit_invocation: true

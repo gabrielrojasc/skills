@@ -66,6 +66,10 @@ installation, updates, and lock tracking.
   round, repeats until a round leaves nothing to fix within a budget of 3
   rounds, or 5 for risky changes, and then pushes and records the reviewer's
   verdict in the PR.
+- [`hill-climb`](skills/hill-climb/SKILL.md) improves work in rounds against a
+  frozen eval, a measured command or a rubric scored by fresh Claude and Codex
+  reviewers, until it meets an agreed target or stalls, then runs a second
+  pass that trims it while holding the score.
 - [`computer-use`](skills/computer-use/SKILL.md) drives the user's signed-in
   browser and native apps: Claude through Claude in Chrome, Codex through
   browser use and Computer Use, and Claude hands native apps to Codex.
