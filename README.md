@@ -70,9 +70,6 @@ installation, updates, and lock tracking.
   frozen eval, a measured command or a rubric scored by fresh Claude and Codex
   reviewers, until it meets an agreed target or stalls, then runs a second
   pass that trims it while holding the score.
-- [`computer-use`](skills/computer-use/SKILL.md) drives the user's signed-in
-  browser and native apps: Claude through Claude in Chrome, Codex through
-  browser use and Computer Use, and Claude hands native apps to Codex.
 - [`slack-message`](skills/slack-message/SKILL.md) writes Slack messages in the
   user's style with Slack markup, and uses standard Markdown when posting
   through the Slack connector.
