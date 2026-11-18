@@ -79,8 +79,8 @@ version. If its regression check fails or it can't be scored, stop and report.
      the user-level Multi-agent work section says. Give both the frozen brief,
      the file path and sha256, the frozen inputs, and the rubric, and nothing
      else. For UI, add fresh renders at 1440px and 390px wide. Ask both to
-     confirm the sha256 and quote each blocker or say "none". Also ask the grader
-     for a strict score and reason per criterion.
+     confirm the sha256 and quote each blocker or say "none". Also ask the
+     grader for a strict score and reason per criterion.
    - A review is valid when it has all of that. Replace an invalid grader or
      reviewer once, and use the first valid review from each. If the
      replacement also fails, the round is unscored.
