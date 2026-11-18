@@ -45,9 +45,11 @@ installation, updates, and lock tracking.
   failed check on a PR in rounds through `gh-review-comments`, including
   checks that also fail on the base, pushes once per round, and hands the PR
   back as merge-ready, waiting on people, or blocked.
-- [`full-stop`](skills/full-stop/SKILL.md) takes a change to a merge-ready PR
-  while the user isn't watching: it proves the change, runs `cross-review`,
-  files the PR, runs `babysit-pr`, and leaves the merge to the user.
+- [`full-stop`](skills/full-stop/SKILL.md) takes a change, while the user
+  isn't watching, to a PR that Fable calls ready to merge and deploy: it
+  proves the change, runs `cross-review`, files the PR, runs `babysit-pr`,
+  loops on Fable's findings with Astra's review as input, and leaves the
+  merge and deploy to the user.
 - [`test-plan`](skills/test-plan/SKILL.md) lists the ways a feature could fail
   in prod, plans a check for each, probes which checks the agent's current
   access can run, and asks for the access the rest need. It plans end-to-end
