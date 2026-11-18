@@ -15,7 +15,7 @@ Before round 0, agree these terms with the user:
 - The eval. A measurement is a command that prints a number, such as p99 latency
   or tests passed; say whether lower or higher is better. A graded review uses a
   full written rubric.
-- The target, such as "9.5 or higher from both reviewers on every criterion".
+- The target, such as "9.5 or higher from the grader on every criterion".
 - The guardrails that must not regress, and the regression check that tests
   them.
 - The stall count: rounds in a row without a gain that end a pass. Default 2.
@@ -37,8 +37,8 @@ to only trim skips pass one. Each pass has its own round 0.
 
 Before round 0, save these next to the revision log and log each sha256:
 
-- the rubric and the reviewer brief
-- each reviewer's model and effort
+- the rubric and the brief
+- the grader's and the Codex reviewer's model and effort
 - the regression check
 - every input that is not the work, such as reviewer sources, tests, or fixtures
 - the commands for a measurement, the pass two measure, or UI renders
@@ -75,46 +75,49 @@ version. If its regression check fails or it can't be scored, stop and report.
      cleanly and prints one number. The result is the median. The spread is the
      gap between round 0's highest and lowest runs. With fewer than three valid
      runs, the round is unscored.
-   - Graded review: start two fresh reviewers, one Claude and one Codex, as the
-     user-level Multi-agent work section says. Give both the frozen brief, the
-     file path and sha256, the frozen inputs, and the rubric, and nothing else.
-     For UI, add fresh renders at 1440px and 390px wide. Ask each to confirm the
-     sha256, give a strict score and reason per criterion, and quote each
-     blocker or say "none".
-   - A review is valid when it has all of that. Replace an invalid reviewer
-     once, and use the first valid review from each. If the replacement also
-     fails, the round is unscored.
+   - Graded review: start a fresh Claude grader and a fresh Codex reviewer, as
+     the user-level Multi-agent work section says. Give both the frozen brief,
+     the file path and sha256, the frozen inputs, and the rubric, and nothing
+     else. For UI, add fresh renders at 1440px and 390px wide. Ask both to
+     confirm the sha256 and quote each blocker or say "none". Also ask the grader
+     for a strict score and reason per criterion.
+   - A review is valid when it has all of that. Replace an invalid grader or
+     reviewer once, and use the first valid review from each. If the
+     replacement also fails, the round is unscored.
+   - Send the Codex reviewer's blockers to the grader, which upholds or rejects
+     each with a reason. Only the grader's blockers and the ones it upholds
+     count.
 5. Log the round:
    - the pass and round number, the changes, the sha256, and the regression
      output
-   - each reviewer's scores, reasons, and blockers exactly as given, or the
-     measured runs
+   - the grader's scores and reasons, every blocker exactly as given, and the
+     grader's ruling on each Codex blocker, or the measured runs
    - the floor and total or the result, and the pass two measure
    - whether the round was accepted and why, and the stall count
 
 ## Accepting a round
 
-For a graded review, the floor is the lowest score any reviewer gave on any
-criterion, and the total is the sum of all scores. A blocker is new when this
-round's changes caused it. Decide that from the diff against the last accepted
-version, and log the lines you relied on. A blocker a reviewer quoted on the
-last accepted version is not new.
+For a graded review, the floor is the grader's lowest score on any criterion,
+and the total is the sum of its scores. A blocker counts as defined in Score it,
+and is new when this round's changes caused it. Decide that from the diff
+against the last accepted version, and log the lines you relied on. A blocker
+quoted on the last accepted version is not new.
 
 A round is accepted only when it was scored, the regression check passes, no new
 blocker appears, and it has one of these:
 
 - A gain over the last accepted version.
   - Graded, pass one: the floor rises, or holds while the total rises by 2 or
-    more. No criterion's lowest score drops.
+    more. No criterion's score drops.
   - Measurement, pass one: the result beats the last accepted result by more
     than the spread.
   - Pass two: the measure moves toward its goal and the score holds. For a
-    graded review, each criterion's lowest score stays at or above its score in
+    graded review, each criterion's score stays at or above its score in
     the pass's round 0. A measurement stays within the spread of its round 0
     result, or better.
 - An error fix, proved by its new regression case.
-- A blocker fix: it clears a logged blocker that no reviewer raises again, and
-  no criterion's lowest score drops.
+- A blocker fix: it clears a logged blocker that doesn't come back as a counted
+  blocker, and no criterion's score drops.
 
 An accepted round becomes the accepted version. An accepted gain resets the
 stall count. Any other round adds one, fix and unscored rounds included.
@@ -137,6 +140,6 @@ scores. If it can't be scored, report the target as unconfirmed.
 ## Report
 
 At the end of each pass, lead with whether the target was met. Then give the
-final file path and sha256, the final scores with each reviewer's reasons, the
+final file path and sha256, the final scores with the grader's reasons, the
 regression output, and the revision log path. Quote every open blocker. After a
 stall, also give the floor or result per round, what's left, and why it stalled.

@@ -69,9 +69,10 @@ installation, updates, and lock tracking.
   rounds, or 5 for risky changes, and then pushes and records the reviewer's
   verdict in the PR.
 - [`hill-climb`](skills/hill-climb/SKILL.md) improves work in rounds against a
-  frozen eval, a measured command or a rubric scored by fresh Claude and Codex
-  reviewers, until it meets an agreed target or stalls, then runs a second
-  pass that trims it while holding the score.
+  frozen eval, a measured command or a rubric scored by a fresh Claude grader
+  that also rules on a Codex reviewer's blockers, until it meets an agreed
+  target or stalls, then runs a second pass that trims it while holding the
+  score.
 - [`slack-message`](skills/slack-message/SKILL.md) writes Slack messages in the
   user's style with Slack markup, and uses standard Markdown when posting
   through the Slack connector.

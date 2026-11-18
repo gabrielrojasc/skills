@@ -150,8 +150,10 @@ at the head, the threads, the standards, and, for Spec, the ticket. It reads
 the report and primary sources only, and returns `confirmed`, `revised` with a
 corrected draft, or `refuted`, each with one line of evidence. It never refutes
 a finding for being small. It checks each simpler route the same way: the code
-or feature it names exists at the head and keeps the required behavior. Drop
-refuted findings and routes, with their reasons, into `triage.md`.
+or feature it names exists at the head and keeps the required behavior. It
+confirms the reviewer's risk rating or corrects it with a reason per path, and
+Triage and Submit use the verified rating. Drop refuted findings and routes,
+with their reasons, into `triage.md`.
 
 Set the event from confirmed findings, pre-existing ones excluded:
 `REQUEST_CHANGES` for any `issue (blocking)`; otherwise `COMMENT` for a
