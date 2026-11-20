@@ -3,5 +3,5 @@ max_turns: 3
 allowed_tools: [Skill]
 ---
 
-These twelve support tickets each need a label: bug, feature request, or
-question. Fable judge.
+Label these twelve support tickets as bug, feature request, or question,
+fable judge

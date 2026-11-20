@@ -3,5 +3,5 @@ max_turns: 3
 allowed_tools: [Skill]
 ---
 
-Here's the reply I'm about to send: "We'll ship the fix Friday after QA signs
-off." Does fable agree with this reply?
+The two alert-queue PRs have green CI and one approval each. Ask fable to
+judge if the PRs are ready to merge.
