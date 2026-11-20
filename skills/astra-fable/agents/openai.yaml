@@ -1,5 +1,5 @@
 interface:
   display_name: "Astra and Fable"
-  short_description: "Use when asked for Astra's and Fable's opinions."
+  short_description: "Use when told 'fable judge'."
 policy:
   allow_implicit_invocation: true

@@ -1,6 +1,6 @@
 ---
 name: astra-fable
-description: Use when asked for Astra's and Fable's opinions.
+description: Use when told 'fable judge'.
 ---
 
 # Astra and Fable
