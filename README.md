@@ -73,6 +73,9 @@ installation, updates, and lock tracking.
   that also rules on a Codex reviewer's blockers, until it meets an agreed
   target or stalls, then runs a second pass that trims it while holding the
   score.
+- [`astra-fable`](skills/astra-fable/SKILL.md) asks Astra and Fable in
+  parallel, has a fresh Fable judge both answers and make the call, and
+  repeats the round when asked to iterate.
 - [`slack-message`](skills/slack-message/SKILL.md) writes Slack messages in the
   user's style with Slack markup, and uses standard Markdown when posting
   through the Slack connector.
