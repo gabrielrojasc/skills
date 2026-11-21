@@ -19,7 +19,7 @@ plan is throwaway.
    integration tests in CI already catch.
 3. Probe each place a check could run with one cheap read-only call: the local
    app, each environment's Grafana MCP, databases through
-   `catalog-guided-db-access`, the browser through `agent-browser`, flag and
+   `catalog-guided-db-access`, the browser through `playwright-cli`, flag and
    deploy tooling, test accounts, and third-party sandboxes. Unprobed access
    counts as missing.
 4. For every risk you won't accept, plan an end-to-end check, as the user-level
