@@ -41,6 +41,9 @@ it touched.
   and branch names the review and Linear skills use.
 - [mattpocock/skills](https://github.com/mattpocock/skills). General research,
   spec, TDD, and review skills, installed upstream instead of copied here.
+- [cursor/plugins `pstack`](https://github.com/cursor/plugins/tree/main/pstack)
+  (Lauren Tan, MIT). The `unslop` rules. The bot skill `unslop` copies them
+  for Grok Bot, because a box can't install the original.
 
 ## Earlier artifact-first workflow
 
