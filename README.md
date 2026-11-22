@@ -108,10 +108,8 @@ originals stay the versions for the user's own sessions.
   `slack-message` for Grok Bot. It replies with the draft in Slack markup for
   the user to send.
 - [`grok-rewrite-it`](skills/bots/grok-rewrite-it/SKILL.md) is `rewrite-it`
-  for Grok Bot, with the user's Writing rules inlined.
-- [`unslop`](skills/bots/unslop/SKILL.md) is a copy of the `unslop` rules for
-  Grok Bot, which the bots' Writing rules and `grok-rewrite-it` apply. It keeps
-  the original's name because those Writing rules name it.
+  for Grok Bot, with the user's Writing rules inlined. It loads `unslop`, which
+  the bots get from its upstream.
 - [`open-items`](skills/bots/open-items/SKILL.md) lists a bot's own open
   items, its threads from the bots' shared ledger and the user's Linear issues
   in its lane, grouped by whether they wait on the user. It reads only.
