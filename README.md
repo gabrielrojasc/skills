@@ -111,8 +111,8 @@ originals stay the versions for the user's own sessions.
   for Grok Bot, with the user's Writing rules inlined. It loads `unslop`, which
   the bots get from its upstream.
 - [`open-items`](skills/bots/open-items/SKILL.md) lists a bot's own open
-  items, its threads from the bots' shared ledger and the user's Linear issues
-  in its lane, grouped by whether they wait on the user. It reads only.
+  items, its threads from the bots' shared ledger and what it tracks in its own
+  chat or memory, grouped by whether they wait on the user. It reads only.
 - [`anything-open-or-settle`](skills/bots/anything-open-or-settle/SKILL.md)
   runs only when `anything-open-or-settle` is written. It reads a T3 thread for
   follow-ups, errors, and open considerations, and raises them before the
