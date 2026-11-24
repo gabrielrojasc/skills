@@ -25,10 +25,12 @@ PR or a closed issue, says one piece finished, not that nothing is left.
    - an open linked PR, or a branch, worktree, or temporary resource it left;
    - anything it asks Gabriel to consider.
 3. Raise the open items first, one line each with its link, even past a bot's
-   nudge limit. T3 Tots gives them, or that it checked and found none, or that
-   it couldn't read the thread, to whoever asked, Gabriel or a bot, or else to
-   the thread's owning bot with the settle question. In a turn Gabriel didn't
-   start, it messages him about nothing.
+   nudge limit. Number them, and keep counting through the whole message, even
+   across sections or threads. Leave a blank line before each list, or Markdown
+   joins it to the line above. T3 Tots gives them, or that it checked and found
+   none, or that it couldn't read the thread, to whoever asked, Gabriel or a
+   bot, or else to the thread's owning bot with the settle question. In a turn
+   Gabriel didn't start, it messages him about nothing.
 4. Then ask whether to settle the thread, keep it open, or file follow-ups
    first, with your pick. Pick keep open when an open item is work the thread
    was asked to finish. With nothing open, say you checked, then ask. If T3 Tots

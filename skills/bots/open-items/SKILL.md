@@ -11,11 +11,16 @@ When asked what's next, give only the next step.
 1. Read `/home/box/t3-tots/unsettled-threads.json` and keep only the entries whose `owner` is you.
 2. Add the items you track in your own chat or memory that aren't on the
    ledger, such as a promise or a question you asked. Leave out an issue you
-   only listed for him from Linear. Mark each "chat only", and put it where its state fits: one that needs Gabriel in Waiting on you,
+   only listed for him from Linear. Mark each "chat only",
+   and put it where its state fits: one that needs Gabriel in Waiting on you,
    one in progress in Moving, and one that's done in Parked.
 3. Reply in three groups, in this order, and skip any group that's empty:
    - **Waiting on you**: entries with status needs-you. Write each as a short question or the exact action.
    - **Moving**: working and waiting-on-others.
-   - **Parked**: done-to-settle. Collapse the group to one line: the count, plus any item that needs Gabriel, and offer "show parked" for the full list.
-   Give each item one line: a short plain name, a link to its Linear issue if it has one, and a link to each of its PRs next to it. After the links, write only the status or next step in a few words. Write no bare ticket IDs.
+   - **Parked**: done-to-settle. Collapse the group to one line with the count, list under it only the items that need Gabriel, and offer "show parked" for the full list.
+   Number every item you write out, such as `1.`, and keep counting through the
+   whole message: when Waiting on you ends at 3, Moving starts at 4. Leave a
+   blank line between a group's own line and its first item, or Markdown joins
+   them. A group's own line and the Parked count get no number.
+   Give each item one line: its number, a short plain name, a link to its Linear issue if it has one, and a link to each of its PRs next to it. After the links, write only the status or next step in a few words. Write no bare ticket IDs.
 4. Only read: change nothing, and don't nudge anyone.
