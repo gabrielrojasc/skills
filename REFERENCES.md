@@ -8,9 +8,8 @@ it touched.
 - [When to fold subagents into your main agent loop](https://claude.com/resources/articles/building-agents-when-to-fold-subagents-into-your-main-agent-loop)
   (Anthropic). Default to one agent loop with skills. Keep a subagent only for
   parallel work that needs a fresh context, independent verification, or a
-  context the main loop would bloat. Shaped the subagent rule in `AGENTS.md`,
-  the dismissal check in `gh-review-comments`, and the readers in
-  `chief-of-staff`.
+  context the main loop would bloat. Shaped the subagent rule in `AGENTS.md`
+  and the dismissal check in `gh-review-comments`.
 - [Solving code review at Anthropic](https://claude.dev/blog/solving-code-review-at-anthropic/)
   (Anthropic). Parallel bug hunters, a separate group that votes on each
   finding, and filters that drop style and cleanup findings. After three
@@ -32,8 +31,9 @@ it touched.
 - [These 3 skills changed my life](https://youtu.be/5Bmp9cz1JN8) (Theo) and
   [t3dotgg/tstack](https://github.com/t3dotgg/tstack). Model-invokable skills
   with trigger-only descriptions that chain by phrase, and the `full-stop`,
-  `babysit-pr`, `sol-loop`, and `file-pr` workflows. Shaped `full-stop`,
-  `babysit-pr`, `cross-review`, and the description rules in `AGENTS.md`.
+  `babysit-pr`, `sol-loop`, `council`, and `file-pr` workflows. Shaped
+  `full-stop`, `babysit-pr`, `cross-review`, `council`, and the description
+  rules in `AGENTS.md`.
 - [Google developer documentation style guide](https://developers.google.com/style/).
   The editorial reference behind `developer-documentation-style`.
 - [Conventional Comments](https://conventionalcomments.org/) and

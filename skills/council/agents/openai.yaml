@@ -1,0 +1,5 @@
+interface:
+  display_name: "Council"
+  short_description: "Use when the user explicitly writes 'council'."
+policy:
+  allow_implicit_invocation: true

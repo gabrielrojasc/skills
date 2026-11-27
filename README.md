@@ -68,20 +68,12 @@ installation, updates, and lock tracking.
   round, repeats until a round leaves nothing to fix within a budget of 3
   rounds, or 5 for risky changes, and then pushes and records the reviewer's
   verdict in the PR.
-- [`hill-climb`](skills/hill-climb/SKILL.md) improves work in rounds against a
-  frozen eval, a measured command or a rubric scored by a fresh Claude grader
-  that also rules on a Codex reviewer's blockers, until it meets an agreed
-  target or stalls, then runs a second pass that trims it while holding the
-  score.
-- [`astra-fable`](skills/astra-fable/SKILL.md) asks Astra and Fable in
-  parallel, has a fresh Fable judge both answers and make the call, and
-  repeats the round when asked to iterate.
+- [`council`](skills/council/SKILL.md) asks Astra, Fable, and Neon in parallel,
+  has a fresh Fable judge their answers and make the call, and iterates with
+  scores, regression, and stall guardrails when asked.
 - [`slack-message`](skills/slack-message/SKILL.md) writes Slack messages in the
   user's style with Slack markup, and uses standard Markdown when posting
   through the Slack connector.
-- [`chief-of-staff`](skills/chief-of-staff/SKILL.md) tracks the user's open T3
-  threads, opens each update with a GitHub stat panel from its `glance` script,
-  and ranks what needs the user, with links to each chat.
 - [`rewrite-it`](skills/rewrite-it/SKILL.md) rewrites text the user points at,
   or the last reply, after rereading the user's Writing rules and `unslop`.
 
